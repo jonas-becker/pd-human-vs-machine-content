@@ -24,6 +24,7 @@ from sklearn.decomposition import PCA
 from numpy import reshape
 import seaborn as sns
 import pandas as pd  
+import plotly.express as px
 
 df = pd.read_json(os.path.join(OUT_DIR, FORMATTED_DATA_FILENAME), orient = "index")
 df[TEXTEMBED1] = None
@@ -47,9 +48,12 @@ print("Model running on " + device)
 #Check for paraphrase with fuzzy based
 t1_embeddings = []
 t2_embeddings = []
-print("Creating embeddings for each sentence (text1 & text2) and calculating their distances ...")
+embeddings = []
+tokenized_texts = { }
+
+print("Creating embeddings for each sentence (text1 & text2) ...")
 for i, row in tqdm(df.iterrows(), total=df.shape[0]):
-    if i>10:
+    if i>1:
         break
 
     # mark the text with BERT special characters
@@ -68,107 +72,92 @@ for i, row in tqdm(df.iterrows(), total=df.shape[0]):
     t1_tokenized = tokenizer.tokenize(t_1)
     t2_tokenized = tokenizer.tokenize(t_2)
 
+    tokenized_texts[row[ID1]] = {"tokens": t1_tokenized, PARAPHRASE: False, "text_preview": row[TEXT1][:40]}
+    tokenized_texts[row[ID2]] = {"tokens": t2_tokenized, PARAPHRASE: row[PARAPHRASE], "text_preview": row[TEXT2][:40]}
+
+
+for tokenized in tqdm(tokenized_texts):
     # throw out longer that 512 token texts because BERT model struggels to process them
-    if len(t1_tokenized) > 512 or len(t2_tokenized) > 512:
+    if len(tokenized_texts[tokenized]["tokens"]) > 512:
         continue
 
     # map tokens to vocab indices
-    t1_indexed = tokenizer.convert_tokens_to_ids(t1_tokenized)
-    t2_indexed = tokenizer.convert_tokens_to_ids(t2_tokenized)
+    indexed = tokenizer.convert_tokens_to_ids(tokenized_texts[tokenized]["tokens"])
 
-    t1_segments_ids = [1] * len(t1_tokenized)
-    t2_segments_ids = [1] * len(t2_tokenized)
+    segments_ids = [1] * len(tokenized_texts[tokenized]["tokens"])
 
     #Extract Embeddings
-    t1_tensor = torch.tensor([t1_indexed])
-    t1_segments_tensors = torch.tensor([t1_segments_ids])
-    t2_tensor = torch.tensor([t2_indexed])
-    t2_segments_tensors = torch.tensor([t2_segments_ids])
+    tensor = torch.tensor([indexed])
+    segments_tensors = torch.tensor([segments_ids])
 
     # collect all of the hidden states produced from all layers 
     with torch.no_grad():
-        t1_hidden_states = model(t1_tensor, t1_segments_tensors)[2]
-        t2_hidden_states = model(t2_tensor, t2_segments_tensors)[2]
+        hidden_states = model(tensor, segments_tensors)[2]
 
     # Concatenate the tensors for all layers (create a new dimension in the tensor)
-    t1_embeds = torch.stack(t1_hidden_states, dim=0)
-    t2_embeds = torch.stack(t2_hidden_states, dim=0)
+    embeds = torch.stack(hidden_states, dim=0)
 
     # Remove dimension 1, the "batches".
-    t1_embeds = torch.squeeze(t1_embeds, dim=1)
-    t2_embeds = torch.squeeze(t2_embeds, dim=1)
+    embeds = torch.squeeze(embeds, dim=1)
 
     #Switch dimensions
-    t1_embeds = t1_embeds.permute(1,0,2)
-    t2_embeds = t2_embeds.permute(1,0,2)
-
-    # Create Word Vector Representation for all tokens within the sentences
-    '''
-    # Use this for per token embeddings
-    t1_token_vecs = []
-    t2_token_vecs = []
-    for token in t1_embeds:
-        # Concatenate the vectors (that is, append them together) from the last four layers.
-        cat_vec = torch.cat((token[-1], token[-2], token[-3], token[-4]), dim=0)
-        t1_token_vecs.append(cat_vec)
-    for token in t2_embeds:
-        # Concatenate the vectors (that is, append them together) from the last four layers.
-        cat_vec = torch.cat((token[-1], token[-2], token[-3], token[-4]), dim=0)
-        t2_token_vecs.append(cat_vec)
-    '''
+    embeds = embeds.permute(1,0,2)
 
     # Create Sentence Vector Representations (average of all token vectors)
-    text1_embedding = torch.mean(t1_hidden_states[-2][0], dim=0)
-    text2_embedding = torch.mean(t2_hidden_states[-2][0], dim=0)
+    embedding = torch.mean(hidden_states[-2][0], dim=0)
 
-    t1_embeddings.append(np.array(list(text1_embedding)))
-    t2_embeddings.append(np.array(list(text2_embedding)))
+    embeddings.append(np.array(list(embedding)))
 
-    cos_distance = 1 - cosine(text1_embedding, text2_embedding)
+    #cos_distance = 1 - cosine(text1_embedding, text2_embedding)
 
     #df.at[i, TEXTEMBED1] = text1_embedding
     #df.at[i, TEXTEMBED2] = text2_embedding
-    df.at[i, COSINE_DISTANCE] = cos_distance
+    #df.at[i, COSINE_DISTANCE] = cos_distance
+
 
 
 model = TSNE(perplexity=20, n_components=2, init='pca', n_iter=2500, random_state=23)
 np.set_printoptions(suppress=True)
-t1_tsne = model.fit_transform(t1_embeddings)
-t1_coord_x = t1_tsne[:, 0]
-t1_coord_y = t1_tsne[:, 1]
-
-t2_tsne = model.fit_transform(t2_embeddings)
-t2_coord_x = t2_tsne[:, 0]
-t2_coord_y = t2_tsne[:, 1]
+tsne = model.fit_transform(embeddings)
+coord_x = tsne[:, 0]
+coord_y = tsne[:, 1]
 
 
 # Plot sentences
-fig = plt.figure(figsize=(20, 20))
-#ax1 = fig.add_subplot(111)
+fig1 = plt.figure(figsize=(20, 20))
+ax1 = fig1.add_subplot(111)
 
-plt.scatter(t1_coord_x, t1_coord_y, s=100, alpha=.5, color="green", marker='s', label='original')
-plt.scatter(t2_coord_x, t2_coord_y, s=100, alpha=.5, color="blue", marker='o', label='paraphrase')
+plt.scatter(coord_x, coord_y, alpha=.5, color="green", marker='s', label='original')
 
-t1_labels = df[TEXT1].tolist()
-t2_labels = df[TEXT2].tolist()
-for j in range(len(t1_embeddings+t2_embeddings)):
-    if j < len(t1_embeddings):
-        plt.annotate(
-            t1_labels[j][:15],
-            xy=(t1_coord_x[j], t1_coord_y[j]),
-            xytext=(5, 2),
-            textcoords='offset points',
-            ha='right', va='bottom')
-    else:
-        plt.annotate(
-            t2_labels[j-len(t1_embeddings)][:15],
-            xy=(t2_coord_x[j-len(t1_embeddings)], t2_coord_y[j-len(t1_embeddings)]),
-            xytext=(5, 2),
-            textcoords='offset points',
-            ha='right', va='bottom')
+labels = list(tokenized_texts)
+texts = [ tokenized_texts[t]["text_preview"] for t in tokenized_texts ]
+for j in range(len(embeddings)):
+    plt.annotate(
+        labels[j],
+        xy=(coord_x[j], coord_y[j]),
+        xytext=(5, 2),
+        textcoords='offset points',
+        ha='right', va='bottom')
+    
 
+#plt.show()
 
-plt.show()
+print(type(tsne))
+df_embeddings = pd.DataFrame(tsne)
+print(len(df_embeddings))
+df_embeddings = df_embeddings.rename(columns={0:'x',1:'y'})
+df_embeddings = df_embeddings.assign(label= labels)
+# We will also add the unmodified base sentences, to make the visualization easier :
+df_embeddings = df_embeddings.assign(text= texts)
+
+fig = px.scatter(
+    df_embeddings, x='x', y='y',
+    color='label', labels={'color': 'label'},
+    hover_data=['text'], title = 'Embedding Visualization'
+    )
+fig.update_layout(showlegend=False)
+
+fig.show()
 
 
 # Output data
