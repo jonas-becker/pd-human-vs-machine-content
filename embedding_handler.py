@@ -49,7 +49,7 @@ t1_embeddings = []
 t2_embeddings = []
 print("Creating embeddings for each sentence (text1 & text2) and calculating their distances ...")
 for i, row in tqdm(df.iterrows(), total=df.shape[0]):
-    if i>100:
+    if i>10:
         break
 
     # mark the text with BERT special characters
@@ -103,6 +103,8 @@ for i, row in tqdm(df.iterrows(), total=df.shape[0]):
     t2_embeds = t2_embeds.permute(1,0,2)
 
     # Create Word Vector Representation for all tokens within the sentences
+    '''
+    # Use this for per token embeddings
     t1_token_vecs = []
     t2_token_vecs = []
     for token in t1_embeds:
@@ -113,6 +115,7 @@ for i, row in tqdm(df.iterrows(), total=df.shape[0]):
         # Concatenate the vectors (that is, append them together) from the last four layers.
         cat_vec = torch.cat((token[-1], token[-2], token[-3], token[-4]), dim=0)
         t2_token_vecs.append(cat_vec)
+    '''
 
     # Create Sentence Vector Representations (average of all token vectors)
     text1_embedding = torch.mean(t1_hidden_states[-2][0], dim=0)
@@ -130,25 +133,40 @@ for i, row in tqdm(df.iterrows(), total=df.shape[0]):
 
 model = TSNE(perplexity=20, n_components=2, init='pca', n_iter=2500, random_state=23)
 np.set_printoptions(suppress=True)
-tsne = model.fit_transform(t1_embeddings)
-coord_x = tsne[:, 0]
-coord_y = tsne[:, 1]
+t1_tsne = model.fit_transform(t1_embeddings)
+t1_coord_x = t1_tsne[:, 0]
+t1_coord_y = t1_tsne[:, 1]
 
-print(coord_x)
-print(coord_y)
+t2_tsne = model.fit_transform(t2_embeddings)
+t2_coord_x = t2_tsne[:, 0]
+t2_coord_y = t2_tsne[:, 1]
 
-labels = df[TEXT1].tolist()
+
 # Plot sentences
-plt.figure(figsize=(20, 20))
-plt.scatter(coord_x, coord_y, s=100,alpha=.5)
+fig = plt.figure(figsize=(20, 20))
+#ax1 = fig.add_subplot(111)
 
-for j in range(len(t1_embeddings)):
-    plt.annotate(
-        labels[j][:19],
-        xy=(coord_x[j], coord_y[j]),
-        xytext=(5, 2),
-        textcoords='offset points',
-        ha='right', va='bottom')
+plt.scatter(t1_coord_x, t1_coord_y, s=100, alpha=.5, color="green", marker='s', label='original')
+plt.scatter(t2_coord_x, t2_coord_y, s=100, alpha=.5, color="blue", marker='o', label='paraphrase')
+
+t1_labels = df[TEXT1].tolist()
+t2_labels = df[TEXT2].tolist()
+for j in range(len(t1_embeddings+t2_embeddings)):
+    if j < len(t1_embeddings):
+        plt.annotate(
+            t1_labels[j][:15],
+            xy=(t1_coord_x[j], t1_coord_y[j]),
+            xytext=(5, 2),
+            textcoords='offset points',
+            ha='right', va='bottom')
+    else:
+        plt.annotate(
+            t2_labels[j-len(t1_embeddings)][:15],
+            xy=(t2_coord_x[j-len(t1_embeddings)], t2_coord_y[j-len(t1_embeddings)]),
+            xytext=(5, 2),
+            textcoords='offset points',
+            ha='right', va='bottom')
+
 
 plt.show()
 
