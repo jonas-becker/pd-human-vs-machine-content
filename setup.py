@@ -20,3 +20,5 @@ WORDVECS2 = "word_vectors_2"
 TEXTEMBED1 = "text_embedding_1" 
 TEXTEMBED2 = "text_embedding_2"
 COSINE_DISTANCE = "cosine_distance"
+
+TRAIN_LABELS = [True, False]
