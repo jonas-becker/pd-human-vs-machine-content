@@ -53,7 +53,7 @@ tokenized_texts = { }
 
 print("Creating embeddings for each sentence (text1 & text2) ...")
 for i, row in tqdm(df.iterrows(), total=df.shape[0]):
-    if i>1:
+    if i>999:
         break
 
     # mark the text with BERT special characters
@@ -76,9 +76,11 @@ for i, row in tqdm(df.iterrows(), total=df.shape[0]):
     tokenized_texts[row[ID2]] = {"tokens": t2_tokenized, PARAPHRASE: row[PARAPHRASE], "text_preview": row[TEXT2][:40]}
 
 
-for tokenized in tqdm(tokenized_texts):
+for tokenized in tqdm(list(tokenized_texts.keys())):
     # throw out longer that 512 token texts because BERT model struggels to process them
     if len(tokenized_texts[tokenized]["tokens"]) > 512:
+        print("Thrown element " + str(tokenized) + " out of the list because it contained to much text ( > 512 chars ).")
+        del tokenized_texts[tokenized]
         continue
 
     # map tokens to vocab indices
