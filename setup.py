@@ -1,6 +1,7 @@
 DATASETS_FOLDER = "datasets"    #the folder that contains the dataset directories to read in
 FORMATTED_DATA_FILENAME = "true_data.json"  #the name of the file that contains the data to read in
 DATASETS = ["MPC", "ETPC", "SAv2", "TURL"]     #the folders in the DATASETS_FOLDER should be named like the datasets here
+MACHINE_PARAPHRASED_DATASETS = ["MPC", "SAv2"]
 OUT_DIR = "output"      #the directory to output the formatted json in
 FIGURES_FOLDER = "figures"
 
@@ -34,3 +35,5 @@ TEXT_PREVIEW = "text_preview"
 TEXT_PREVIEW1 = "text_preview_1"
 TEXT_PREVIEW2 = "text_preview_2"
 EMBEDDINGS = "embeddings"
+TEXT_ID = "text_id"
+EMBED = "embed"
