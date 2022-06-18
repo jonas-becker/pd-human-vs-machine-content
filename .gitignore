@@ -1,2 +1,9 @@
 datasets/*
 output/results output.zip
+output/figures/all_embeddings.html
+output/figures/ETPC_embeddings.html
+output/figures/ETPC_paraphrasedOnly_embeddings.html
+output/figures/MPC_embeddings.html
+output/figures/MPC_paraphrasedOnly_embeddings.html
+output/figures/SAv2_embeddings.html
+output/figures/SAv2_paraphrasedOnly_embeddings.html

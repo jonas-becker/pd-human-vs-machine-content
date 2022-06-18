@@ -27,8 +27,6 @@ import pandas as pd
 import plotly.express as px
 
 df = pd.read_json(os.path.join(OUT_DIR, FORMATTED_DATA_FILENAME), orient = "index")
-df[TEXTEMBED1] = None
-df[TEXTEMBED2] = None
 df[COSINE_DISTANCE] = None
 
 
@@ -46,15 +44,18 @@ print("GPU available: " +  str(torch.cuda.is_available()))
 print("Model running on " + device)
 
 #Check for paraphrase with fuzzy based
-t1_embeddings = []
-t2_embeddings = []
 embeddings = []
+embed_dict = { }
+MPC_embeddings = []
+ETPC_embeddings = []
+
 tokenized_texts = { }
+tokenized_pairs = { }
 
 print("Creating embeddings for each sentence (text1 & text2) ...")
 for i, row in tqdm(df.iterrows(), total=df.shape[0]):
-    if i>999:
-        break
+    #if i>39:
+    #    break
 
     # mark the text with BERT special characters
     t_1 = "[CLS] " + row[TEXT1].replace(".", ". [SEP][CLS]") 
@@ -72,97 +73,208 @@ for i, row in tqdm(df.iterrows(), total=df.shape[0]):
     t1_tokenized = tokenizer.tokenize(t_1)
     t2_tokenized = tokenizer.tokenize(t_2)
 
-    tokenized_texts[row[ID1]] = {"tokens": t1_tokenized, PARAPHRASE: False, "text_preview": row[TEXT1][:40]}
-    tokenized_texts[row[ID2]] = {"tokens": t2_tokenized, PARAPHRASE: row[PARAPHRASE], "text_preview": row[TEXT2][:40]}
+    #tokenized_texts[row[ID1]] = {PAIR_ID: row[PAIR_ID], TOKENS: t1_tokenized, PARAPHRASE: False, TEXT_PREVIEW: row[TEXT1][:70]+"...", DATASET: row[DATASET]}
+    #tokenized_texts[row[ID2]] = {PAIR_ID: row[PAIR_ID], TOKENS: t2_tokenized, PARAPHRASE: row[PARAPHRASE], TEXT_PREVIEW: row[TEXT2][:70]+"...", DATASET: row[DATASET]}
+
+    tokenized_pairs[row[PAIR_ID]] = {ID1: row[ID1], TOKENS1: t1_tokenized, ID2: row[ID2], TOKENS2: t2_tokenized, PARAPHRASE: row[PARAPHRASE], TEXT_PREVIEW1: row[TEXT1][:90]+"...", TEXT_PREVIEW2: row[TEXT2][:90]+"...", DATASET: row[DATASET]}
 
 
-for tokenized in tqdm(list(tokenized_texts.keys())):
+for pair_id in tqdm(list(tokenized_pairs.keys())):
     # throw out longer that 512 token texts because BERT model struggels to process them
-    if len(tokenized_texts[tokenized]["tokens"]) > 512:
-        print("Thrown element " + str(tokenized) + " out of the list because it contained to much text ( > 512 chars ).")
-        del tokenized_texts[tokenized]
+    if len(tokenized_pairs[pair_id][TOKENS1]) > 512 or len(tokenized_pairs[pair_id][TOKENS2]) > 512:
+        print("Thrown element " + str(pair_id) + " out of the list because it contained to much text ( > 512 chars ).")
+        del tokenized_pairs[pair_id]
         continue
-
+    
+    # DO FOR FIRST TEXT
     # map tokens to vocab indices
-    indexed = tokenizer.convert_tokens_to_ids(tokenized_texts[tokenized]["tokens"])
-
-    segments_ids = [1] * len(tokenized_texts[tokenized]["tokens"])
-
+    indexed = tokenizer.convert_tokens_to_ids(tokenized_pairs[pair_id][TOKENS1])
+    segments_ids = [1] * len(tokenized_pairs[pair_id][TOKENS1])
     #Extract Embeddings
     tensor = torch.tensor([indexed])
     segments_tensors = torch.tensor([segments_ids])
-
     # collect all of the hidden states produced from all layers 
     with torch.no_grad():
         hidden_states = model(tensor, segments_tensors)[2]
-
     # Concatenate the tensors for all layers (create a new dimension in the tensor)
     embeds = torch.stack(hidden_states, dim=0)
-
     # Remove dimension 1, the "batches".
     embeds = torch.squeeze(embeds, dim=1)
-
     #Switch dimensions
     embeds = embeds.permute(1,0,2)
-
     # Create Sentence Vector Representations (average of all token vectors)
-    embedding = torch.mean(hidden_states[-2][0], dim=0)
+    embedding_1 = torch.mean(hidden_states[-2][0], dim=0)
+    embeddings.append(np.array(list(embedding_1)))
 
-    embeddings.append(np.array(list(embedding)))
+    # DO FOR SECOND TEXT
+    # map tokens to vocab indices
+    indexed = tokenizer.convert_tokens_to_ids(tokenized_pairs[pair_id][TOKENS2])
+    segments_ids = [1] * len(tokenized_pairs[pair_id][TOKENS2])
+    #Extract Embeddings
+    tensor = torch.tensor([indexed])
+    segments_tensors = torch.tensor([segments_ids])
+    # collect all of the hidden states produced from all layers 
+    with torch.no_grad():
+        hidden_states = model(tensor, segments_tensors)[2]
+    # Concatenate the tensors for all layers (create a new dimension in the tensor)
+    embeds = torch.stack(hidden_states, dim=0)
+    # Remove dimension 1, the "batches".
+    embeds = torch.squeeze(embeds, dim=1)
+    #Switch dimensions
+    embeds = embeds.permute(1,0,2)
+    # Create Sentence Vector Representations (average of all token vectors)
+    embedding_2 = torch.mean(hidden_states[-2][0], dim=0)
+    embeddings.append(np.array(list(embedding_2)))
 
-    #cos_distance = 1 - cosine(text1_embedding, text2_embedding)
+    # Add embeddings to dataset-specific lists:
+    dataset = tokenized_pairs[pair_id][DATASET]
+    if dataset in embed_dict:
+        embed_dict[dataset][EMBEDDINGS].append({ "pair_id": pair_id, "text_id": tokenized_pairs[pair_id][ID1], TEXT_PREVIEW: tokenized_pairs[pair_id][TEXT_PREVIEW1] ,"embed": list(embedding_1), "paraphrased_pair": tokenized_pairs[pair_id][PARAPHRASE], TUPLE_ID: False }) 
+        embed_dict[dataset][EMBEDDINGS].append({ "pair_id": pair_id, "text_id": tokenized_pairs[pair_id][ID2], TEXT_PREVIEW: tokenized_pairs[pair_id][TEXT_PREVIEW2] ,"embed": list(embedding_2), "paraphrased_pair": tokenized_pairs[pair_id][PARAPHRASE], TUPLE_ID: True }) 
+    else:
+        embed_dict[dataset] = { EMBEDDINGS: [{ "pair_id": pair_id, "text_id": tokenized_pairs[pair_id][ID1], TEXT_PREVIEW: tokenized_pairs[pair_id][TEXT_PREVIEW1] ,"embed": list(embedding_1), "paraphrased_pair": tokenized_pairs[pair_id][PARAPHRASE], TUPLE_ID: False }] }
+        embed_dict[dataset][EMBEDDINGS].append({ "pair_id": pair_id, "text_id": tokenized_pairs[pair_id][ID2], TEXT_PREVIEW: tokenized_pairs[pair_id][TEXT_PREVIEW2] ,"embed": list(embedding_2), "paraphrased_pair": tokenized_pairs[pair_id][PARAPHRASE], TUPLE_ID: True }) 
 
-    #df.at[i, TEXTEMBED1] = text1_embedding
-    #df.at[i, TEXTEMBED2] = text2_embedding
-    #df.at[i, COSINE_DISTANCE] = cos_distance
+# Save dataset-specific embeddings
+#embed_dict["ETPC"] = { DATASET: "ETPC", EMBEDDINGS: ETPC_embeddings}
+#embed_dict["MPC"] = { DATASET: "MPC", EMBEDDINGS: MPC_embeddings}
 
-
-
-model = TSNE(perplexity=20, n_components=2, init='pca', n_iter=2500, random_state=23)
+# Create T-SNE visualization for whole data (all datasets combined)
+'''
+print("Creating the visualization for all datasets combined...")
+tsne_model = TSNE(perplexity=20, n_components=2, init='pca', n_iter=2500, random_state=23)
 np.set_printoptions(suppress=True)
-tsne = model.fit_transform(embeddings)
+tsne = tsne_model.fit_transform(embeddings)
 coord_x = tsne[:, 0]
 coord_y = tsne[:, 1]
-
-
-# Plot sentences
-fig1 = plt.figure(figsize=(20, 20))
-ax1 = fig1.add_subplot(111)
-
-plt.scatter(coord_x, coord_y, alpha=.5, color="green", marker='s', label='original')
-
 labels = list(tokenized_texts)
-texts = [ tokenized_texts[t]["text_preview"] for t in tokenized_texts ]
-for j in range(len(embeddings)):
-    plt.annotate(
-        labels[j],
-        xy=(coord_x[j], coord_y[j]),
-        xytext=(5, 2),
-        textcoords='offset points',
-        ha='right', va='bottom')
-    
+texts = [ tokenized_texts[t][TEXT_PREVIEW] for t in tokenized_texts ]
 
-#plt.show()
-
-print(type(tsne))
 df_embeddings = pd.DataFrame(tsne)
-print(len(df_embeddings))
 df_embeddings = df_embeddings.rename(columns={0:'x',1:'y'})
 df_embeddings = df_embeddings.assign(label= labels)
-# We will also add the unmodified base sentences, to make the visualization easier :
 df_embeddings = df_embeddings.assign(text= texts)
-
 fig = px.scatter(
     df_embeddings, x='x', y='y',
     color='label', labels={'color': 'label'},
-    hover_data=['text'], title = 'Embedding Visualization'
+    hover_data=['text'], title = 'Embedding Visualization (T-SNE)'
     )
 fig.update_layout(showlegend=False)
-
 fig.show()
+fig.write_html(os.path.join(OUT_DIR, FIGURES_FOLDER, "all_embeddings.html"))
+'''
 
+# Create visualization per dataset (paraphrase & non-paraphrase pairs combined)
+print("Creating visualizations per dataset...")
+for dataset in tqdm(list(embed_dict.keys())):
+    embed_data = embed_dict[dataset][EMBEDDINGS]
+
+    print("Visualizing " + str(len(embed_data)) + " texts for the " + dataset + "dataset. That makes " + str(len(embed_data)/2) + " text pairs.")
+
+    dataset_embeddings = [d["embed"] for d in embed_data]
+    text_ids = [d["text_id"] for d in embed_data]
+    pair_ids = [d["pair_id"] for d in embed_data]
+    pair_paraphrased = [d["paraphrased_pair"] for d in embed_data]
+    text_previews = [d[TEXT_PREVIEW] for d in embed_data]
+    tuple_markers = [d[TUPLE_ID] for d in embed_data]   #false= first text, true= second text
+
+    tsne_model = TSNE(perplexity=20, n_components=2, init='pca', n_iter=2500, random_state=23)
+    np.set_printoptions(suppress=True)
+    tsne = tsne_model.fit_transform(dataset_embeddings)
+    coord_x = tsne[:, 0]
+    coord_y = tsne[:, 1]
+
+    df_embeddings = pd.DataFrame(tsne)
+    df_embeddings = df_embeddings.rename(columns = {0:'x',1:'y'})
+    df_embeddings = df_embeddings.assign(label = text_ids)
+    df_embeddings = df_embeddings.assign(text_id = text_ids)
+    df_embeddings = df_embeddings.assign(paraphrase = pair_paraphrased)
+    df_embeddings = df_embeddings.assign(text = text_previews)
+    df_embeddings = df_embeddings.assign(tuple_marker= tuple_markers)
+    df_embeddings = df_embeddings.assign(pair_id = pair_ids)
+
+    fig = px.scatter(
+        df_embeddings, x='x', y='y',
+        color='tuple_marker', labels={'color': 'label'},
+        hover_data=["text_id", "pair_id", "text", "paraphrase"], title = 'Embedding Visualization: ' + str(dataset)
+        )
+    fig.update_layout(showlegend=False)
+    #fig.show()
+    fig.write_html(os.path.join(OUT_DIR, FIGURES_FOLDER, dataset + "_embeddings.html"))
+
+
+# Create visualization per dataset (paraphrase pairs only)
+print("Creating visualizations per dataset (paraphrase-pairs only)...")
+for dataset in tqdm(list(embed_dict.keys())):
+    embed_data = embed_dict[dataset][EMBEDDINGS]
+    # Filter the data to only contain paraphrased pairs:
+    embed_data = [e for e in embed_data if e["paraphrased_pair"] == True]
+
+    print("Visualizing " + str(len(embed_data)) + " texts for the " + dataset + "dataset. That makes " + str(len(embed_data)/2) + " text pairs.")
+
+    dataset_embeddings = [d["embed"] for d in embed_data]
+    text_ids = [d["text_id"] for d in embed_data]
+    pair_ids = [d["pair_id"] for d in embed_data]
+    pair_paraphrased = [d["paraphrased_pair"] for d in embed_data]
+    text_previews = [d[TEXT_PREVIEW] for d in embed_data]
+    tuple_markers = [d[TUPLE_ID] for d in embed_data]   #false= first text, true= second text
+
+    tsne_model = TSNE(perplexity=20, n_components=2, init='pca', n_iter=2500, random_state=23)
+    np.set_printoptions(suppress=True)
+    tsne = tsne_model.fit_transform(dataset_embeddings)
+    coord_x = tsne[:, 0]
+    coord_y = tsne[:, 1]
+
+    df_embeddings = pd.DataFrame(tsne)
+    df_embeddings = df_embeddings.rename(columns = {0:'x',1:'y'})
+    df_embeddings = df_embeddings.assign(label = text_ids)
+    df_embeddings = df_embeddings.assign(text_id = text_ids)
+    df_embeddings = df_embeddings.assign(paraphrase = pair_paraphrased)
+    df_embeddings = df_embeddings.assign(text = text_previews)
+    df_embeddings = df_embeddings.assign(tuple_marker= tuple_markers)
+    df_embeddings = df_embeddings.assign(pair_id = pair_ids)
+
+    fig = px.scatter(
+        df_embeddings, x='x', y='y',
+        color='tuple_marker', labels={'color': 'label'},
+        hover_data=["text_id", "pair_id", "text", "paraphrase"], title = 'Embedding Visualization: ' + str(dataset) + ' (paraphrased pairs only)'
+        )
+    fig.update_layout(showlegend=False)
+    #fig.show()
+    fig.write_html(os.path.join(OUT_DIR, FIGURES_FOLDER, dataset + "_paraphrasedOnly_embeddings.html"))
+
+# Calculate cosine distance of embeddings between each pair
+print("Calculating cosine distances between pairs embeddings...")
+for dataset in tqdm(list(embed_dict.keys())):
+    embed_data = embed_dict[dataset][EMBEDDINGS]
+
+    dataset_embeddings = [[d["embed"], d["text_id"]] for d in embed_data]
+    pair_ids = [d["pair_id"] for d in embed_data]
+    pair_ids = list(set(pair_ids))
+
+    for i, pair_id in enumerate(pair_ids):
+        id_1 = df.loc[df[PAIR_ID] == pair_id][ID1].item()
+        id_2 = df.loc[df[PAIR_ID] == pair_id][ID2].item()
+        emb_1 = None
+        emb_2 = None
+        for d in dataset_embeddings:
+            if d[1] == id_1:
+                emb_1 = d[0]
+            elif d[1] == id_2:
+                emb_2 = d[0]
+            if emb_1 and emb_2:
+                break
+        df.loc[df[PAIR_ID] == pair_id, COSINE_DISTANCE] = 1 - cosine(emb_1, emb_2)
+
+# Calculate the mean distances per dataset
+for dataset in DATASETS:
+    df_filtered = df[(df[DATASET] == dataset) & (df[PARAPHRASE] == True)]
+    mean_cos_dist = df_filtered[COSINE_DISTANCE].mean()
+    print("The mean cosine distance of paraphrased pairs (Dataset: " + dataset + ") : " + str(mean_cos_dist))
+    
+    df_filtered = df[(df[DATASET] == dataset) & (df[PARAPHRASE] == False)]
+    mean_cos_dist = df_filtered[COSINE_DISTANCE].mean()
+    print("The mean cosine distance of non-paraphrased (original) pairs (Dataset: " + dataset + ") : " + str(mean_cos_dist))
 
 # Output data
 df.to_json(os.path.join(OUT_DIR, "data_embedded.json"), orient = "index", index = True, indent = 4)
-
-torch.save(model, os.path.join(OUT_DIR, "embeddings_model"))
