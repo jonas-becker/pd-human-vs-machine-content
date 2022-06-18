@@ -1,785 +1,272 @@
 {
     "0":{
-        "dataset":"MPC",
-        "pair_id":"eSSazcLb",
-        "id_1":"dSYrKRgD",
-        "id_2":"YGtGXWQ8",
-        "text_1":"Uriel Sebree",
-        "text_2":"Uriel Sebree",
+        "dataset":"TURL",
+        "pair_id":"gagMsbQY",
+        "id_1":"HgNNak2t",
+        "id_2":"HzFPwTWw",
+        "text_1":"How an unverified but explosive dossier became a crisis for Donald Trump ",
+        "text_2":"How a Sensational , Unverified Dossier Became a Crisis for Donald Trump ",
         "is_paraphrase":true
     },
     "1":{
-        "dataset":"MPC",
-        "pair_id":"NDrJ2EA6",
-        "id_1":"Y4LXcBGq",
-        "id_2":"5TiNENVT",
-        "text_1":"Uriel Sebree (February\u00a020, 1848\u00a0\u2013 August\u00a06, 1922) was a career officer in the United States Navy. He entered the Naval Academy during the Civil War and served until 1910, retiring as a rear admiral. He is best remembered for his two expeditions into the Arctic and for serving as acting governor of American Samoa. He was also commander-in-chief of the Pacific Fleet.",
-        "text_2":"Uriel Sebree (February\u00c2\u00a020, 1848\u00c2\u00a0\u00e2\u0080\u0093 August\u00c2\u00a06, 1922) was a lifelong officer in the United States Navy. He entered the Naval Academy amid the Civil War and served until 1910, resigning as a back naval commander. He is best associated with his two endeavors into the Arctic and for filling in as acting legislative head of American Samoa. He was additionally president of the Pacific Fleet.",
-        "is_paraphrase":true
+        "dataset":"TURL",
+        "pair_id":"HJLfyVqo",
+        "id_1":"cQtFdD6J",
+        "id_2":"853NTfEa",
+        "text_1":"How an unverified but explosive dossier became a crisis for Donald Trump ",
+        "text_2":"Dossier Donald Trump don't forget , DNC hacked to get this same oppo research on Trump . ",
+        "is_paraphrase":false
     },
     "2":{
-        "dataset":"MPC",
-        "pair_id":"DrrF4xbG",
-        "id_1":"LZBi6n6d",
-        "id_2":"86DRMtE8",
-        "text_1":"After graduating from the U.S. Naval Academy in 1867, Sebree was posted to a number of vessels before being assigned to a rescue mission to find the remaining crew of the missing \"Polaris\" in the Navy's first mission to the Arctic. This attempt was only a partial success\u2014the \"Polaris\" crew was rescued by a British ship rather than the US Navy\u2014but this led to Sebree's selection eleven years later for a second expedition to the Arctic. That mission to rescue Adolphus Greely and the survivors of the Lady Franklin Bay expedition was a success. Sebree was subsequently appointed as the second acting governor of American Samoa. He served in this position for only a year before returning to the United States. In 1907, he was promoted to rear admiral and given command of the Pathfinder Expedition around the South American coast before being appointed commander of the 2nd Division of the Pacific Fleet and then commander-in-chief of the entire fleet. He retired in 1910 and died in Coronado, California, in 1922. Two geographical features in Alaska\u2014Sebree Peak and Sebree Island\u2014are named for Admiral Sebree.",
-        "text_2":"In the wake of moving on from the U.S. Maritime Academy in 1867, Sebree was presented on various vessels before being appointed to a salvage mission to locate the rest of the team of the missing \"Polaris\" in the Navy's first mission to the Arctic. This endeavor was just a fractional achievement\u00e2\u0080\u0094the \"Polaris\" group was saved by a British ship as opposed to the US Navy\u00e2\u0080\u0094yet this prompted Sebree's choice eleven years after the fact for a second campaign to the Arctic. That mission to safeguard Adolphus Greely and the overcomers of the Lady Franklin Bay endeavor was a triumph. Sebree was in this manner designated as the second acting legislative leader of American Samoa. He served in this situation for just a year prior coming back to the United States. In 1907, he was elevated to raise naval commander and given direction of the Pathfinder Expedition around the South American coast before being named authority of the second Division of the Pacific Fleet and afterward president of the whole armada. He resigned in 1910 and passed on in Coronado, California, in 1922. Two topographical highlights in Alaska\u00e2\u0080\u0094Sebree Peak and Sebree Island\u00e2\u0080\u0094are named for Admiral Sebree.",
-        "is_paraphrase":true
+        "dataset":"TURL",
+        "pair_id":"6kGn5Ac2",
+        "id_1":"BjF8guzS",
+        "id_2":"RCEA5cPQ",
+        "text_1":"How an unverified but explosive dossier became a crisis for Donald Trump ",
+        "text_2":"a wealthy Republican donor who strongly opposed Mr. Trump put up the money to build ",
+        "is_paraphrase":false
     },
     "3":{
-        "dataset":"MPC",
-        "pair_id":"T2yTozHi",
-        "id_1":"jLQ2bbwa",
-        "id_2":"GoaRoMkd",
-        "text_1":"\"Super Mario 64\" is a 3D platformer in which the player controls Mario through several courses. Each course is an enclosed world in which the player is free to wander in all directions and discover the environment without time limits. The worlds are filled with enemies that attack Mario, as well as friendly creatures that provide assistance, offer information, or ask a favor (such as peaceful pink Bob-omb Buddies). The player gathers stars in each course; some stars only appear after completing certain tasks, often hinted at by the name of the course. These challenges include defeating a boss, solving puzzles, racing an opponent, and gathering coins. As more stars are collected, more areas of the castle hub world become accessible. The player unlocks doors in the castle with keys obtained by defeating Bowser in special courses. There are many hidden mini-courses and other secrets to the game, most containing extra stars required for the full completion of the game.",
-        "text_2":"\"Super Mario 64\" is a 3D platformer in which the player controls Mario through a few courses. Each course is an encased world in which the player is allowed to meander every which way and find nature without time limits. The universes are loaded up with foes that assault Mario, just as amicable animals that give help, offer data, or ask some help, (for example, quiet pink Bob-omb Buddies). The player assembles stars in each course; a few stars just show up subsequent to finishing certain assignments, frequently alluded to by the name of the course. These difficulties incorporate overcoming a manager, fathoming perplexes, dashing a rival, and assembling coins. As more stars are gathered, more zones of the stronghold center point world become open. The player opens entryways in the stronghold with keys gotten by overcoming Bowser in uncommon courses. There are many shrouded small scale courses and different insider facts to the diversion, most containing additional stars required for the full finish of the amusement.",
+        "dataset":"TURL",
+        "pair_id":"ann2vx74",
+        "id_1":"FtkZNhCM",
+        "id_2":"UCfJ49eY",
+        "text_1":"How an unverified but explosive dossier became a crisis for Donald Trump ",
+        "text_2":"How an Unverified Dossier Became a Crisis for @realDonaldTrump ",
         "is_paraphrase":true
     },
     "4":{
-        "dataset":"MPC",
-        "pair_id":"nNTdFW3G",
-        "id_1":"eA7wL8wN",
-        "id_2":"Pxud2m2C",
-        "text_1":"There are three special cap power-ups that appear in certain areas on many stages. The Wing Cap allows Mario to fly; the Metal Cap makes him immune to most damage, allows him to withstand wind, walk underwater, and be unaffected by noxious gases; and the Vanish Cap renders him partially immaterial and allows him to walk through some obstacles such as wire mesh, as well as granting invulnerability to some forms of damage. Some courses contain cannons that Mario can access by speaking to a pink Bob-omb Buddy. After entering a cannon, Mario can be shot out to reach distant places. When the player has the Wing Cap equipped, cannons can be used to reach high altitudes or fly across most levels quickly.",
-        "text_2":"There are three exceptional top catalysts that show up in specific zones on numerous stages. The Wing Cap permits Mario to fly; the Metal Cap makes him insusceptible to most harm, enables him to withstand wind, walk submerged, and be unaffected by poisonous gases; and the Vanish Cap renders him halfway unimportant and enables him to stroll through certain impediments, for example, wire work, just as allowing resistance to certain types of harm. A few courses contain guns that Mario can access by addressing a pink Bob-omb Buddy. Subsequent to entering a gun, Mario can be shot out to achieve removed spots. At the point when the player has the Wing Cap prepared, guns can be utilized to achieve high heights or fly crosswise over most dimensions rapidly.",
-        "is_paraphrase":true
+        "dataset":"TURL",
+        "pair_id":"cmmbEtyH",
+        "id_1":"8QBcUD2e",
+        "id_2":"ieUThyTe",
+        "text_1":"How an unverified but explosive dossier became a crisis for Donald Trump ",
+        "text_2":"Outstanding piece puts Russian rumors re Trump into context . Read this @ScottShaneNYT @nickconfessore @AllMattNYT ",
+        "is_paraphrase":false
     },
     "5":{
-        "dataset":"MPC",
-        "pair_id":"WbNmQXo4",
-        "id_1":"QiXyHi5S",
-        "id_2":"ZdFvZTDF",
-        "text_1":"Mario's abilities in \"Super Mario 64\" are far more diverse than those of previous \"Mario\" games. The player can make Mario walk, run, jump, crouch, crawl, swim, climb, kick, or punch using the game controller's analog stick and buttons. Special jumps can be executed by combining a regular jump with other actions, including the double and triple jumps (jumping two and three times in a row, respectively), long jump and backflip. There are also special maneuvers, such as wall jumping - jumping from one wall to another in rapid succession to reach areas that would otherwise be too high. The player can pick up and carry certain items, an ability which is used to solve various puzzles, and swim underwater at various speeds. Mario's life energy slowly diminishes while underwater, representing how long he can hold his breath.",
-        "text_2":"Mario's capacities in \"Super Mario 64\" are unmistakably more assorted than those of past \"Mario\" recreations. The player can make Mario walk, run, hop, hunch, slither, swim, climb, kick, or punch utilizing the amusement controller's simple stick and catches. Exceptional bounces can be executed by joining a normal hop with different activities, including the twofold and triple hops (hopping two and multiple times in succession, separately), long hop and reverse somersault. There are additionally exceptional moves, for example, divider bouncing - hopping starting with one divider then onto the next in quick progression to achieve territories that would somehow be excessively high. The player can get and convey certain things, a capacity which is utilized to illuminate different riddles, and swim submerged at different rates. Mario's life vitality gradually lessens while submerged, speaking to what extent he can hold his breath.",
-        "is_paraphrase":true
+        "dataset":"TURL",
+        "pair_id":"MKjzxWSg",
+        "id_1":"3dCV94ZN",
+        "id_2":"NyuqK6pm",
+        "text_1":"How an unverified but explosive dossier became a crisis for Donald Trump ",
+        "text_2":"The intelligence credentials of the man behind the Trump dossier & gt ",
+        "is_paraphrase":false
     },
     "6":{
-        "dataset":"MPC",
-        "pair_id":"VvHRi9VC",
-        "id_1":"2EPajmew",
-        "id_2":"WzQUkezN",
-        "text_1":"\"Super Mario 64\" is set in Princess Peach's Castle, which consists of three floors, a basement, a moat, and a courtyard. The area outside the castle is an introductory area in which the player can experiment with gameplay. Scattered throughout the castle are entrances to courses via secret walls and paintings. \"Super Mario 64\" begins with a letter from Princess Peach inviting Mario to come to her castle for a cake she has baked for him. When he arrives, Mario discovers that Bowser has invaded the castle and imprisoned the princess and her servants within it using the power of the castle's 120 Power Stars. Many of the castle's paintings are portals to other worlds, in which Bowser's minions keep watch over the stars. Mario explores the castle for these portals to enter the worlds and recover the stars. He gains access to more rooms as he recovers more Power Stars, and eventually traverses three different obstacle courses, each leading to its own battle with Bowser. Defeating Bowser the first two times earns Mario a key for opening another level of the castle. After Mario defeats Bowser in the final battle, Peach is released from the stained-glass window above the castle's entrance. Peach rewards Mario by kissing him on the nose and baking the cake that she had promised him.",
-        "text_2":"\"Super Mario 64\" is set in Princess Peach's Castle, which comprises of three stories, a storm cellar, a channel, and a yard. The region outside the ch\u00c3\u00a2teau is an initial territory in which the player can try different things with ongoing interaction. Dispersed all through the ch\u00c3\u00a2teau are doors to courses by means of mystery dividers and artistic creations. \"Super Mario 64\" starts with a letter from Princess Peach welcoming Mario to go to her palace for a cake she has prepared for him. When he arrives, Mario finds that Bowser has attacked the palace and detained the princess and her hirelings inside it utilizing the intensity of the manor's 120 Power Stars. A considerable lot of the manor's canvases are entrances to different universes, in which Bowser's cronies keep watch over the stars. Mario investigates the palace for these entryways to enter the universes and recuperate the stars. He accesses more rooms as he recoups more Power Stars, and in the end navigates three diverse impediment courses, each prompting its very own fight with Bowser. Vanquishing Bowser the initial multiple times procures Mario a key for opening another dimension of the mansion. After Mario routs Bowser in the last fight, Peach is discharged from the recolored glass window over the palace's passage. Peach rewards Mario by kissing him on the nose and preparing the cake that she had guaranteed him.",
-        "is_paraphrase":true
+        "dataset":"TURL",
+        "pair_id":"VjL75dHv",
+        "id_1":"3kJDafV6",
+        "id_2":"hBr5ZLGu",
+        "text_1":"How an unverified but explosive dossier became a crisis for Donald Trump ",
+        "text_2":"Not quite as ridiculous as #realDonaldTrump says . But then again he lies all the time . ",
+        "is_paraphrase":false
     },
     "7":{
-        "dataset":"MPC",
-        "pair_id":"9wGuuZWy",
-        "id_1":"BrFD5ygg",
-        "id_2":"LjXtRnpA",
-        "text_1":"More than five years prior to the release of \"Super Mario 64\", producer and director Shigeru Miyamoto conceived a 3D \"Mario\" design during the development of the Super Nintendo Entertainment System (SNES) game \"Star Fox\" (1993), developed by Nintendo along with Argonaut Software. He considered using the Super FX chip to develop a SNES game which would have been called \"Super Mario FX\", with gameplay based on \"an entire world in miniature, like miniature trains\". Instead, he eventually reformulated the 3D \"Mario\" idea for the Nintendo 64 - not due to the next generation console's substantially greater power, but because its controller has more buttons for gameplay. According to former Argonaut engineer Dylan Cuthbert, no game titled \"Super Mario FX\" had ever entered development, but rather \"Super Mario FX\" was the internal code name of the Super FX chip itself. According to Argonaut founder Jez San, \"Super Mario 64\" was influenced by a prototype of a canceled Argonaut game starring the \"Mario\" character Yoshi, which later became the 1997 platform game \"\".",
-        "text_2":"Over five years before the arrival of \"Super Mario 64\", maker and chief Shigeru Miyamoto imagined a 3D \"Mario\" structure amid the advancement of the Super Nintendo Entertainment System (SNES) amusement \"Star Fox\" (1993), created by Nintendo alongside Argonaut Software. He considered utilizing the Super FX chip to build up a SNES amusement which would have been designated \"Super Mario FX\", with interactivity dependent on \"a whole world in smaller than expected, similar to scaled down trains\". Rather, he in the long run reformulated the 3D \"Mario\" thought for the Nintendo 64 - not because of the cutting edge comfort's generously more prominent power, but since its controller has more catches for ongoing interaction. As indicated by previous Argonaut engineer Dylan Cuthbert, no amusement titled \"Super Mario FX\" had ever entered improvement, but instead \"Super Mario FX\" was the inner code name of the Super FX chip itself. As indicated by Argonaut originator Jez San, \"Super Mario 64\" was impacted by a model of a dropped Argonaut amusement featuring the \"Mario\" character Yoshi, which later turned into the 1997 stage diversion \"\".",
-        "is_paraphrase":true
+        "dataset":"TURL",
+        "pair_id":"Exc6XF5J",
+        "id_1":"eC4XPYXj",
+        "id_2":"CCnw8gXR",
+        "text_1":"How an unverified but explosive dossier became a crisis for Donald Trump ",
+        "text_2":"How a Sensational , Unverified Dossier Became a Crisis for @realDonaldTrump ",
+        "is_paraphrase":false
     },
     "8":{
-        "dataset":"MPC",
-        "pair_id":"Rm3RbxDz",
-        "id_1":"oK7JzsT2",
-        "id_2":"D5x8NUiR",
-        "text_1":"The full scope of \"Super Mario 64\" spanned approximately three years, with one year spent on the design concept and approximately two years on the direct development of the game software. Development began with the characters and camera system. Miyamoto and the other designers were unsure of which direction the game should take; months were spent selecting a camera view and layout. The original concept involved the game having fixed path like an isometric-type game (similar to \"Super Mario RPG\"), before the choice was made to settle on a free-roaming 3D design. Although the majority of \"Super Mario 64\" features the free-roaming design, elements of the original fixed path concept remain, particularly in the three Bowser encounters. One of the programmers, Giles Goddard, explained that these linear elements survived as a means to force players into Bowser's lair rather than encourage exploration.",
-        "text_2":"The full extent of \"Super Mario 64\" spread over around three years, with one year spent on the structure idea and roughly two years on the immediate improvement of the diversion programming. Improvement started with the characters and camera framework. Miyamoto and different creators were uncertain of which bearing the amusement should take; months were spent choosing a camera view and format. The first idea included the diversion having fixed way like an isometric-type amusement (like \"Super Mario RPG\"), before the decision was made to settle on a free-wandering 3D plan. In spite of the fact that most of \"Super Mario 64\" highlights the free-meandering structure, components of the first fixed way idea remain, especially in the three Bowser experiences. One of the developers, Giles Goddard, clarified that these straight components made due as a way to drive players into Bowser's den instead of support investigation.",
-        "is_paraphrase":true
+        "dataset":"TURL",
+        "pair_id":"Mtp4Rox2",
+        "id_1":"CidFxKmD",
+        "id_2":"DbCfShXU",
+        "text_1":"How an unverified but explosive dossier became a crisis for Donald Trump ",
+        "text_2":"A wealthy anti-Trump Republican donor . A former British spy . The tale behind an unverified but explosive dossier htt ",
+        "is_paraphrase":false
     },
     "9":{
-        "dataset":"MPC",
-        "pair_id":"CdruDWZF",
-        "id_1":"7j5Vux5G",
-        "id_2":"Fu2dbYqN",
-        "text_1":"3D graphics were created using the Nichimen N-World toolkit running on a Silicon Graphics workstation. The team placed high priority on Mario's movement, and before levels were created, they tested and refined Mario's animations on a simple grid. The first test scenario for controls and physics involved Mario interacting with a golden rabbit, named \"MIPS\" after the Nintendo 64's MIPS architecture processors; the rabbit was included in the final version of the game. The developers tried to implement split-screen cooperative play using Mario and Luigi simultaneously where the two characters would start at separate points in the castle and work their way through the game together. The two-player mode was eliminated because the developers were unable to make the gameplay work satisfactorily. To assist players with depth perception, the team positioned a faux shadow directly beneath each object regardless of the area's lighting. Developer Yoshiaki Koizumi described the feature as an \"iron-clad necessity\" which \"might not be realistic, but it's much easier to play.\"",
-        "text_2":"3D illustrations were made utilizing the Nichimen N-World toolbox running on a Silicon Graphics workstation. The group put high need on Mario's development, and before levels were made, they tried and refined Mario's movements on a straightforward lattice. The primary test situation for controls and material science included Mario cooperating with a brilliant rabbit, named \"MIPS\" after the Nintendo 64's MIPS design processors; the rabbit was incorporated into the last form of the amusement. The designers attempted to actualize split-screen agreeable play utilizing Mario and Luigi all the while where the two characters would begin at independent focuses in the mansion and work their way through the amusement together. The two-player mode was disposed of on the grounds that the designers were unfit to make the ongoing interaction work attractively. To help players with profundity discernment, the group situated a fake shadow straightforwardly underneath each article paying little mind to the territory's lighting. Engineer Yoshiaki Koizumi depicted the component as an \"iron-clad need\" which \"probably won't be sensible, yet it's a lot simpler to play.\"",
-        "is_paraphrase":true
+        "dataset":"TURL",
+        "pair_id":"T4LbDMxd",
+        "id_1":"dVhx86GK",
+        "id_2":"bk9zDFGD",
+        "text_1":"How an unverified but explosive dossier became a crisis for Donald Trump ",
+        "text_2":"The consequences of the dossier, put together by a former British spy named Christopher Steele, are incalculable and will play out long past Inauguration Day.",
+        "is_paraphrase":false
     },
     "10":{
-        "dataset":"MPC",
-        "pair_id":"ZHpKNLUd",
-        "id_1":"dgQigtAp",
-        "id_2":"JCFvm4Ra",
-        "text_1":"Miyamoto's guiding design philosophy was to include more details than earlier games, using the Nintendo 64's power to feature \"all the emotions of the characters\". He likened the game's style to a 3D interactive cartoon. Some details were inspired by the developers' personal lives; for example, the Boos are based on assistant director Takashi Tezuka's wife, who, as Miyamoto explained, \"is very quiet normally, but one day she exploded, maddened by all the time Tezuka spent at work.\" In the game, the Boos shrink when Mario looks at them, but when he turns away, they grow large and menacing.",
-        "text_2":"Miyamoto's controlling plan logic was to incorporate a larger number of subtleties than prior recreations, utilizing the Nintendo 64's capacity to highlight \"every one of the feelings of the characters\". He compared the amusement's style to a 3D intuitive animation. A few subtleties were enlivened by the engineers' close to home lives; for instance, the Boos depend on right hand executive Takashi Tezuka's significant other, who, as Miyamoto clarified, \"is peaceful regularly, however one day she detonated, chafed by all the time Tezuka spent at work.\" In the amusement, the Boos contract when Mario takes a gander at them, yet when he dismisses, they develop huge and threatening.",
-        "is_paraphrase":true
+        "dataset":"TURL",
+        "pair_id":"RLxU9WgF",
+        "id_1":"4vey2qgh",
+        "id_2":"M6fDogRj",
+        "text_1":"Are you open to 2020 ? I am open to doing everything I can right now ",
+        "text_2":"From one Senator to the next . ",
+        "is_paraphrase":false
     },
     "11":{
-        "dataset":"MPC",
-        "pair_id":"XVeLq9K5",
-        "id_1":"Eoyjeugn",
-        "id_2":"ZAKKn5Pw",
-        "text_1":"\"Super Mario 64\" features more puzzles than earlier \"Mario\" games. It was developed simultaneously with \"\", but as \"Ocarina of Time\" was released more than two years later, some puzzles were taken for \"Super Mario 64\". Information about \"Super Mario 64\" leaked in November 1995, and a playable version of the game was presented days later as part of the Nintendo 64 premiere (then known as the \"Ultra 64\") at Nintendo Space World. At this point, the basic controls had been implemented and the game was 50% finished, featuring 32 courses, though only about 2% of mapping was complete. Miyamoto had hoped to create more courses, but only 15 courses could fit. According to Nintendo of America chairman Howard Lincoln, Miyamoto's desire to add more to the game was a major factor in the decision to delay the Nintendo 64 release from Christmas 1995 to April 1996. Nintendo president Hiroshi Yamauchi later commented, \"Game creators can finish games quickly if they compromise. But users have sharp eyes. They soon know if the games are compromised. [Shigeru Miyamoto] asked for two more months and I gave them to him unconditionally.\"",
-        "text_2":"\"Super Mario 64\" includes a bigger number of riddles than prior \"Mario\" recreations. It was grown all the while with \"\", however as \"Ocarina of Time\" was discharged over two years after the fact, a few riddles were taken for \"Super Mario 64\". Data about \"Super Mario 64\" spilled in November 1995, and a playable adaptation of the diversion was displayed days after the fact as a major aspect of the Nintendo 64 debut (at that point known as the \"Ultra 64\") at Nintendo Space World. Now, the fundamental controls had been actualized and the diversion was half got done with, including 32 courses, however just about 2% of mapping was finished. Miyamoto had would have liked to make more courses, however just 15 courses could fit. As indicated by Nintendo of America administrator Howard Lincoln, Miyamoto's longing to add more to the amusement was a main consideration in the choice to defer the Nintendo 64 discharge from Christmas 1995 to April 1996. Nintendo president Hiroshi Yamauchi later remarked, \"Amusement makers can complete diversions rapidly in the event that they bargain. Be that as it may, clients have sharp eyes. They before long know whether the amusements are undermined. [Shigeru Miyamoto] requested two additional months and I offered them to him unequivocally.\"",
-        "is_paraphrase":true
+        "dataset":"TURL",
+        "pair_id":"RyNgYVYL",
+        "id_1":"jnNLW7V9",
+        "id_2":"E3Gf9ZWr",
+        "text_1":"Are you open to 2020 ? I am open to doing everything I can right now ",
+        "text_2":"With Harry Reed gone I thought the Senate would change . What a cowardly display . ",
+        "is_paraphrase":false
     },
     "12":{
-        "dataset":"MPC",
-        "pair_id":"UBkYKSCg",
-        "id_1":"EAxLnzSG",
-        "id_2":"HhTq5z8t",
-        "text_1":"The music was composed by veteran composer Koji Kondo, who created new interpretations of the familiar melodies from earlier games as well as entirely new material. \"Super Mario 64\" was one of the first games in the series to feature Charles Martinet as the voice of Mario. It also features the voices of Leslie Swan (then Senior Editor of \"Nintendo Power\") as Princess Peach, who also wrote the English text for the game.",
-        "text_2":"The music was formed by veteran author Koji Kondo, who made new elucidations of the recognizable songs from prior diversions just as altogether new material. \"Super Mario 64\" was one of the main amusements in the arrangement to highlight Charles Martinet as the voice of Mario. It likewise includes the voices of Leslie Swan (at that point Senior Editor of \"Nintendo Power\") as Princess Peach, who additionally composed the English content for the diversion.",
-        "is_paraphrase":true
+        "dataset":"TURL",
+        "pair_id":"H9CxuKxA",
+        "id_1":"N4DZ4kP9",
+        "id_2":"ixoCU5eJ",
+        "text_1":"Are you open to 2020 ? I am open to doing everything I can right now ",
+        "text_2":"Cory Booker takes stage to rail against Jeff Sessions nomination ",
+        "is_paraphrase":false
     },
     "13":{
-        "dataset":"MPC",
-        "pair_id":"Qzc9bRLB",
-        "id_1":"JNUv3z6C",
-        "id_2":"AfRTdTkT",
-        "text_1":"\"Super Mario 64\" received widespread critical acclaim and is the best-selling Nintendo 64 game. At the 1999 Milia festival in Cannes, it took home a \"Gold\" prize for revenues above \u20ac21 million in the European Union during the previous year. By May 2003, eleven million copies had been sold. \"Super Mario 64\" had become the second most popular game on Wii's Virtual Console by June 2007, behind \"Super Mario Bros.\"",
-        "text_2":"\"Super Mario 64\" got boundless basic praise and is the top rated Nintendo 64 amusement. At the 1999 Milia celebration in Cannes, it brought home a \"Gold\" prize for incomes above \u00e2\u0082\u00ac21 million in the European Union amid the earlier year. By May 2003, eleven million duplicates had been sold. \"Super Mario 64\" had turned into the second most well known amusement on Wii's Virtual Console by June 2007, behind \"Super Mario Bros.\"",
-        "is_paraphrase":true
+        "dataset":"TURL",
+        "pair_id":"9dP7m6vb",
+        "id_1":"Z4MjLDYA",
+        "id_2":"hgYiXJvn",
+        "text_1":"Are you open to 2020 ? I am open to doing everything I can right now ",
+        "text_2":"Sen. Booker did not ' rail ' against Sessions he set forth a cogent argument ! ",
+        "is_paraphrase":false
     },
     "14":{
-        "dataset":"MPC",
-        "pair_id":"Yn4dy8TS",
-        "id_1":"BUQEhWfa",
-        "id_2":"Gn6BPYfR",
-        "text_1":"The game has been praised in the gaming press, and is still highly acclaimed. It has collected numerous awards, including various \"Game of the Year\" honors by members of the gaming media, as well as Nintendo's own best-selling Player's Choice selection. In addition, \"Super Mario 64\" has been placed high on \"the greatest games of all time\" lists by many reviewers, including IGN, \"Game Informer\", \"Edge\", Yahoo! Games, and \"Nintendo Power\". \"Electronic Gaming Monthly\" awarded the game a Gold award in its initial review, and in \"Edge\" magazine, \"Super Mario 64\" was the first game to receive a perfect score. At the 1997 Computer Game Developers Conference, it was given Spotlight Awards for Best Use of Innovative Technology, Best Console Game, and Best Game of 1996. It won \"Electronic Gaming Monthly\"s Game of the Year for both editors' pick and readers' pick, as well as Nintendo 64 Game of the Year, Adventure Game of the Year, and Best Graphics. British magazine \"Maximum\" gave it their \"Maximum Game of the Month Award\", making it the only import game (since \"Super Mario 64\" had not yet been released outside Japan) to win that honor, and attested it to be the greatest game the magazine had ever reviewed. \"Game Informer\" initially rated the game a 9.75, but re-rated it a 9.0 a decade later in a \"Retro Review\". The Japanese gaming magazine \"Famitsu\" rated \"Super Mario 64\" a 39\/40. \"GamePro\" gave it a perfect 5 out of 5 in every category (FunFactor, control, sound, and graphics). Common praise focused on the presentation, while criticism was directed at the camera system. \"Nintendo Power\" lauded the graphics, sound, and gameplay, but commented the shifting camera angle took getting used to. \"Next Generation Magazine\" praised many aspects of the game: musical score, graphics, lack of loading times, and the scale of the game, though they commented that the game is less accessible than previous \"Mario\" games, citing the camera's occasional, erratic movements and lack of optimal angle as frustrating. \"GamePro\" particularly praised the combination of unprecedented technical performance and captivating artistic design, calling it \"the most visually impressive game of all time.\" \"Maximum\" found the game's strongest points to be its sense of freedom and the fact that revisiting levels unearths new areas and challenges.",
-        "text_2":"The diversion has been commended in the gaming press, is still profoundly acclaimed. It has gathered various honors, including different \"Round of the Year\" respects by individuals from the gaming media, just as Nintendo's own top rated Player's Choice determination. What's more, \"Super Mario 64\" has been set high on \"the best rounds ever\" records by numerous analysts, including IGN, \"Diversion Informer\", \"Edge\", Yahoo! Diversions, and \"Nintendo Power\". \"Electronic Gaming Monthly\" granted the diversion a Gold honor in its underlying survey, and in \"Edge\" magazine, \"Super Mario 64\" was the primary amusement to get an ideal score. At the 1997 Computer Game Developers Conference, it was given Spotlight Awards for Best Use of Innovative Technology, Best Console Game, and Best Game of 1996. It won \"Electronic Gaming Monthly\"s Game of the Year for the two editors' pick and perusers' pick, just as Nintendo 64 Game of the Year, Adventure Game of the Year, and Best Graphics. English magazine \"Most extreme\" gave it their \"Most extreme Game of the Month Award\", making it the main import diversion (since \"Super Mario 64\" had not yet been discharged outside Japan) to win that respect, and validated it to be the best amusement the magazine had ever looked into. \"Amusement Informer\" at first appraised the diversion a 9.75, yet re-evaluated it a 9.0 every decade later in a \"Retro Review\". The Japanese gaming magazine \"Famitsu\" evaluated \"Super Mario 64\" a 39\/40. \"GamePro\" gave it an ideal 5 out of 5 in each class (FunFactor, control, sound, and illustrations). Normal recognition concentrated on the introduction, while analysis was aimed at the camera framework. \"Nintendo Power\" praised the designs, sound, and ongoing interaction, yet remarked the moving camera edge took becoming accustomed to. \"Cutting edge Magazine\" adulated numerous parts of the amusement: melodic score, designs, absence of stacking times, and the size of the diversion, however they remarked that the amusement is less available than past \"Mario\" recreations, refering to the camera's periodic, whimsical developments and absence of ideal point as disappointing. \"GamePro\" especially adulated the blend of phenomenal specialized execution and dazzling masterful plan, calling it \"the most outwardly amazing round ever.\" \"Greatest\" observed the amusement's most grounded focuses to be its feeling of opportunity and the way that returning to levels uncovers new territories and difficulties.",
-        "is_paraphrase":true
+        "dataset":"TURL",
+        "pair_id":"7AhUKGcP",
+        "id_1":"H5oNE392",
+        "id_2":"Eu6wgCUS",
+        "text_1":"Are you open to 2020 ? I am open to doing everything I can right now ",
+        "text_2":"Cory Booker has become the first sitting senator in history to testify against another sitting senator at a . ",
+        "is_paraphrase":false
     },
     "15":{
-        "dataset":"MPC",
-        "pair_id":"LAf827RD",
-        "id_1":"4kSMWDx8",
-        "id_2":"LF8ZvUmW",
-        "text_1":"Video game publications and developers praised \"Super Mario 64\" for its design and use of the 3D gameplay. The game is counted by 1UP.com as one of the first games to have brought a series of 2D games into full 3D. \"Maximum\" commented that \"The old 2D platform genre is essentially dead with the arrival of this game. The limitations inherent with the genre have been swept away in the wake of Mario 64.\" In the transition to 3D, many of the series conventions were rethought drastically, placing an emphasis on exploration over traditional platform jumping, or \"hop and bop\" action. While its quality was disputed by some, it has been argued that it established an entirely new genre, different from that of previous games in the series. \"Time Magazine\" focused on the realistic kinetic animation and the controls provided by the integration of the new pressure-sensitive controller into the game, calling it the \"fastest, smoothest game action yet attainable via joystick at the service of equally virtuoso motion\", where \"[f]or once, the movement on the screen feels real\".",
-        "text_2":"Computer game distributions and engineers adulated \"Super Mario 64\" for its structure and utilization of the 3D interactivity. The diversion is considered by 1UP.com one of the main recreations to have brought a progression of 2D amusements into full 3D. \"Most extreme\" remarked that \"The old 2D stage class is basically dead with the entry of this amusement. The constraints characteristic with the class have been cleared away in the wake of Mario 64.\" In the change to 3D, a large number of the arrangement traditions were reexamined definitely, putting an accentuation on investigation over customary stage hopping, or \"bounce and bop\" activity. While its quality was debated by a few, it has been contended that it set up a completely new sort, unique in relation to that of past diversions in the arrangement. \"Time Magazine\" concentrated on the practical dynamic activity and the controls given by the coordination of the new weight touchy controller into the amusement, considering it the \"quickest, smoothest diversion activity yet achievable through joystick at the administration of similarly virtuoso movement\", where \"[f]or once, the development on the screen feels genuine\".",
-        "is_paraphrase":true
+        "dataset":"TURL",
+        "pair_id":"P66gDNR6",
+        "id_1":"9S8fc4SN",
+        "id_2":"H8WgucAq",
+        "text_1":"Are you open to 2020 ? I am open to doing everything I can right now ",
+        "text_2":"on Sessions \" The arc of the moral universe does not just naturally curve toward justice we must bend it ",
+        "is_paraphrase":false
     },
     "16":{
-        "dataset":"MPC",
-        "pair_id":"PbfcLVJd",
-        "id_1":"2C2mmtud",
-        "id_2":"f272eVdQ",
-        "text_1":"In the same issue in which they reviewed the game, \"Next Generation\" ranked it number 1 on their \"Top 100 Games of All Time\". They explained, \"\"Super Mario 64\" is the first true 3D game to play as good as the 2D games of the 16-bit era. ... As such, it represents the new high-water mark of both gameplay and graphic sophistication.\" GameSpot called it one of the 15 most influential games of all time, and rated the Nintendo 64 version a score of 9.4 and the Wii Virtual Console version an 8. \"Game Informer\" commented that even a decade later the game still offers hours of entertainment. They also commented on the camera system, stating that by present-day standards the camera system \"would almost be considered broken\". Game Revolution's retrospective review referred to the graphics as \"beautiful\", but criticized the camera angles, saying \"it doesn't work as well as it should\". The game placed 6th in \"Official Nintendo Magazine\"s \"100 greatest Nintendo games of all time\". In 2009, \"Game Informer\" put \"Super Mario 64\" 13th on their list of \"The Top 200 Games of All Time\". \"Official Nintendo Magazine\" referred to the game as a \"masterpiece of game design\", stating that Nintendo was able to take its \"number-one 2D franchise and convert it flawlessly into 3D\". Michael Grayford of Liquid Entertainment stated he was initially \"very turned off\" by the openness of the game the first time he played it. Upon playing it later, he was \"highly pleased\" and stated \"each level brought some new unique cool gameplay element and I was never bored\". Warren Spector, former lead designer at Ion Storm, stated it was \"not possible to squeeze this much gameplay into a single game\" and \"no game has done a better job of showing goals before they can be attained, allowing players to make a plan and execute on it\". He also praised the exploration aspect of the game, commenting that \"[allowing players to] explore the same spaces several times while revealing something new each time is a revelation\".",
-        "text_2":"In a similar issue in which they assessed the diversion, \"People to come\" positioned it number 1 on their \"Best 100 Games of All Time\". They clarified, \"\"Super Mario 64\" is the main genuine 3D diversion to play in the same class as the 2D rounds of the 16-bit time. ... All things considered, it speaks to the new high-water sign of both ongoing interaction and realistic advancement.\" GameSpot called it one of the 15 most powerful rounds ever, and appraised the Nintendo 64 form a score of 9.4 and the Wii Virtual Console form a 8. \"Amusement Informer\" remarked that even after 10 years the diversion still offers long stretches of excitement. They additionally remarked on the camera framework, expressing that by present-day norms the camera framework \"would nearly be viewed as broken\". Diversion Revolution's review survey alluded to the illustrations as \"wonderful\", however censured the camera edges, saying \"it doesn't function just as it should\". The diversion set sixth in \"Official Nintendo Magazine\"s \"100 biggest Nintendo rounds ever\". In 2009, \"Diversion Informer\" put \"Super Mario 64\" thirteenth on their rundown of \"The Top 200 Games of All Time\". \"Official Nintendo Magazine\" alluded to the amusement as a \"showstopper of diversion configuration\", expressing that Nintendo had the capacity to take its \"number-one 2D establishment and convert it immaculately into 3D\". Michael Grayford of Liquid Entertainment expressed he was at first \"very killed\" by the transparency of the amusement the first occasion when he played it. After playing it later, he was \"exceedingly satisfied\" and expressed \"each dimension brought some new one of a kind cool ongoing interaction component and I was never exhausted\". Warren Spector, previous lead architect at Ion Storm, expressed it was \"unrealistic to crush this much ongoing interaction into a solitary amusement\" and \"no diversion has completed a superior employment of appearing before they can be accomplished, enabling players to make an arrangement and execute on it\". He likewise commended the investigation part of the amusement, remarking that \"[allowing players to] investigate similar spaces a few times while uncovering something new each time is a disclosure\".",
-        "is_paraphrase":true
+        "dataset":"TURL",
+        "pair_id":"ZcWyuqZT",
+        "id_1":"mwxJrxWf",
+        "id_2":"9h83wJGG",
+        "text_1":"Are you open to 2020 ? I am open to doing everything I can right now ",
+        "text_2":"I LITERALLY just saw Corey Booker say he was \" honored \" to work alongside Jeff Sessions . He didn't know before ? ",
+        "is_paraphrase":false
     },
     "17":{
-        "dataset":"MPC",
-        "pair_id":"d27WFpj4",
-        "id_1":"e5mf7qb9",
-        "id_2":"Nrbtik8U",
-        "text_1":"Critics acknowledge \"Super Mario 64\" as a key contributor to the anticipation, and initial success, of the Nintendo 64 console. Though the system was initially very successful, it eventually lost much of its market share to Sony's PlayStation. 1UP.com attributed this decline to Nintendo's use of cartridges and the design of the Nintendo 64 controller, which were reportedly implemented by Miyamoto for \"Super Mario 64\".",
-        "text_2":"Pundits recognize \"Super Mario 64\" as a key supporter of the expectation, and beginning achievement, of the Nintendo 64 reassure. In spite of the fact that the framework was at first exceptionally effective, it in the end lost quite a bit of its piece of the pie to Sony's PlayStation. 1UP.com credited this decrease to Nintendo's utilization of cartridges and the structure of the Nintendo 64 controller, which were supposedly actualized by Miyamoto for \"Super Mario 64\".",
-        "is_paraphrase":true
+        "dataset":"TURL",
+        "pair_id":"cPm3KLPS",
+        "id_1":"NT5qxogY",
+        "id_2":"h7tsvXbN",
+        "text_1":"Are you open to 2020 ? I am open to doing everything I can right now ",
+        "text_2":"Corey Booker lays out why Jeff Sessions would be the anti-christ of justice on any level ",
+        "is_paraphrase":false
     },
     "18":{
-        "dataset":"MPC",
-        "pair_id":"2cEHovEE",
-        "id_1":"HB7BUjZP",
-        "id_2":"9Z4T3Qur",
-        "text_1":"The game also set many precedents for 3D platformers to follow. GameDaily listed the game as one of the \"Most Influential Video Games\" and stated it \"defined the 3-D platform experience, influencing numerous designers to create their own, original offerings\". \"GamesTM\" noted many game companies, including Nintendo, have tried to develop a platform game to match up to \"Super Mario 64\". Members of Rare, a second-party developer for Nintendo during the 1990s, reflected in 2013 that during the development of 2001's \"Conker's Bad Fur Day\", they had originally drawn inspiration from their deep analysis of the gameplay and camera mechanics of \"Super Mario 64\": \"We were just copying \"Mario\", weren't we? Which, to this day, is still the best 3D camera.\" \"Super Mario 64\" is notable for its sense of freedom and non-linearity. A central hub, where controls can be learned before entering levels themselves, has been used in many 3D platformers since. In addition, the game's mission-based level design is an inspiration for other game designers. Martin Hollis, who produced and directed Rare's \"GoldenEye 007\", says \"the idea for the huge variety of missions within a level came from \"Super Mario 64\"\". In 2012, Dan Houser, a prominent figure in the development of the \"Grand Theft Auto\" series, stated, \"Anyone who makes 3D games who says they've not borrowed something from \"Mario\" or \"Zelda\" [on the Nintendo 64] is lying.\" Tetsuya Nomura, a leading designer at Square Enix, stated in 2016 that \"Super Mario 64\" was the impetus for the creation of the \"Kingdom Hearts\" series.",
-        "text_2":"The diversion likewise set numerous points of reference for 3D platformers to pursue. GameDaily recorded the amusement as a standout amongst the \"Most Influential Video Games\" and expressed it \"characterized the 3-D stage understanding, impacting various creators to make their own, unique contributions\". \"GamesTM\" noted many diversion organizations, including Nintendo, have attempted to build up a stage amusement to coordinate to \"Super Mario 64\". Individuals from Rare, a second-party engineer for Nintendo amid the 1990s, reflected in 2013 that amid the improvement of 2001's \"Conker's Bad Fur Day\", they had initially drawn motivation from their profound examination of the ongoing interaction and camera mechanics of \"Super Mario 64\": \"We were simply replicating \"Mario\", would we say we weren't? Which, right up 'til the present time, is as yet the best 3D camera.\" \"Super Mario 64\" is remarkable for its feeling of opportunity and non-linearity. A focal center, where controls can be learned before entering levels themselves, has been utilized in numerous 3D platformers since. Likewise, the amusement's main goal based dimension configuration is a motivation for other diversion creators. Martin Hollis, who created and coordinated Rare's \"GoldenEye 007\", says \"the thought for the enormous assortment of missions inside a dimension originated from \"Super Mario 64\"\". In 2012, Dan Houser, an unmistakable figure in the improvement of the \"Stupendous Theft Auto\" arrangement, expressed, \"Any individual who makes 3D recreations who says they've not obtained something from \"Mario\" or \"Zelda\" [on the Nintendo 64] is lying.\" Tetsuya Nomura, a main creator at Square Enix, expressed in 2016 that \"Super Mario 64\" was the catalyst for the formation of the \"Kingdom Hearts\" arrangement.",
-        "is_paraphrase":true
+        "dataset":"TURL",
+        "pair_id":"GsmE7vEg",
+        "id_1":"QUYZVubm",
+        "id_2":"nzfXpDBR",
+        "text_1":"Are you open to 2020 ? I am open to doing everything I can right now ",
+        "text_2":"Cory Booker testifies that Jeff Sessions has been hostile to civil rights ",
+        "is_paraphrase":false
     },
     "19":{
-        "dataset":"MPC",
-        "pair_id":"igvmidn7",
-        "id_1":"nnhKcDHw",
-        "id_2":"9bSykfK3",
-        "text_1":"\"Super Mario 64\" is the first game to have a \"free\" camera that can be controlled independently of the character. Most 3D games from the time use a first-person perspective, or a camera that is fixed in position relative to the player's character, or to the level. To create freedom of exploration, and more fluid control in a 3D world, the designers created a dynamic system in which the video camera is operated by the in-game character Lakitu. The camera system would become the standard for 3D platform games in the future. \"Nintendo Power\" stated the camera-control scheme is what transitioned platform games into three dimensions, and that the game, along with \"\", \"blazed trails\" into the 3D era. Along with camera control, the game also innovated in its implementation of movement. \"Edge\" stated the game changed \"gamers' expectations of 3D movement forever\". The Nintendo 64's analog stick allows for more precise and wide-ranging character movements than the digital D-pads of other consoles, and \"Super Mario 64\" uses this in a way that was unique for its time. At the time, 3D games generally allowed for controls in which the player could either control the character in relation to a fixed camera angle or in relation to the character's perspective. \"Super Mario 64\"s controls are fully analog, and interpret a 360-degree range of motion into navigation through a 3D space relative to the camera. The analog stick also allows for precise control over subtleties such as the speed at which Mario runs. \"Super Mario 64\" was one of the first games to implement the system.",
-        "text_2":"\"Super Mario 64\" is the primary diversion to have a \"free\" camera that can be controlled autonomously of the character. Most 3D amusements from the time utilize a first-individual point of view, or a camera that is fixed in position with respect to the player's character, or to the dimension. To make opportunity of investigation, and progressively liquid control in a 3D world, the originators made a dynamic framework in which the camcorder is worked by the in-amusement character Lakitu. The camera framework would turn into the standard for 3D stage amusements later on. \"Nintendo Power\" expressed the camera-control plot is the thing that changed stage amusements into three measurements, and that the diversion, alongside \"\", \"pioneered trails\" into the 3D time. Alongside camera control, the amusement additionally developed in its usage of development. \"Edge\" expressed the amusement changed \"gamers' desires for 3D development for eternity\". The Nintendo 64's simple stick takes into consideration more exact and wide-going character developments than the computerized D-stack of different consoles, and \"Super Mario 64\" utilizes this in a way that was one of a kind for now is the ideal time. At the time, 3D recreations for the most part took into consideration controls in which the player could either control the character in connection to a fixed camera edge or in connection to the character's point of view. \"Super Mario 64\"s controls are completely simple, and translate a 360-degree scope of movement into route through a 3D space with respect to the camera. The simple stick additionally takes into consideration exact command over nuances, for example, the speed at which Mario runs. \"Super Mario 64\" was one of the principal diversions to execute the framework.",
-        "is_paraphrase":true
+        "dataset":"TURL",
+        "pair_id":"4DJZMLwC",
+        "id_1":"h6t2KKnd",
+        "id_2":"AgrpbMd3",
+        "text_1":"Are you open to 2020 ? I am open to doing everything I can right now ",
+        "text_2":"New Jersey Sen. Cory Booker gave an impassioned and unprecedented plea to the Senate on Wednesday to vote against Donald Trump's nominee for attorney general and his fellow senator, Jeff Sessions.\" property",
+        "is_paraphrase":false
     },
     "20":{
-        "dataset":"MPC",
-        "pair_id":"EiQrzMjX",
-        "id_1":"37Mj9Pmo",
-        "id_2":"bJhYWdqb",
-        "text_1":"Because of the game's popularity, rumors about glitches and secrets spread rapidly after its release. A common rumor was that Luigi was a secret character in the game, fueled by illegible symbols in the castle courtyard that were said to resemble the text \"L is real 2401\". This same texture would reappear in \"\" on a plaque in Dodongo's Cavern. IGN received so many questions and supposed methods to unlock Luigi that the staff offered a reward to anyone who could prove that Luigi was in the game. The number of false codes submitted to IGN dropped dramatically, as Luigi's inclusion was proved to be a myth. The April Fools' Day 1998 issue of \"Nintendo Power\" claims that the cryptic phrase would be discussed on the non-existent page 128, and also features a facetious article, \"Luigi 64\", commenting humorously on the rumor. Several players have discovered coins that were impossible to obtain without glitching the game. Scott Buchanan, under the alias pannenkoek2012, had managed to collect one of those coins in 2014 without tool-assistance, and also creates content about the programming mechanics of \"Super Mario 64\".",
-        "text_2":"In view of the amusement's ubiquity, bits of gossip about glitches and privileged insights spread quickly after its discharge. A typical talk was that Luigi was a mystery character in the diversion, filled by unintelligible images in the manor yard that were said to take after the content \"L is genuine 2401\". This equivalent surface would return in \"\" on a plaque in Dodongo's Cavern. IGN got such a large number of inquiries and assumed techniques to open Luigi that the staff offered a reward to any individual who could demonstrate that Luigi was in the diversion. The quantity of false codes submitted to IGN dropped significantly, as Luigi's consideration was ended up being a legend. The April Fools' Day 1998 issue of \"Nintendo Power\" asserts that the obscure expression would be talked about on the non-existent page 128, and furthermore includes a wry article, \"Luigi 64\", remarking amusingly on the gossip. A few players have found coins that were difficult to get without glitching the diversion. Scott Buchanan, under the moniker pannenkoek2012, had figured out how to gather one of those coins in 2014 without device help, and furthermore makes content about the programming mechanics of \"Super Mario 64\".",
-        "is_paraphrase":true
+        "dataset":"TURL",
+        "pair_id":"fRpaLueJ",
+        "id_1":"a6xJdQhq",
+        "id_2":"UbSbMdds",
+        "text_1":"Trump is manipulating the media the same way he manipulated the electorate ",
+        "text_2":"exploited the gap expertly , turning one journalist against another , see this excellent column ",
+        "is_paraphrase":false
     },
     "21":{
-        "dataset":"MPC",
-        "pair_id":"jVSQzocK",
-        "id_1":"XwMDyqXK",
-        "id_2":"CGjTBfED",
-        "text_1":"On May 5, 2011, \"Super Mario 64\" was selected as one of the 80 games to be displayed at the Smithsonian American Art Museum as part of \"The Art of Video Games\" exhibit that opened on March 16, 2012.",
-        "text_2":"On May 5, 2011, \"Super Mario 64\" was chosen as one of the 80 recreations to be shown at the Smithsonian American Art Museum as a major aspect of \"The Art of Video Games\" display that opened on March 16, 2012.",
+        "dataset":"TURL",
+        "pair_id":"AbB5LnsC",
+        "id_1":"5WFc2SHB",
+        "id_2":"Jv22bJzf",
+        "text_1":"Trump is manipulating the media the same way he manipulated the electorate ",
+        "text_2":"How Trump is manipulating the media . ",
         "is_paraphrase":true
     },
     "22":{
-        "dataset":"MPC",
-        "pair_id":"2W7d5Nyj",
-        "id_1":"i7LBpZbL",
-        "id_2":"Ro46qEpe",
-        "text_1":"A 64DD version of the original game was created only for demonstration of the prototype drive's operation and performance at the 1996 Nintendo Space World trade show. Nintendo of America's Chairman Howard Lincoln explained, \"\"Super Mario 64\" is running on the 64DD right now. First they weren't going to show anything on 64DD, but they decided at the last minute to have a game people recognize.\"",
-        "text_2":"A 64DD variant of the first diversion was made just for exhibition of the model drive's task and execution at the 1996 Nintendo Space World public expo. Nintendo of America's Chairman Howard Lincoln clarified, \"\"Super Mario 64\" is running on the 64DD at the present time. First they weren't going to indicate anything on 64DD, yet they chose ultimately to have a diversion people perceive.\"",
-        "is_paraphrase":true
+        "dataset":"TURL",
+        "pair_id":"PrzLXkyB",
+        "id_1":"W3FQuy48",
+        "id_2":"SHeLogHN",
+        "text_1":"Trump is manipulating the media the same way he manipulated the electorate ",
+        "text_2":"After the Liar King's birth cert . Con job , his crowd isn't allowed to use the word responsibility ; Tune them out . ",
+        "is_paraphrase":false
     },
     "23":{
-        "dataset":"MPC",
-        "pair_id":"ewqMbXic",
-        "id_1":"TeUpd74g",
-        "id_2":"23iArUjW",
-        "text_1":"Like \"Wave Race 64\", \"Super Mario 64\" was re-released in Japan on July 18, 1997, as . This version adds support for Nintendo's Rumble Pak peripheral and includes the voice acting from the English version. In 1998, \"Super Mario 64\" was re-released in Europe and North America as part of the Player's Choice line, a selection of games with high sales sold for a reduced price. The game was later released on the Wii's Virtual Console service in the United States on November 19, 2006, and in other territories the following weeks. This release adds compatibility with the GameCube and Classic controllers, and enhances the resolution to 480p.",
-        "text_2":"Like \"Wave Race 64\", \"Super Mario 64\" was re-discharged in Japan on July 18, 1997, as . This variant includes support for Nintendo's Rumble Pak fringe and incorporates the voice acting from the English rendition. In 1998, \"Super Mario 64\" was re-discharged in Europe and North America as a feature of the Player's Choice line, a choice of recreations with high deals sold at a diminished cost. The diversion was later discharged on the Wii's Virtual Console administration in the United States on November 19, 2006, and in different domains the next weeks. This discharge includes similarity with the GameCube and Classic controllers, and upgrades the goals to 480p.",
-        "is_paraphrase":true
+        "dataset":"TURL",
+        "pair_id":"mYxSyaFB",
+        "id_1":"PWyrT6gk",
+        "id_2":"asxqhQWN",
+        "text_1":"Trump is manipulating the media the same way he manipulated the electorate ",
+        "text_2":"News orgs that turn on each other or fail to stick up for one another presents a big problem in the US right now . ",
+        "is_paraphrase":false
     },
     "24":{
-        "dataset":"MPC",
-        "pair_id":"NJP4tfpr",
-        "id_1":"WcSFzdzC",
-        "id_2":"YKgNSDr9",
-        "text_1":"An enhanced remake for the Nintendo DS called \"Super Mario 64 DS\" was available for the launch of the handheld system in 2004. Yoshi, Luigi, and Wario are additional playable characters, and the game features improved graphics, slightly altered courses, touchscreen mini-games, and a multiplayer mode. In addition, the number of Power Stars has been raised from 120 to 150. Reviews were mostly positive, and by March 2008, 6.12 million copies of \"Super Mario 64 DS\" had been sold worldwide. In 2015, a fan remake of \"Super Mario 64\" was created in Unity, called \"Super Mario 64 HD\". The project was later taken down due to a copyright claim by Nintendo.",
-        "text_2":"An improved revamp for the Nintendo DS called \"Super Mario 64 DS\" was accessible for the dispatch of the handheld framework in 2004. Yoshi, Luigi, and Wario are extra playable characters, and the diversion highlights improved illustrations, marginally adjusted courses, touchscreen smaller than usual recreations, and a multiplayer mode. Also, the quantity of Power Stars has been raised from 120 to 150. Audits were for the most part positive, and by March 2008, 6.12 million duplicates of \"Super Mario 64 DS\" had been sold around the world. In 2015, a fan change of \"Super Mario 64\" was made in Unity, called \"Super Mario 64 HD\". The venture was later brought down because of a copyright guarantee by Nintendo.",
-        "is_paraphrase":true
+        "dataset":"TURL",
+        "pair_id":"7K55a5EB",
+        "id_1":"UGVvRp77",
+        "id_2":"DTNzKANT",
+        "text_1":"Trump is manipulating the media the same way he manipulated the electorate ",
+        "text_2":"Trump exploited weaknesses not just the tendency of the press to eat itself , but also its own status anxieties . ",
+        "is_paraphrase":false
     },
     "25":{
-        "dataset":"MPC",
-        "pair_id":"7M6f9x3n",
-        "id_1":"JaPsiZDQ",
-        "id_2":"myri7r3b",
-        "text_1":"A direct sequel tentatively titled \"Super Mario 64 2\" was planned for the Nintendo 64DD. In July 1996 Nintendo insiders stated that Miyamoto was assembling a team to work on a \"Super Mario 64\" sequel, consisting mostly of developers who had worked on the original \"Super Mario 64\". Miyamoto mentioned at E3's 1997 convention that he was \"just getting started\" on the project. In May 1999, \"Super Mario 64 2\" was reported to be released in late 1999; however, the game was canceled due to the commercial failure of the 64DD, as well as lack of progress in the game's development.",
-        "text_2":"An immediate spin-off likely titled \"Super Mario 64 2\" was gotten ready for the Nintendo 64DD. In July 1996 Nintendo insiders expressed that Miyamoto was amassing a group to deal with a \"Super Mario 64\" continuation, comprising for the most part of engineers who had taken a shot at the first \"Super Mario 64\". Miyamoto referenced at E3's 1997 tradition that he was \"simply beginning\" on the task. In May 1999, \"Super Mario 64 2\" was accounted for to be discharged in late 1999; in any case, the diversion was dropped because of the business disappointment of the 64DD, just as absence of advancement in the amusement's improvement.",
-        "is_paraphrase":true
+        "dataset":"TURL",
+        "pair_id":"BvnVgXeK",
+        "id_1":"46kTKmXy",
+        "id_2":"B6mq83j6",
+        "text_1":"Trump is manipulating the media the same way he manipulated the electorate ",
+        "text_2":"He exploited voters status anxieties in the election . Now hes doing it to journalists . ",
+        "is_paraphrase":false
     },
     "26":{
-        "dataset":"MPC",
-        "pair_id":"j25aZhPC",
-        "id_1":"mV4AGr5h",
-        "id_2":"Hax8tm3u",
-        "text_1":"Instead, \"Super Mario 64\" was followed by other 3D \"Mario\" games on subsequent Nintendo systems, such as \"Super Mario Sunshine\" for the GameCube and \"Super Mario Galaxy\" for the Wii. These games built on \"Super Mario 64\"s core design of enhancement items and open ended gameplay. \"Super Mario Galaxy 2\" features a remake of \"Mario 64\"s Whomp's Fortress level. Later 3D games, namely \"Super Mario 3D Land\" and \"Super Mario 3D World\", while keeping many of \"Super Mario 64\"s core gameplay elements, departed from the game's open-ended design and focused more on platforming reminiscent of 2D games. The Nintendo Switch game \"Super Mario Odyssey\" returns to \"Super Mario 64\"s open design.",
-        "text_2":"Rather, \"Super Mario 64\" was trailed by other 3D \"Mario\" diversions on resulting Nintendo frameworks, for example, \"Super Mario Sunshine\" for the GameCube and \"Super Mario Galaxy\" for the Wii. These amusements based on \"Super Mario 64\"s center structure of improvement things and open finished interactivity. \"Super Mario Galaxy 2\" includes a revamp of \"Mario 64\"s Whomp's Fortress level. Later 3D diversions, specifically \"Super Mario 3D Land\" and \"Super Mario 3D World\", while keeping a significant number of \"Super Mario 64\"s center ongoing interaction components, withdrew from the amusement's open-finished structure and concentrated more on platforming reminiscent of 2D recreations. The Nintendo Switch amusement \"Super Mario Odyssey\" comes back to \"Super Mario 64\"s open plan.",
+        "dataset":"TURL",
+        "pair_id":"3aZLYTUE",
+        "id_1":"jpGWd4EH",
+        "id_2":"gYzV5XWV",
+        "text_1":"Trump is manipulating the media the same way he manipulated the electorate ",
+        "text_2":"Trump is manipulating the media the same way he did the electorate . ",
         "is_paraphrase":true
     },
     "27":{
-        "dataset":"ETPC",
-        "pair_id":"3Yp2BWAw",
-        "id_1":"702876",
-        "id_2":"702977",
-        "text_1":"Amrozi accused his brother, whom he called \"the witness\", of deliberately distorting his evidence.",
-        "text_2":"Referring to him as only \"the witness\", Amrozi accused his brother of deliberately distorting his evidence.",
-        "is_paraphrase":true
+        "dataset":"TURL",
+        "pair_id":"YDTFuyph",
+        "id_1":"8w9AE8uA",
+        "id_2":"ErZp8eaN",
+        "text_1":"Trump is manipulating the media the same way he manipulated the electorate ",
+        "text_2":"He exploited traditional media outlets intense desire to be perceived as sober and objective a business . ",
+        "is_paraphrase":false
     },
     "28":{
-        "dataset":"ETPC",
-        "pair_id":"8kEejbKJ",
-        "id_1":"2108705",
-        "id_2":"2108831",
-        "text_1":"Yucaipa owned Dominick's before selling the chain to Safeway in 1998 for $2.5 billion.",
-        "text_2":"Yucaipa bought Dominick's in 1995 for $693 million and sold it to Safeway for $1.8 billion in 1998.",
+        "dataset":"TURL",
+        "pair_id":"5DumcWk8",
+        "id_1":"2PyP9iSm",
+        "id_2":"6bJiG2mE",
+        "text_1":"Trump is manipulating the media the same way he manipulated the electorate ",
+        "text_2":"Media must resist the urge to turn against one another . You're dealing with a master manipulator . ",
         "is_paraphrase":false
     },
     "29":{
-        "dataset":"ETPC",
-        "pair_id":"Ds862sfD",
-        "id_1":"1330381",
-        "id_2":"1330521",
-        "text_1":"They had published an advertisement on the Internet on June 10, offering the cargo for sale, he added.",
-        "text_2":"On June 10, the ship's owners had published an advertisement on the Internet, offering the explosives for sale.",
-        "is_paraphrase":true
-    },
-    "30":{
-        "dataset":"ETPC",
-        "pair_id":"FsbJDWtN",
-        "id_1":"3344667",
-        "id_2":"3344648",
-        "text_1":"Around 0335 GMT, Tab shares were up 19 cents, or 4.4%, at A$4.56, having earlier set a record high of A$4.57.",
-        "text_2":"Tab shares jumped 20 cents, or 4.6%, to set a record closing high at A$4.57.",
+        "dataset":"TURL",
+        "pair_id":"kSuMzX9t",
+        "id_1":"duiGXhXb",
+        "id_2":"JkcvFu5v",
+        "text_1":"Trump is manipulating the media the same way he manipulated the electorate ",
+        "text_2":"The &ldquo;liberal media&rdquo; have long been one of President-elect Donald Trump&rsquo;s favorite punching bags. So it was no surprise on Wednesday to hear Trump use h ...",
         "is_paraphrase":false
-    },
-    "31":{
-        "dataset":"ETPC",
-        "pair_id":"auUyuDEm",
-        "id_1":"1236820",
-        "id_2":"1236712",
-        "text_1":"The stock rose $2.11, or about 11 percent, to close Friday at $21.51 on the New York Stock Exchange.",
-        "text_2":"PG&E Corp. shares jumped $1.63 or 8 percent to $21.03 on the New York Stock Exchange on Friday.",
-        "is_paraphrase":false
-    },
-    "32":{
-        "dataset":"ETPC",
-        "pair_id":"QGuRSctx",
-        "id_1":"738533",
-        "id_2":"737951",
-        "text_1":"Revenue in the first quarter of the year dropped 15 percent from the same period a year earlier.",
-        "text_2":"With the scandal hanging over Stewart's company, revenue the first quarter of the year dropped 15 percent from the same period a year earlier.",
-        "is_paraphrase":true
-    },
-    "33":{
-        "dataset":"ETPC",
-        "pair_id":"ZhFW5h2f",
-        "id_1":"264589",
-        "id_2":"264502",
-        "text_1":"The Nasdaq had a weekly gain of 17.27, or 1.2 percent, closing at 1,520.15 on Friday.",
-        "text_2":"The tech-laced Nasdaq Composite .IXIC rallied 30.46 points, or 2.04 percent, to 1,520.15.",
-        "is_paraphrase":false
-    },
-    "34":{
-        "dataset":"ETPC",
-        "pair_id":"UrN5UjUL",
-        "id_1":"579975",
-        "id_2":"579810",
-        "text_1":"The DVD-CCA then appealed to the state Supreme Court.",
-        "text_2":"The DVD CCA appealed that decision to the U.S. Supreme Court.",
-        "is_paraphrase":true
-    },
-    "35":{
-        "dataset":"ETPC",
-        "pair_id":"2kPKo9DV",
-        "id_1":"3114205",
-        "id_2":"3114194",
-        "text_1":"That compared with $35.18 million, or 24 cents per share, in the year-ago period.",
-        "text_2":"Earnings were affected by a non-recurring $8 million tax benefit in the year-ago period.",
-        "is_paraphrase":false
-    },
-    "36":{
-        "dataset":"ETPC",
-        "pair_id":"TeJRBhes",
-        "id_1":"1355540",
-        "id_2":"1355592",
-        "text_1":"He said the foodservice pie business doesn't fit the company's long-term growth strategy.",
-        "text_2":"\"The foodservice pie business does not fit our long-term growth strategy.",
-        "is_paraphrase":true
-    },
-    "37":{
-        "dataset":"ETPC",
-        "pair_id":"TEaNzrJG",
-        "id_1":"222621",
-        "id_2":"222514",
-        "text_1":"Shares of Genentech, a much larger company with several products on the market, rose more than 2 percent.",
-        "text_2":"Shares of Xoma fell 16 percent in early trade, while shares of Genentech, a much larger company with several products on the market, were up 2 percent.",
-        "is_paraphrase":false
-    },
-    "38":{
-        "dataset":"ETPC",
-        "pair_id":"emnpsnVw",
-        "id_1":"3131772",
-        "id_2":"3131625",
-        "text_1":"Legislation making it harder for consumers to erase their debts in bankruptcy court won overwhelming House approval in March.",
-        "text_2":"Legislation making it harder for consumers to erase their debts in bankruptcy court won speedy, House approval in March and was endorsed by the White House.",
-        "is_paraphrase":false
-    },
-    "39":{
-        "dataset":"ETPC",
-        "pair_id":"kox2rKWJ",
-        "id_1":"58747",
-        "id_2":"58516",
-        "text_1":"The Nasdaq composite index increased 10.73, or 0.7 percent, to 1,514.77.",
-        "text_2":"The Nasdaq Composite index, full of technology stocks, was lately up around 18 points.",
-        "is_paraphrase":false
-    },
-    "40":{
-        "dataset":"ETPC",
-        "pair_id":"CDCi9Lqp",
-        "id_1":"1464126",
-        "id_2":"1464107",
-        "text_1":"But he added group performance would improve in the second half of the year and beyond.",
-        "text_2":"De Sole said in the results statement that group performance would improve in the second half of the year and beyond.",
-        "is_paraphrase":true
-    },
-    "41":{
-        "dataset":"ETPC",
-        "pair_id":"eWs9zPLD",
-        "id_1":"771416",
-        "id_2":"771467",
-        "text_1":"He told The Sun newspaper that Mr. Hussein's daughters had British schools and hospitals in mind when they decided to ask for asylum.",
-        "text_2":"\"Saddam's daughters had British schools and hospitals in mind when they decided to ask for asylum -- especially the schools,\" he told The Sun.",
-        "is_paraphrase":true
-    },
-    "42":{
-        "dataset":"ETPC",
-        "pair_id":"A8Xq8JgY",
-        "id_1":"142746",
-        "id_2":"142671",
-        "text_1":"Gyorgy Heizler, head of the local disaster unit, said the coach was carrying 38 passengers.",
-        "text_2":"The head of the local disaster unit, Gyorgy Heizler, said the coach driver had failed to heed red stop lights.",
-        "is_paraphrase":false
-    },
-    "43":{
-        "dataset":"ETPC",
-        "pair_id":"Lhk2EFdC",
-        "id_1":"1286053",
-        "id_2":"1286069",
-        "text_1":"Rudder was most recently senior vice president for the Developer & Platform Evangelism Business.",
-        "text_2":"Senior Vice President Eric Rudder, formerly head of the Developer and Platform Evangelism unit, will lead the new entity.",
-        "is_paraphrase":false
-    },
-    "44":{
-        "dataset":"ETPC",
-        "pair_id":"467DkSdR",
-        "id_1":"1563874",
-        "id_2":"1563853",
-        "text_1":"As well as the dolphin scheme, the chaos has allowed foreign companies to engage in damaging logging and fishing operations without proper monitoring or export controls.",
-        "text_2":"Internal chaos has allowed foreign companies to set up damaging commercial logging and fishing operations without proper monitoring or export controls.",
-        "is_paraphrase":true
-    },
-    "45":{
-        "dataset":"ETPC",
-        "pair_id":"PBXHMstB",
-        "id_1":"2029631",
-        "id_2":"2029565",
-        "text_1":"Magnarelli said Racicot hated the Iraqi regime and looked forward to using his long years of training in the war.",
-        "text_2":"His wife said he was \"100 percent behind George Bush\" and looked forward to using his years of training in the war.",
-        "is_paraphrase":false
-    },
-    "46":{
-        "dataset":"ETPC",
-        "pair_id":"FM7zMPaL",
-        "id_1":"2150265",
-        "id_2":"2150184",
-        "text_1":"Sheena Young of Child, the national infertility support network, hoped the guidelines would lead to a more \"fair and equitable\" service for infertility sufferers.",
-        "text_2":"Sheena Young, a spokesman for Child, the national infertility support network, said the proposed guidelines should lead to a more \"fair and equitable\" service for infertility sufferers.",
-        "is_paraphrase":true
-    },
-    "47":{
-        "dataset":"ETPC",
-        "pair_id":"HEpbhx5B",
-        "id_1":"2044342",
-        "id_2":"2044457",
-        "text_1":"\"I think you'll see a lot of job growth in the next two years,\" he said, adding the growth could replace jobs lost.",
-        "text_2":"\"I think you'll see a lot of job growth in the next two years,\" said Mankiw.",
-        "is_paraphrase":false
-    },
-    "48":{
-        "dataset":"ETPC",
-        "pair_id":"HWJpzQNp",
-        "id_1":"1284150",
-        "id_2":"1284173",
-        "text_1":"The new Finder puts a user's folders, hard drive, network servers, iDisk and removable media in one location, providing one-click access.",
-        "text_2":"Panther's redesigned Finder navigation tool puts a user's favourite folders, hard drive, network servers, iDisk and removable media in one location.",
-        "is_paraphrase":true
-    },
-    "49":{
-        "dataset":"ETPC",
-        "pair_id":"kMERzy2Y",
-        "id_1":"3270389",
-        "id_2":"3270327",
-        "text_1":"But tropical storm warnings and watches were posted today for Haiti, western portions of the Dominican Republic, the southeastern Bahamas and the Turk and Caicos islands.",
-        "text_2":"Tropical storm warnings were in place Thursday for Jamaica and Haiti and watches for the western Dominican Republic, the southeastern Bahamas and the Turks and Caicos islands.",
-        "is_paraphrase":false
-    },
-    "50":{
-        "dataset":"ETPC",
-        "pair_id":"kxyAF89M",
-        "id_1":"2294059",
-        "id_2":"2294112",
-        "text_1":"A federal magistrate in Fort Lauderdale ordered him held without bail.",
-        "text_2":"Zuccarini was ordered held without bail Wednesday by a federal judge in Fort Lauderdale, Fla.",
-        "is_paraphrase":true
-    },
-    "51":{
-        "dataset":"ETPC",
-        "pair_id":"VQSPJuow",
-        "id_1":"1713015",
-        "id_2":"1712982",
-        "text_1":"A BMI of 25 or above is considered overweight; 30 or above is considered obese.",
-        "text_2":"A BMI between 18.5 and 24.9 is considered normal, over 25 is considered overweight and 30 or greater is defined as obese.",
-        "is_paraphrase":false
-    },
-    "52":{
-        "dataset":"ETPC",
-        "pair_id":"jknzWXB8",
-        "id_1":"487993",
-        "id_2":"487952",
-        "text_1":"The dollar was at 116.92 yen against the yen , flat on the session, and at 1.2891 against the Swiss franc , also flat.",
-        "text_2":"The dollar was at 116.78 yen JPY= , virtually flat on the session, and at 1.2871 against the Swiss franc CHF= , down 0.1 percent.",
-        "is_paraphrase":false
-    },
-    "53":{
-        "dataset":"ETPC",
-        "pair_id":"VjK6ZApK",
-        "id_1":"1321918",
-        "id_2":"1321644",
-        "text_1":"Six months ago, the IMF and Argentina struck a bare-minimum $6.8-billion debt rollover deal that expires in August.",
-        "text_2":"But six months ago, the two sides managed to strike a $6.8-billion debt rollover deal, which expires in August.",
-        "is_paraphrase":true
-    },
-    "54":{
-        "dataset":"ETPC",
-        "pair_id":"YkVuZGnA",
-        "id_1":"1239046",
-        "id_2":"1239031",
-        "text_1":"Inhibited children tend to be timid with new people, objects, and situations, while uninhibited children spontaneously approach them.",
-        "text_2":"Simply put, shy invividuals tend to be more timid with new people and situations.",
-        "is_paraphrase":true
-    },
-    "55":{
-        "dataset":"ETPC",
-        "pair_id":"C5nW3sbx",
-        "id_1":"2907515",
-        "id_2":"2907224",
-        "text_1":"I wanted to bring the most beautiful people into the most beautiful building, he said Sunday inside the Grand Central concourse.",
-        "text_2":"\"I wanted to bring the most beautiful people into the most beautiful building,\" Tunick said Sunday.",
-        "is_paraphrase":true
-    },
-    "56":{
-        "dataset":"ETPC",
-        "pair_id":"BB2zRpo8",
-        "id_1":"2791650",
-        "id_2":"2791604",
-        "text_1":"The broad Standard & Poor's 500 <.SPX> fell 10.75 points, or 1.02 percent, to 1,039.32.",
-        "text_2":"The S&P 500 index was up 1.26, or 0.1 percent, to 1,039.32 after sinking 10.75 yesterday.",
-        "is_paraphrase":false
-    },
-    "57":{
-        "dataset":"SAv2",
-        "pair_id":"U8sgiNay",
-        "id_1":"CherokeeOklahoma_HMyJfsge",
-        "id_2":"CherokeeOklahoma_P8CS88Yu",
-        "text_1":"It is the county seat of Alfalfa County .",
-        "text_2":"It is the county seat of Alfalfa County .",
-        "is_paraphrase":true
-    },
-    "58":{
-        "dataset":"SAv2",
-        "pair_id":"7gHjN4WF",
-        "id_1":"CherokeeOklahoma_Z382gUUC",
-        "id_2":"CherokeeOklahoma_nNX6aRFh",
-        "text_1":"Cherokee is a city in Alfalfa County , Oklahoma , United States .",
-        "text_2":"Cherokee is a city of Oklahoma in the United States .",
-        "is_paraphrase":true
-    },
-    "59":{
-        "dataset":"SAv2",
-        "pair_id":"fksT725t",
-        "id_1":"Skateboard_SLXa4fA4",
-        "id_2":"Skateboard_WhkGCA7G",
-        "text_1":"Skateboard decks are usually between 28 and 33 inches long .",
-        "text_2":"Skateboard decks are normally between 28 and 33 inches long .",
-        "is_paraphrase":true
-    },
-    "60":{
-        "dataset":"SAv2",
-        "pair_id":"kDjQL5Fa",
-        "id_1":"Skateboard_KvPbeF2f",
-        "id_2":"Skateboard_4t9fCRoT",
-        "text_1":"The underside of the deck can be printed with a design by the manufacturer , blank , or decorated by any other means .",
-        "text_2":"The bottom of the deck can be printed with a design by the maker . Or it can be blank .",
-        "is_paraphrase":true
-    },
-    "61":{
-        "dataset":"SAv2",
-        "pair_id":"KccbddPc",
-        "id_1":"Skateboard_6r6Ds9Hv",
-        "id_2":"Skateboard_ZyCVbVbz",
-        "text_1":"This was created by two surfers ; Ben Whatson and Jonny Drapper .",
-        "text_2":"The longboard was made by two surfers ; Ben Whatson and Jonny Drapper .",
-        "is_paraphrase":true
-    },
-    "62":{
-        "dataset":"SAv2",
-        "pair_id":"VrVJNVw5",
-        "id_1":"Skateboard_6TYUvZMo",
-        "id_2":"Skateboard_S8dpTLzn",
-        "text_1":"Some of them have special materials that help to keep the deck from breaking : such as fiberglass , bamboo , resin , Kevlar , carbon fiber , aluminum , and plastic .",
-        "text_2":"Other materials used in making decks fiberglass , bamboo , resin , Kevlar , carbon fiber , aluminum , and plastic .",
-        "is_paraphrase":true
-    },
-    "63":{
-        "dataset":"SAv2",
-        "pair_id":"JfeZqqMJ",
-        "id_1":"Skateboard_g8Ba5SL7",
-        "id_2":"Skateboard_Kiby2LwA",
-        "text_1":"`` Old school '' boards -LRB- those made in the 1970s \u00e2 `` 80s or modern boards that mimic their shape -RRB- are generally wider and often have only one kicktail .",
-        "text_2":"`` Old school '' boards -LRB- those made in the 1970s \u00e2 `` 80s -RRB- are mostly wider and often have only one kicktail .",
-        "is_paraphrase":true
-    },
-    "64":{
-        "dataset":"SAv2",
-        "pair_id":"aZ7ahPzo",
-        "id_1":"Skateboard_J6RT4NVF",
-        "id_2":"Skateboard_bKem5Q2E",
-        "text_1":"One of the first deck companies was called `` Drapped '' taken from Jonny 's second name .",
-        "text_2":"One of the first deck companies was called `` Drapped '' taken from Jonny 's second name .",
-        "is_paraphrase":true
-    },
-    "65":{
-        "dataset":"SAv2",
-        "pair_id":"QrbVyyiD",
-        "id_1":"Skateboard_3VNqoBm6",
-        "id_2":"Skateboard_JmmDZ8t9",
-        "text_1":"Grip tape , when applied to the top surface of a skateboard , gives a skater 's feet grip on the deck .",
-        "text_2":"Grip tape , when put on to the top of a skateboard , gives a skater 's feet grip on the deck .",
-        "is_paraphrase":true
-    },
-    "66":{
-        "dataset":"SAv2",
-        "pair_id":"YcRXbDmV",
-        "id_1":"Skateboard_8Fjy86kT",
-        "id_2":"Skateboard_Pb3xkey3",
-        "text_1":"Modern decks vary in size , but most are 7 to 10.5 inches wide .",
-        "text_2":"Modern decks are different in size . Most are 7 to 10.5 inches wide .",
-        "is_paraphrase":true
-    },
-    "67":{
-        "dataset":"SAv2",
-        "pair_id":"D9vsq6Fr",
-        "id_1":"Skateboard_3FaxLXaH",
-        "id_2":"Skateboard_aDGkRCKm",
-        "text_1":"Variants of the 1970s often have little or no concavity , whereas 1980s models have deeper concavities and steeper kicktails .",
-        "text_2":"Different kinds of the 1970s often have little or no concavity , whereas 1980s models have deeper concavities and steeper kicktails .",
-        "is_paraphrase":true
-    },
-    "68":{
-        "dataset":"SAv2",
-        "pair_id":"B5qvL8Mq",
-        "id_1":"Skateboard_nTQG4GBJ",
-        "id_2":"Skateboard_Ma9wnvw5",
-        "text_1":"The usual parts to design a complete skateboard are the deck , trucks , wheels , bearings , hardware , and griptape .",
-        "text_2":"The normal parts to made a complete skateboard are the deck , trucks , wheels , bearings , hardware , and griptape .",
-        "is_paraphrase":true
-    },
-    "69":{
-        "dataset":"SAv2",
-        "pair_id":"9BgsvCJk",
-        "id_1":"Skateboard_kr9P3wra",
-        "id_2":"Skateboard_SEfnDTtz",
-        "text_1":"This is mostly ridden down hills or by the beach to represent the riding of a wave in the ocean on a surfboard .",
-        "text_2":"This is mostly ridden down hills or by the beach .",
-        "is_paraphrase":true
-    },
-    "70":{
-        "dataset":"SAv2",
-        "pair_id":"JeU24HLQ",
-        "id_1":"Skateboard_6w3jPa47",
-        "id_2":"Skateboard_H3z6AV4y",
-        "text_1":"It is most often black but can come in a variety of colors including clear , allowing the top of the deck to be decorated .",
-        "text_2":"However , it can come in many different colors like clear . Clear allows the top of the deck to be decorated .",
-        "is_paraphrase":true
-    },
-    "71":{
-        "dataset":"SAv2",
-        "pair_id":"a4KKTago",
-        "id_1":"Skateboard_LaGtgHHF",
-        "id_2":"Skateboard_7sbwbBnc",
-        "text_1":"The longboard , a common variant of the skateboard , has a longer deck .",
-        "text_2":"The longboard , a common different kind of skateboard , has a longer deck .",
-        "is_paraphrase":true
-    },
-    "72":{
-        "dataset":"SAv2",
-        "pair_id":"AVopach5",
-        "id_1":"Skateboard_EjjtF5Zt",
-        "id_2":"Skateboard_kzQN33Aq",
-        "text_1":"Wider decks can be used for greater stability when transition or ramp skating .",
-        "text_2":"Wider decks can be used for greater stability when transition or ramp skating .",
-        "is_paraphrase":true
-    },
-    "73":{
-        "dataset":"SAv2",
-        "pair_id":"D5L4fQvK",
-        "id_1":"EdmilsonAlves_DsTgcPr5",
-        "id_2":"EdmilsonAlves_cG38Y8vs",
-        "text_1":"Edmilson Alves -LRB- born February 17 , 1976 -RRB- , is a Brazilian midfielder who currently plays for Roasso Kumamoto in the J. League Division 2 .",
-        "text_2":"Edmilson Alves -LRB- born 17 February 1976 -RRB- is a Brazilian football player .",
-        "is_paraphrase":true
-    },
-    "74":{
-        "dataset":"SAv2",
-        "pair_id":"kaLKmbDW",
-        "id_1":"LesOubeaux_bYFau2Tm",
-        "id_2":"LesOubeaux_i9QjWJuK",
-        "text_1":"Les Oubeaux is a commune in the Calvados department in the Basse-Normandie region in northwestern France .",
-        "text_2":"Les Oubeaux is a commune . It is found in the region Basse-Normandie in the Calvados department in the northwest of France .",
-        "is_paraphrase":true
-    },
-    "75":{
-        "dataset":"SAv2",
-        "pair_id":"FyDgVvJC",
-        "id_1":"MitsubishiMotors_3aEkzfbt",
-        "id_2":"MitsubishiMotors_gXYqCNSt",
-        "text_1":"It is part of the Mitsubishi keiretsu , formerly the biggest industrial group in Japan , and was formed in 1970 from the automotive division of Mitsubishi Heavy Industries .",
-        "text_2":"Mitsubishi Motors has been around since 1970 .",
-        "is_paraphrase":true
-    },
-    "76":{
-        "dataset":"SAv2",
-        "pair_id":"DY6xDtQY",
-        "id_1":"Templatedoc_dvFgBEaU",
-        "id_2":"Templatedoc_hdtjEUPr",
-        "text_1":"This template , like some other is a workaround for wikimarkup behaviors .",
-        "text_2":"This template , like some other is a workaround for wikimarkup behaviors .",
-        "is_paraphrase":true
-    },
-    "77":{
-        "dataset":"SAv2",
-        "pair_id":"MvAoWSXF",
-        "id_1":"HelenHunt_eKPdf4Hy",
-        "id_2":"HelenHunt_Xpz2dTvX",
-        "text_1":"In 1998 , she became the second actress -LRB- after Liza Minnelli -RRB- to win a Golden Globe Award , an Academy Award and an Emmy Award in the same year .",
-        "text_2":"In 1998 she became one of only two actresses -LRB- the other is Helen Mirren -RRB- to win a Golden Globe Award , an Academy Award and an Emmy Award in the same year .",
-        "is_paraphrase":true
-    },
-    "78":{
-        "dataset":"SAv2",
-        "pair_id":"FGxobaKY",
-        "id_1":"Penin_mVyrhmX2",
-        "id_2":"Penin_N934Cd7H",
-        "text_1":"Penin is a commune in the Pas-de-Calais department in the Nord-Pas-de-Calais region of France .",
-        "text_2":"Penin is a commune . It is found in the region Nord-Pas-de-Calais in the Pas-de-Calais department in the north of France .",
-        "is_paraphrase":true
-    },
-    "79":{
-        "dataset":"SAv2",
-        "pair_id":"7N8aQ9md",
-        "id_1":"Cardiff_4DvXAmzv",
-        "id_2":"Cardiff_M4ks7Dj7",
-        "text_1":"Cardiff has many cultural sites varying from the historical Cardiff Castle and out of town Castell Coch to the more modern Wales Millennium Centre and Cardiff Bay . Cardiff was a finalist in the European Capital of Culture 2008 .",
-        "text_2":"Cardiff is the capital and biggest city of Wales , in the United Kingdom .",
-        "is_paraphrase":true
-    },
-    "80":{
-        "dataset":"SAv2",
-        "pair_id":"ShfCYvxK",
-        "id_1":"Cardiff_aENKuFjP",
-        "id_2":"Cardiff_bbcWRtq9",
-        "text_1":"Sporting venues in the city include the Millennium Stadium -LRB- the national stadium for the Wales national rugby union team and the Wales national football team -RRB- , SWALEC Stadium -LRB- the home of Glamorgan County Cricket Club -RRB- , Cardiff City Stadium -LRB- the home of Cardiff City football team and Cardiff Blues rugby union team -RRB- , Cardiff International Sports Stadium -LRB- the home of Cardiff Amateur Athletic Club -RRB- and Cardiff Arms Park -LRB- the home of Cardiff Rugby Club -RRB- .",
-        "text_2":"Cardiff has one of the largest stadiums in the United Kingdom , the Millennium Stadium , where important world sports matches and concerts happen . Other big stadiums in the city are the Cardiff City Stadium , where the main football and rugby teams play , and the SWALEC Stadium where cricket is played .",
-        "is_paraphrase":true
-    },
-    "81":{
-        "dataset":"SAv2",
-        "pair_id":"cmnjZCcN",
-        "id_1":"Cardiff_8Rs2ezHi",
-        "id_2":"Cardiff_Z7xWZphZ",
-        "text_1":"Annual events in Cardiff that have become regular appearances in Cardiff 's calendar include Sparks in the Park , The Great British Cheese Festival , Cardiff Mardi Gras , Cardiff Winter Wonderland and Cardiff Festival .",
-        "text_2":"Cardiff has a big port that used to be known as Tiger Bay , now just called Cardiff Bay , where the Welsh government works and now there are lots of shops , pubs and restaurants . Cardiff has an international airport , and is twinned with Nantes in France and Stuttgart in Germany .",
-        "is_paraphrase":true
-    },
-    "82":{
-        "dataset":"SAv2",
-        "pair_id":"26o9V3DD",
-        "id_1":"Puym\u00c3\u00a9ras_hFDZagb7",
-        "id_2":"Puym\u00c3\u00a9ras_E3PuTvZR",
-        "text_1":"Puym\u00c3 ras is a commune in the Vaucluse department in the Provence-Alpes-C \u00c3 te d'Azur region in southeastern France .",
-        "text_2":"Puym\u00c3 ras is a commune of 610 people -LRB- 1999 -RRB- . It is in the Provence-Alpes-C \u00c3 te d'Azur region , in the Vaucluse department in the south of France .",
-        "is_paraphrase":true
-    },
-    "83":{
-        "dataset":"SAv2",
-        "pair_id":"4oSQ4mEe",
-        "id_1":"Gastines_gsGVbKMw",
-        "id_2":"Gastines_HeWm35BD",
-        "text_1":"Gastines is a commune in the Mayenne department in north-western France .",
-        "text_2":"Gastines is a commune of 162 people -LRB- 1999 -RRB- . It is found in the region Pays de la Loire in the Mayenne department in the northwest of France .",
-        "is_paraphrase":true
-    },
-    "84":{
-        "dataset":"SAv2",
-        "pair_id":"Xy4CGBnu",
-        "id_1":"Haitinationalfootballteam_EUgLPHHv",
-        "id_2":"Haitinationalfootballteam_FM76zLim",
-        "text_1":"The Haiti national football team represents Haiti in association football and is controlled by the F\u00c3 d\u00c3 ration Ha\u00c3 tienne de Football , the governing body for football in Haiti .",
-        "text_2":"Haiti national football team is the national football team of Haiti .",
-        "is_paraphrase":true
-    },
-    "85":{
-        "dataset":"SAv2",
-        "pair_id":"FLQ4gUUe",
-        "id_1":"ChenabRiver_Rsk8bkEz",
-        "id_2":"ChenabRiver_XwYzNbYQ",
-        "text_1":"The Chenab then joins the Indus at Mithankot , Pakistan .",
-        "text_2":"The Chenab then joins the Indus at Mithankot .",
-        "is_paraphrase":true
-    },
-    "86":{
-        "dataset":"SAv2",
-        "pair_id":"MbYyG4E3",
-        "id_1":"ChenabRiver_FKjFaZQd",
-        "id_2":"ChenabRiver_iwsFLg8n",
-        "text_1":"It then merges with the Sutlej River near Uch Sharif , Pakistan to form the Panjnad or the ` Five Rivers ' , the fifth being the Beas River which joins the Satluj near Ferozepur , India .",
-        "text_2":"It then merges with the Sutlej River near Uch Sharif to form the Panjnad or the ` Five Rivers ' , the fifth being the Beas River which joins the Satluj near Ferozepur , India .",
-        "is_paraphrase":true
     }
 }
