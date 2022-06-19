@@ -76,7 +76,7 @@ for dataset in DATASETS:
         with open(os.path.join(path_to_dataset, "textual_paraphrases.xml"), encoding='utf-8', mode = "r") as file:
             tree = ET.parse(file)
             root = tree.getroot()
-            for i, elem in enumerate(tqdm(root)):
+            for i, elem in enumerate(root):
                 if elem[0].text in paraphrase_types.keys():
                     paraphrase_types[elem[0].text] = { PARAPHRASE_TYPE:  paraphrase_types[elem[0].text][PARAPHRASE_TYPE] + 
                     [ { TYPE_ID: int(elem[1].text), SENSE_PRESERVING: bool(elem[2].text == "yes"), TEXT1_SCOPE: elem[4].text, TEXT2_SCOPE: elem[5].text } ] }
@@ -85,7 +85,7 @@ for dataset in DATASETS:
         with open(os.path.join(path_to_dataset, "textual_np_neg.xml"), encoding='utf-8', mode = "r") as file:
             tree = ET.parse(file)
             root = tree.getroot()
-            for i, elem in enumerate(tqdm(root)):
+            for i, elem in enumerate(root):
                 if elem[0].text in paraphrase_types.keys():
                     paraphrase_types[elem[0].text] = { PARAPHRASE_TYPE:  paraphrase_types[elem[0].text][PARAPHRASE_TYPE] + 
                     [ { TYPE_ID: int(elem[1].text), SENSE_PRESERVING: bool(elem[2].text == "yes"), TEXT1_SCOPE: elem[4].text, TEXT2_SCOPE: elem[5].text } ] }
@@ -94,7 +94,7 @@ for dataset in DATASETS:
         with open(os.path.join(path_to_dataset, "textual_np_pos.xml"), encoding='utf-8', mode = "r") as file:
             tree = ET.parse(file)
             root = tree.getroot()
-            for i, elem in enumerate(tqdm(root)):
+            for i, elem in enumerate(root):
                 if elem[0].text in paraphrase_types.keys():
                     paraphrase_types[elem[0].text] = { PARAPHRASE_TYPE:  paraphrase_types[elem[0].text][PARAPHRASE_TYPE] + 
                     [ { TYPE_ID: int(elem[1].text), SENSE_PRESERVING: bool(elem[2].text == "yes"), TEXT1_SCOPE: elem[4].text, TEXT2_SCOPE: elem[5].text } ] }
@@ -103,7 +103,7 @@ for dataset in DATASETS:
         with open(os.path.join(path_to_dataset, "negation.xml"), encoding='utf-8', mode = "r") as file:
             tree = ET.parse(file)
             root = tree.getroot()
-            for i, elem in enumerate(tqdm(root)):
+            for i, elem in enumerate(root):
                 if elem[0].text in paraphrase_types.keys():
                     paraphrase_types[elem[0].text] = { PARAPHRASE_TYPE:  paraphrase_types[elem[0].text][PARAPHRASE_TYPE] + 
                     [ { TYPE_ID: int(elem[1].text), SENSE_PRESERVING: bool(elem[2].text == "yes"), TEXT1_SCOPE: elem[4].text, TEXT2_SCOPE: elem[5].text } ] }
