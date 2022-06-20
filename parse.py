@@ -12,11 +12,11 @@ import numpy as np
 pd.set_option("display.max_colwidth", None)
 
 # For Debugging:
-#DATASETS = ["ETPC"]
+DATASETS = ["QQP"]
 
 #Bring datasets to the same format (standardized)
 
-df = pd.DataFrame(columns= [DATASET, PAIR_ID, ID1, ID2, TEXT1, TEXT2, PARAPHRASE, PARAPHRASE_TYPE] )
+df = pd.DataFrame(columns= [DATASET, ORIGIN, PAIR_ID, ID1, ID2, TEXT1, TEXT2, PARAPHRASE, PARAPHRASE_TYPE] )
 
 for dataset in DATASETS:
     path_to_dataset = os.path.join(DATASETS_FOLDER, dataset)
@@ -24,7 +24,7 @@ for dataset in DATASETS:
 
     counter = 0
 
-    df_tmp = pd.DataFrame(columns= [DATASET, PAIR_ID, ID1, ID2, TEXT1, TEXT2, PARAPHRASE, PARAPHRASE_TYPE] )
+    df_tmp = pd.DataFrame(columns= [DATASET, ORIGIN, PAIR_ID, ID1, ID2, TEXT1, TEXT2, PARAPHRASE, PARAPHRASE_TYPE] )
 
     if dataset == "MPC":
         dmop_path = os.path.join(path_to_dataset, "wikipedia_documents_train", "machined")      #read train data
@@ -42,12 +42,12 @@ for dataset in DATASETS:
                         print("ERROR")
 
                     for i, og_line in enumerate(og_lines):
-                        #counter = counter+1
-                        #if counter > 30:
-                        #    break
+                        counter = counter+1
+                        if counter > 30:
+                            break
 
                         if og_line != "\n":
-                            df_tmp.loc[i] = np.array([dataset, shortuuid.uuid()[:8], shortuuid.uuid()[:8], shortuuid.uuid()[:8], og_line, mg_lines[i], True, [0]], dtype=object)
+                            df_tmp.loc[i] = np.array([dataset, "wikipedia", shortuuid.uuid()[:8], shortuuid.uuid()[:8], shortuuid.uuid()[:8], og_line, mg_lines[i], True, [0]], dtype=object)
         
         df = pd.concat([df, df_tmp], ignore_index = True)
         df_tmp = pd.DataFrame(columns= [DATASET, PAIR_ID, ID1, ID2, TEXT1, TEXT2, PARAPHRASE, PARAPHRASE_TYPE] )
@@ -64,11 +64,44 @@ for dataset in DATASETS:
                     mg_lines = [l for l in mg_lines if l != ""]
 
                     for i, og_line in enumerate(og_lines):
-                        #counter = counter+1
-                        #if counter > 30:
-                        #    break
+                        counter = counter+1
+                        if counter > 30:
+                            break
                         if og_line != "\n":
-                            df_tmp.loc[i] = np.array([dataset, shortuuid.uuid()[:8], shortuuid.uuid()[:8], shortuuid.uuid()[:8], og_line, mg_lines[i], True, [0]], dtype=object)
+                            df_tmp.loc[i] = np.array([dataset, "wikipedia", shortuuid.uuid()[:8], shortuuid.uuid()[:8], shortuuid.uuid()[:8], og_line, mg_lines[i], True, [0]], dtype=object)
+    
+    elif dataset == "MPCBert":
+        mpcbert_og_path = os.path.join(path_to_dataset, "og")      #read og data
+        mpcbert_mg_path = os.path.join(path_to_dataset, "bert-large-cased_parallel_mlm_prob_0.3", "mg")      #read og data
+        processed_texts = 0
+        for j, origin_folder in enumerate(os.listdir(mpcbert_og_path)):
+            print("Reading " + str(origin_folder))
+            for i, file in enumerate(tqdm(os.listdir(os.path.join(mpcbert_og_path, origin_folder)))):
+                counter = counter+1
+                if i > 30:
+                    break
+                with open(os.path.join(mpcbert_og_path, origin_folder, file), encoding="utf8", mode = "r") as f1:
+                    with open(os.path.join(mpcbert_mg_path, origin_folder, str(file.replace("ORIG", "SPUN"))), encoding="utf8", mode = "r") as f2:
+                        og_line = f1.readlines()
+                        og_line = [line.rstrip() for line in og_line]
+                        og_line = [l for l in og_line if l != ""][0]
+                        mg_line = f2.readlines()
+                        mg_line = [line.rstrip() for line in mg_line]
+                        mg_line = [l for l in mg_line if l != ""][0]
+
+                        if og_line != "\n":
+                            df_tmp.loc[processed_texts] = np.array([
+                                dataset, 
+                                str(origin_folder).split("_")[0], 
+                                shortuuid.uuid()[:8], 
+                                shortuuid.uuid()[:8], 
+                                shortuuid.uuid()[:8], 
+                                og_line, 
+                                mg_line, 
+                                True, 
+                                [0]
+                                ], dtype=object)
+                processed_texts = processed_texts + 1
 
     elif dataset == "ETPC":
         # get paraphrase types for all pair IDs (read from different files)
@@ -115,11 +148,11 @@ for dataset in DATASETS:
             tree = ET.parse(file)
             root = tree.getroot()
             for i, elem in enumerate(tqdm(root)):
-                #counter = counter+1
-                #if counter > 30:
-                #    break
+                counter = counter+1
+                if counter > 30:
+                    break
                 paraphrase_types_list = [type_dict[TYPE_ID] for type_dict in paraphrase_types[elem[0].text][PARAPHRASE_TYPE] ]
-                df_tmp.loc[i] = np.array([dataset, shortuuid.uuid()[:8], elem[1].text, elem[2].text, elem[3].text, elem[4].text, bool(int(elem[8].text)), paraphrase_types_list], dtype=object)
+                df_tmp.loc[i] = np.array([dataset, "newswire", shortuuid.uuid()[:8], elem[1].text, elem[2].text, elem[3].text, elem[4].text, bool(int(elem[8].text)), paraphrase_types_list], dtype=object)
     
     elif dataset == "SAv2":
         asv2_path = os.path.join(path_to_dataset)      #read train data
@@ -134,11 +167,12 @@ for dataset in DATASETS:
 
                 for i, og_line in enumerate(tqdm(og_lines)):
                     counter = counter+1
-                    #if counter > 30:
-                    #    break
+                    if counter > 30:
+                        break
                     if og_line != "\n":
                         df_tmp.loc[i] = np.array([
                             dataset, 
+                            "wikipedia",
                             shortuuid.uuid()[:8],
                             og_line.split("\t")[0].translate(str.maketrans('', '', string.punctuation+" ")) + "_" + shortuuid.uuid()[:8], 
                             mg_lines[i].split("\t")[0].translate(str.maketrans('', '', string.punctuation+" ")) + "_" + shortuuid.uuid()[:8], 
@@ -147,6 +181,22 @@ for dataset in DATASETS:
                             True,
                             [16]    # simplification dataset ( => only ellipsis)
                         ], dtype=object)
+    
+    elif dataset == "QQP":
+        qqp_path = os.path.join(path_to_dataset, "questions.csv")      #read train data
+        quora_df = pd.read_csv(qqp_path)
+        for i, row in tqdm(quora_df.iterrows(), total=quora_df.shape[0]):
+            df_tmp.loc[i] = np.array([
+                dataset, 
+                "quora",
+                str(row["id"]) + "_" + shortuuid.uuid()[:8],
+                str(row["qid1"]) + "_" + shortuuid.uuid()[:8], 
+                str(row["qid2"]) + "_" + shortuuid.uuid()[:8], 
+                row["question1"], 
+                row["question2"], 
+                bool(row["is_duplicate"]),
+                [0]     # unknown type
+            ], dtype=object)
 
     elif dataset == "TURL":
         turl_path = os.path.join(path_to_dataset)      #read train data
@@ -161,15 +211,16 @@ for dataset in DATASETS:
                 lines = test_lines + train_lines
 
                 for i, line in enumerate(tqdm(lines)):
-                    #counter = counter+1
-                    #if counter > 30:
-                    #    break
+                    counter = counter+1
+                    if counter > 30:
+                        break
                     if line != "\n":
                         # based on the datasets paper, we value a phrase as paraphrase when >=4 out of 6 amazon workers marked it a such
                         is_paraphrase = int(line.split("\t")[2][1]) >= 4
                         df_tmp.loc[i] = np.array([
                             dataset, 
-                            shortuuid.uuid()[:8],
+                            "twitter news", 
+                            shortuuid.uuid()[:8], 
                             shortuuid.uuid()[:8], 
                             shortuuid.uuid()[:8], 
                             line.split("\t")[0], 

@@ -3,10 +3,11 @@ import xml.etree.ElementTree as ET
 
 DATASETS_FOLDER = "datasets"    #the folder that contains the dataset directories to read in
 FORMATTED_DATA_FILENAME = "true_data.json"  #the name of the file that contains the data to read in
-DATASETS = ["MPC", "ETPC", "SAv2", "TURL"]     #the folders in the DATASETS_FOLDER should be named like the datasets here
-MACHINE_PARAPHRASED_DATASETS = ["MPC", "SAv2"]
+DATASETS = ["MPC", "ETPC", "SAv2", "TURL", "MPCBert"]     #the folders in the DATASETS_FOLDER should be named like the datasets here
+MACHINE_PARAPHRASED_DATASETS = ["MPC", "SAv2", "MPCBert"]
 OUT_DIR = "output"      #the directory to output the formatted json in
 FIGURES_FOLDER = "figures"
+EMBEDDINGS_FOLDER = "embeddings"
 
 FUZZY = "fuzzy_based_result"
 SEMANTIC = "semantic_based_result"
@@ -27,6 +28,7 @@ WORDVECS2 = "word_vectors_2"
 TEXTEMBED1 = "text_embedding_1" 
 TEXTEMBED2 = "text_embedding_2"
 COSINE_DISTANCE = "cosine_distance"
+ORIGIN = "origin"
 
 PARAPHRASE_TYPE = "paraphrase_type"
 TYPE_ID = "type_id"
