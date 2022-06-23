@@ -16,7 +16,7 @@ DATASETS = ["ParaNMT"]
 
 #Bring datasets to the same format (standardized)
 
-df = pd.DataFrame(columns= [DATASET, ORIGIN, PAIR_ID, ID1, ID2, TEXT1, TEXT2, PARAPHRASE, PARAPHRASE_TYPE, "percent"] )
+df = pd.DataFrame(columns= [DATASET, ORIGIN, PAIR_ID, ID1, ID2, TEXT1, TEXT2, PARAPHRASE, PARAPHRASE_TYPE] )
 
 for dataset in DATASETS:
     path_to_dataset = os.path.join(DATASETS_FOLDER, dataset)
@@ -24,7 +24,7 @@ for dataset in DATASETS:
 
     counter = 0
 
-    df_tmp = pd.DataFrame(columns= [DATASET, ORIGIN, PAIR_ID, ID1, ID2, TEXT1, TEXT2, PARAPHRASE, PARAPHRASE_TYPE, "percent"] )
+    df_tmp = pd.DataFrame(columns= [DATASET, ORIGIN, PAIR_ID, ID1, ID2, TEXT1, TEXT2, PARAPHRASE, PARAPHRASE_TYPE] )
 
     if dataset == "MPC":
         dmop_path = os.path.join(path_to_dataset, "wikipedia_documents_train", "machined")      #read train data
@@ -248,8 +248,7 @@ for dataset in DATASETS:
                             l[0], 
                             l[1], 
                             True,
-                            [0],
-                            float(l[2])
+                            [0]
                         ], dtype=object)
                 if df_tmp.shape[0] >= MAX_DATASET_INPUT:    # stop (do not process al 5 million)
                     break
