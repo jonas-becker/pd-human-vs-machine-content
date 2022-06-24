@@ -12,7 +12,7 @@ import numpy as np
 pd.set_option("display.max_colwidth", None)
 
 # For Debugging:
-DATASETS = ["ParaNMT"]
+#DATASETS = ["ParaNMT"]
 
 #Bring datasets to the same format (standardized)
 
@@ -101,6 +101,8 @@ for dataset in DATASETS:
                                 True, 
                                 [0]
                                 ], dtype=object)
+                            if df_tmp.shape[0] >= MAX_DATASET_INPUT:    # stop (do not process al 5 million)
+                                break
                 processed_texts = processed_texts + 1
 
     elif dataset == "ETPC":
@@ -181,6 +183,8 @@ for dataset in DATASETS:
                             True,
                             [16]    # simplification dataset ( => only ellipsis)
                         ], dtype=object)
+                        if df_tmp.shape[0] >= MAX_DATASET_INPUT:    # stop (do not process al 5 million)
+                            break
     
     elif dataset == "QQP":
         qqp_path = os.path.join(path_to_dataset, "questions.csv")  
@@ -200,6 +204,8 @@ for dataset in DATASETS:
                 bool(row["is_duplicate"]),
                 [0]     # unknown type
             ], dtype=object)
+            if df_tmp.shape[0] >= MAX_DATASET_INPUT:    # stop (do not process al 5 million)
+                break
 
     elif dataset == "TURL":
         turl_path = os.path.join(path_to_dataset)    
@@ -231,6 +237,8 @@ for dataset in DATASETS:
                             is_paraphrase,
                             [0]
                         ], dtype=object)
+                        if df_tmp.shape[0] >= MAX_DATASET_INPUT:    # stop (do not process al 5 million)
+                            break
     
     elif dataset == "ParaNMT":
         nmt_path = os.path.join(path_to_dataset)      #read train data

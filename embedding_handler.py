@@ -16,6 +16,7 @@ import gc
 
 def create_tsne_figure(embed_data, out_filename):
     dataset_embeddings = [d[EMBED] for d in embed_data]
+    dataset_embeddings = torch.tensor(dataset_embeddings, device = "cpu")   # move tensors to cpu
     text_ids = [d[TEXT_ID] for d in embed_data]
     pair_ids = [d[PAIR_ID] for d in embed_data]
     pair_paraphrased = [d[PARAPHRASE] for d in embed_data]
@@ -75,6 +76,8 @@ def calculate_cosine_dists(df, embed_dict, dataset):
         id_2 = df.loc[df[PAIR_ID] == pair_id][ID2].item()
         emb_1 = dataset_embeddings[id_1][EMBED]
         emb_2 = dataset_embeddings[id_2][EMBED]
+        emb_1 = torch.tensor(emb_1, device = "cpu")   # move tensors to cpu
+        emb_2 = torch.tensor(emb_2, device = "cpu")   
         #for d in dataset_embeddings:
         #    if d[1] == id_1:
         #        emb_1 = d[0]
@@ -228,31 +231,31 @@ for i, pair_id in enumerate(tqdm(list(tokenized_pairs.keys()))):
     indexed = tokenizer.convert_tokens_to_ids(tokenized_pairs[pair_id][TOKENS1])
     segments_ids = [1] * len(tokenized_pairs[pair_id][TOKENS1])
     #Extract Embeddings
-    tensor = torch.tensor([indexed])
-    segments_tensors = torch.tensor([segments_ids])
+    tensor = torch.tensor([indexed]).to(device)
+    segments_tensors = torch.tensor([segments_ids]).to(device)
     # collect all of the hidden states produced from all layers 
     with torch.no_grad():
         hidden_states = model(tensor, segments_tensors)[2]
     # Concatenate the tensors for all layers (create a new dimension in the tensor)
-    embeds = torch.stack(hidden_states, dim=0)
+    embeds = torch.stack(hidden_states, dim=0).to(device)
     # Remove dimension 1, the "batches".
-    embeds = torch.squeeze(embeds, dim=1)
+    embeds = torch.squeeze(embeds, dim=1).to(device)
     #Switch dimensions
     embeds = embeds.permute(1,0,2)
     # Create Sentence Vector Representations (average of all token vectors)
-    embedding_1 = torch.mean(hidden_states[-2][0], dim=0)
+    embedding_1 = torch.mean(hidden_states[-2][0], dim=0).to(device)
 
     # DO FOR SECOND TEXT
     indexed = tokenizer.convert_tokens_to_ids(tokenized_pairs[pair_id][TOKENS2])
     segments_ids = [1] * len(tokenized_pairs[pair_id][TOKENS2])
-    tensor = torch.tensor([indexed])
-    segments_tensors = torch.tensor([segments_ids])
+    tensor = torch.tensor([indexed]).to(device)
+    segments_tensors = torch.tensor([segments_ids]).to(device)
     with torch.no_grad():
         hidden_states = model(tensor, segments_tensors)[2]
-    embeds = torch.stack(hidden_states, dim=0)
-    embeds = torch.squeeze(embeds, dim=1)
+    embeds = torch.stack(hidden_states, dim=0).to(device)
+    embeds = torch.squeeze(embeds, dim=1).to(device)
     embeds = embeds.permute(1,0,2)
-    embedding_2 = torch.mean(hidden_states[-2][0], dim=0)
+    embedding_2 = torch.mean(hidden_states[-2][0], dim=0).to(device)
 
     # Add embeddings to dataset-specific lists:
     if dataset in embed_dict:
@@ -264,8 +267,7 @@ for i, pair_id in enumerate(tqdm(list(tokenized_pairs.keys()))):
 
 # Also do after the for loop completed (for the last dataset)
 stats_dict = visualize_embeddings(embed_dict, last_dataset_viewed, stats_dict)
-df, stats_dict = calculate_cosine_dists(df, embed_dict, last_dataset_viewed)
-
+df = calculate_cosine_dists(df, embed_dict, last_dataset_viewed)
 df[df[DATASET] == last_dataset_viewed].to_json(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER, last_dataset_viewed+"_embedded.json"), orient = "index", index = True, indent = 4)
 last_dataset_viewed = dataset
 last_index = i
