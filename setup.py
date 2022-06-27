@@ -3,8 +3,8 @@ import xml.etree.ElementTree as ET
 
 DATASETS_FOLDER = "datasets"    #the folder that contains the dataset directories to read in
 FORMATTED_DATA_FILENAME = "true_data.json"  #the name of the file that contains the data to read in
-DATASETS = ["MPC", "ETPC", "SAv2", "TURL", "MPCBert", "QQP", "ParaNMT"]     #the folders in the DATASETS_FOLDER should be named like the datasets here
-MACHINE_PARAPHRASED_DATASETS = ["MPC", "SAv2", "MPCBert", "ParaNMT"]
+DATASETS = ["MPC", "ETPC", "SAv2", "TURL", "MPCBert", "QQP", "ParaNMT", "APH", "APT"]     #the folders in the DATASETS_FOLDER should be named like the datasets here
+MACHINE_PARAPHRASED_DATASETS = ["MPC", "SAv2", "MPCBert", "ParaNMT", "APT"]
 OUT_DIR = "output"      #the directory to output the formatted json in
 FIGURES_FOLDER = "figures"
 EMBEDDINGS_FOLDER = "embeddings"
@@ -16,7 +16,7 @@ SEMANTIC = "semantic_based_result"
 STOPWORDS = ['the', 'and', 'are', 'a']
 FIGURE_SIZE = 1000  
 MAX_DATASET_INPUT = 100000
-PARAGRAM_PHRASE_SCORE = [0.4, 0.9]
+PARAGRAM_PHRASE_SCORE = [0.4, 0.9]  # the span in which dataset entries will be taken into parsing (throw out other entries), only for ParaNMT
 
 # Variable Names for the outputs:
 TEXT1 = "text_1"

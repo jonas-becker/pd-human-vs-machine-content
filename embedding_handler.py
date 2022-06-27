@@ -111,7 +111,7 @@ def mean_cos_distance(df, stats_dict):
         print("The mean cosine distance of non-paraphrased (original) pairs (Dataset: " + dataset + ") : " + str(mean_cos_dist))
         stats_dict[dataset]["mean_cos_original"] = mean_cos_dist
 
-    return df, stats_dict
+    return stats_dict
 
 
 # MAIN -----------------------------------------------------------------------------------------------------
@@ -189,6 +189,7 @@ for i, row in tqdm(df[df[DATASET].isin(DATASETS)].iterrows(), total=df[df[DATASE
 
 last_dataset_viewed = tokenized_pairs[list(tokenized_pairs.keys())[0]][DATASET]
 last_index = 0
+skipped_counter = 0
 
 for i, pair_id in enumerate(tqdm(list(tokenized_pairs.keys()))):
 
@@ -207,9 +208,10 @@ for i, pair_id in enumerate(tqdm(list(tokenized_pairs.keys()))):
         last_dataset_viewed = dataset
         last_index = i
         embed_dict = { }  
+        skipped_counter = 0
         gc.collect()  
 
-    elif i - last_index >= FIGURE_SIZE and dataset == last_dataset_viewed:     # specified figure size (max) to avoid high memory usage
+    elif i - skipped_counter - last_index >= FIGURE_SIZE and dataset == last_dataset_viewed:     # specified figure size (max) to avoid high memory usage
         if last_dataset_viewed not in visualized_datasets:
             stats_dict = visualize_embeddings(embed_dict, dataset, stats_dict)
             visualized_datasets.append(last_dataset_viewed)
@@ -219,11 +221,13 @@ for i, pair_id in enumerate(tqdm(list(tokenized_pairs.keys()))):
 
         last_index = i
         embed_dict = { }
+        skipped_counter = 0
         gc.collect()
 
     # throw out longer that 512 token texts because BERT model struggels to process them
     if len(tokenized_pairs[pair_id][TOKENS1]) > 512 or len(tokenized_pairs[pair_id][TOKENS2]) > 512:
         del tokenized_pairs[pair_id]
+        skipped_counter = skipped_counter + 1
         continue
     
     # DO FOR FIRST TEXT

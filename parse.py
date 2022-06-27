@@ -12,7 +12,7 @@ import numpy as np
 pd.set_option("display.max_colwidth", None)
 
 # For Debugging:
-#DATASETS = ["ParaNMT"]
+#DATASETS = ["ETPC"]
 
 #Bring datasets to the same format (standardized)
 
@@ -38,15 +38,12 @@ for dataset in DATASETS:
                     mg_lines = [line.rstrip() for line in mg_lines]
                     mg_lines = [l for l in mg_lines if l != ""]
 
-                    if len(og_lines) != len(mg_lines):
-                        print("ERROR")
-
                     for i, og_line in enumerate(og_lines):
                         #counter = counter+1
                         #if counter > 30:
                         #    break
 
-                        if og_line != "\n":
+                        if og_line != "\n" and og_line != mg_lines[i]:
                             df_tmp.loc[i] = np.array([dataset, "wikipedia", shortuuid.uuid()[:8], shortuuid.uuid()[:8], shortuuid.uuid()[:8], og_line, mg_lines[i], True, [0]], dtype=object)
         
         df = pd.concat([df, df_tmp], ignore_index = True)
@@ -89,7 +86,7 @@ for dataset in DATASETS:
                         mg_line = [line.rstrip() for line in mg_line]
                         mg_line = [l for l in mg_line if l != ""][0]
 
-                        if og_line != "\n":
+                        if og_line != "\n" and og_line != mg_line:
                             df_tmp.loc[processed_texts] = np.array([
                                 dataset, 
                                 str(origin_folder).split("_")[0], 
@@ -154,7 +151,7 @@ for dataset in DATASETS:
                 #if counter > 30:
                 #    break
                 paraphrase_types_list = [type_dict[TYPE_ID] for type_dict in paraphrase_types[elem[0].text][PARAPHRASE_TYPE] ]
-                df_tmp.loc[i] = np.array([dataset, "newswire", shortuuid.uuid()[:8], elem[1].text, elem[2].text, elem[3].text, elem[4].text, bool(30 in paraphrase_types_list), paraphrase_types_list], dtype=object)
+                df_tmp.loc[i] = np.array([dataset, "newswire", shortuuid.uuid()[:8], elem[1].text, elem[2].text, elem[3].text, elem[4].text, bool(int(elem[8].text)), paraphrase_types_list], dtype=object)
 
     elif dataset == "SAv2":
         asv2_path = os.path.join(path_to_dataset) 
@@ -183,7 +180,8 @@ for dataset in DATASETS:
                             True,
                             [16]    # simplification dataset ( => only ellipsis)
                         ], dtype=object)
-                        if df_tmp.shape[0] >= MAX_DATASET_INPUT:    # stop (do not process al 5 million)
+                        if df_tmp.shape[0] >= MAX_DATASET_INPUT:  
+                            print("\nReached the max. amount: " + str(MAX_DATASET_INPUT))
                             break
     
     elif dataset == "QQP":
@@ -204,7 +202,8 @@ for dataset in DATASETS:
                 bool(row["is_duplicate"]),
                 [0]     # unknown type
             ], dtype=object)
-            if df_tmp.shape[0] >= MAX_DATASET_INPUT:    # stop (do not process al 5 million)
+            if df_tmp.shape[0] >= MAX_DATASET_INPUT: 
+                print("\nReached the max. amount: " + str(MAX_DATASET_INPUT))
                 break
 
     elif dataset == "TURL":
@@ -223,7 +222,7 @@ for dataset in DATASETS:
                     #counter = counter+1
                     #if counter > 30:
                     #    break
-                    if line != "\n" and int(line.split("\t")[2][1] != 3):   # if amazon workers could not decide, skip
+                    if line != "\n" and int(line.split("\t")[2][1]) != 3:   # if amazon workers could not decide, skip
                         # based on the datasets paper, we value a phrase as paraphrase when >=4 out of 6 amazon workers marked it a such
                         is_paraphrase = int(line.split("\t")[2][1]) >= 4
                         df_tmp.loc[i] = np.array([
@@ -237,7 +236,8 @@ for dataset in DATASETS:
                             is_paraphrase,
                             [0]
                         ], dtype=object)
-                        if df_tmp.shape[0] >= MAX_DATASET_INPUT:    # stop (do not process al 5 million)
+                        if df_tmp.shape[0] >= MAX_DATASET_INPUT: 
+                            print("\nReached the max. amount: " + str(MAX_DATASET_INPUT))
                             break
     
     elif dataset == "ParaNMT":
@@ -246,7 +246,7 @@ for dataset in DATASETS:
         with open(os.path.join(nmt_path, "para-nmt-50m.txt"), encoding="utf8", mode = "r") as f:   # read file line-by-line as it is very big
             for i, line in tqdm(enumerate(f)):
                 l = line.rstrip().split("\t")
-                if PARAGRAM_PHRASE_SCORE[0] < float(l[2]) < PARAGRAM_PHRASE_SCORE[1]:    # only keep paragram-phrase score middleground to remove near identical and noisy data
+                if PARAGRAM_PHRASE_SCORE[0] < float(l[2]) < PARAGRAM_PHRASE_SCORE[1] and l[0] != l[1]:    # only keep paragram-phrase score middleground to remove near identical and noisy data
                     df_tmp.loc[i] = np.array([
                             dataset, 
                             "czeng", 
@@ -258,9 +258,93 @@ for dataset in DATASETS:
                             True,
                             [0]
                         ], dtype=object)
-                if df_tmp.shape[0] >= MAX_DATASET_INPUT:    # stop (do not process al 5 million)
+                if df_tmp.shape[0] >= MAX_DATASET_INPUT:
+                    print("\nReached the max. amount: " + str(MAX_DATASET_INPUT))
+                    break
+    
+    elif dataset == "APT":
+        apt_path = os.path.join(path_to_dataset)
+        print("Reading MSRP split...")
+        with open(os.path.join(apt_path, "apt5-m"), encoding="utf8", mode = "r") as f1: 
+            lines = f1.readlines()
+            lines = [line.rstrip() for line in lines]
+            lines = [l for l in lines if l != ""][1:]
+            for i, line in enumerate(tqdm(lines)):
+                #counter = counter+1
+                #if counter > 30:
+                #    break
+                is_paraphrase = bool(int(line.split("\t")[2]))
+                df_tmp.loc[i] = np.array([
+                    dataset, 
+                    "msrp", 
+                    shortuuid.uuid()[:8], 
+                    shortuuid.uuid()[:8], 
+                    shortuuid.uuid()[:8], 
+                    line.split("\t")[0], 
+                    line.split("\t")[1], 
+                    is_paraphrase,
+                    [0]
+                ], dtype=object)
+                if df_tmp.shape[0] >= MAX_DATASET_INPUT/2:  
+                    print("\nReached the max. amount (half-way): " + str(MAX_DATASET_INPUT))
                     break
 
+        df = pd.concat([df, df_tmp], ignore_index = True)
+        df_tmp = pd.DataFrame(columns= [DATASET, ORIGIN, PAIR_ID, ID1, ID2, TEXT1, TEXT2, PARAPHRASE, PARAPHRASE_TYPE] )
+        
+        print("Reading Twitter PPDB split...")
+        with open(os.path.join(apt_path, "apt5-tw"), encoding="utf8", mode = "r") as f1:  
+            lines = f1.readlines()
+            lines = [line.rstrip() for line in lines]
+            lines = [l for l in lines if l != ""][1:]
+            for i, line in enumerate(tqdm(lines)):
+                #counter = counter+1
+                #if counter > 30:
+                #    break
+                is_paraphrase = bool(int(line.split("\t")[2]))
+                df_tmp.loc[i] = np.array([
+                    dataset, 
+                    "twitterppdb", 
+                    shortuuid.uuid()[:8], 
+                    shortuuid.uuid()[:8], 
+                    shortuuid.uuid()[:8], 
+                    line.split("\t")[0], 
+                    line.split("\t")[1], 
+                    is_paraphrase,
+                    [0]
+                ], dtype=object)
+                if df_tmp.shape[0] >= MAX_DATASET_INPUT/2: 
+                    print("\nReached the max. amount (half-way): " + str(MAX_DATASET_INPUT))
+                    break
+
+    elif dataset == "APH":
+        aph_path = os.path.join(path_to_dataset)
+        with open(os.path.join(aph_path, "ap-h-test"), encoding="utf8", mode = "r") as f1: 
+            with open(os.path.join(aph_path, "ap-h-train"), encoding="utf8", mode = "r") as f2: 
+                test_lines = f1.readlines()
+                test_lines = [line.rstrip() for line in test_lines]
+                test_lines = [l for l in test_lines if l != ""][1:]
+                train_lines = f2.readlines()
+                train_lines = [line.rstrip() for line in train_lines]
+                train_lines = [l for l in train_lines if l != ""][1:]
+                lines = test_lines + train_lines
+
+                for i, line in enumerate(tqdm(lines)):
+                    is_paraphrase = bool(int(line.split("\t")[2]))
+                    df_tmp.loc[i] = np.array([
+                        dataset, 
+                        "msrp,ppnmt", 
+                        shortuuid.uuid()[:8], 
+                        shortuuid.uuid()[:8], 
+                        shortuuid.uuid()[:8], 
+                        line.split("\t")[0], 
+                        line.split("\t")[1], 
+                        is_paraphrase,
+                        [0]
+                    ], dtype=object)
+                    if df_tmp.shape[0] >= MAX_DATASET_INPUT: 
+                        print("\nReached the max. amount: " + str(MAX_DATASET_INPUT))
+                        break
 
     df = pd.concat([df, df_tmp], ignore_index = True)   #concat the lastly processed dataset to the combined dataset
 
