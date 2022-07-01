@@ -9,6 +9,7 @@ from transformers import BertTokenizer, BertModel
 import matplotlib.pyplot as plt
 from scipy.spatial.distance import cosine
 from sklearn.manifold import TSNE
+from sklearn.utils import shuffle
 import pandas as pd  
 import plotly.express as px
 import json
@@ -44,19 +45,21 @@ def create_tsne_figure(embed_data, out_filename):
 
 def visualize_embeddings(embed_dict, dataset, stats_dict):
     # Create visualization per dataset (paraphrase & non-paraphrase pairs combined)
-    print("Creating visualizations per dataset...")
+    print("Creating visualizations for dataset...")
     embed_data = embed_dict[dataset][EMBEDDINGS]
-    print("Visualizing " + str(len(embed_data)) + " texts for the " + dataset + " dataset. That makes " + str(len(embed_data)/2) + " text pairs.")
-    stats_dict[dataset]["total_pairs"] = stats_dict[dataset]["total_pairs"] + int(len(embed_data)/2)
-    create_tsne_figure(embed_data, dataset+"_embeddings")
+    if len(embed_data) > 1:
+        print("Visualizing " + str(len(embed_data)) + " texts for the " + dataset + " dataset. That makes " + str(len(embed_data)/2) + " text pairs.")
+        stats_dict[dataset]["total_pairs"] = stats_dict[dataset]["total_pairs"] + int(len(embed_data)/2)
+        create_tsne_figure(embed_data, dataset+"_embeddings")
 
     # Create visualization per dataset (paraphrase pairs only)
-    print("Creating visualizations per dataset (paraphrase-pairs only)...")
+    print("Creating visualizations for dataset (paraphrase-pairs only)...")
     # Filter the data to only contain paraphrased pairs:
     embed_data = [e for e in embed_data if e[PARAPHRASE] == True]
-    print("Visualizing " + str(len(embed_data)) + " texts for the " + dataset + " dataset. That makes " + str(len(embed_data)/2) + " text pairs.")
-    stats_dict[dataset]["paraphrase_pairs"] = stats_dict[dataset]["paraphrase_pairs"] + int(len(embed_data)/2)
-    create_tsne_figure(embed_data, dataset+"_paraphrasedOnly_embeddings")
+    if len(embed_data) > 1:
+        print("Visualizing " + str(len(embed_data)) + " texts for the " + dataset + " dataset. That makes " + str(len(embed_data)/2) + " text pairs.")
+        stats_dict[dataset]["paraphrase_pairs"] = stats_dict[dataset]["paraphrase_pairs"] + int(len(embed_data)/2)
+        create_tsne_figure(embed_data, dataset+"_paraphrasedOnly_embeddings")
 
     return stats_dict
 
@@ -137,10 +140,12 @@ print("GPU available: " +  str(torch.cuda.is_available()))
 print("Model running on " + device)
 
 print("Shuffle the dataframe...")
+new_df = pd.DataFrame()
 for dataset in DATASETS:
     d_df = df[df[DATASET] == dataset]   # shuffle while keeping the order of datasets in the df
-    d_df = d_df.sample(frac=1)
-    df[df[DATASET] == dataset] = d_df
+    d_df = shuffle(d_df)
+    new_df = pd.concat([new_df, d_df])
+df = new_df.reset_index(drop=True)
 print("Shuffled.")
 
 print("Welcome! Do you want to embed all datasets or a specific one?")
@@ -192,6 +197,8 @@ last_index = 0
 skipped_counter = 0
 
 for i, pair_id in enumerate(tqdm(list(tokenized_pairs.keys()))):
+    #if i < 560000:
+    #    continue
 
     dataset = tokenized_pairs[pair_id][DATASET]
     
@@ -270,10 +277,13 @@ for i, pair_id in enumerate(tqdm(list(tokenized_pairs.keys()))):
         embed_dict[dataset][EMBEDDINGS].append({ PAIR_ID: pair_id, TEXT_ID: tokenized_pairs[pair_id][ID2], TEXT_PREVIEW: tokenized_pairs[pair_id][TEXT_PREVIEW2], EMBED: list(embedding_2), PARAPHRASE: tokenized_pairs[pair_id][PARAPHRASE], TUPLE_ID: True }) 
 
 # Also do after the for loop completed (for the last dataset)
-stats_dict = visualize_embeddings(embed_dict, last_dataset_viewed, stats_dict)
-df = calculate_cosine_dists(df, embed_dict, last_dataset_viewed)
-df[df[DATASET] == last_dataset_viewed].to_json(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER, last_dataset_viewed+"_embedded.json"), orient = "index", index = True, indent = 4)
-last_dataset_viewed = dataset
+if dataset not in visualized_datasets:
+    print(dataset)
+    print(visualized_datasets)
+    stats_dict = visualize_embeddings(embed_dict, dataset, stats_dict)
+    visualized_datasets.append(dataset)
+df = calculate_cosine_dists(df, embed_dict, dataset)
+df[df[DATASET] == dataset].to_json(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER, dataset+"_embedded.json"), orient = "index", index = True, indent = 4)
 last_index = i
 embed_dict = { }    
 
