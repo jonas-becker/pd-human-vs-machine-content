@@ -5,10 +5,12 @@ DATASETS_FOLDER = "datasets"    #the folder that contains the dataset directorie
 FORMATTED_DATA_FILENAME = "true_data.json"  #the name of the file that contains the data to read in
 DATASETS = ["MPC", "ETPC", "SAv2", "TURL", "MPCBert", "QQP", "ParaNMT", "APH", "APT"]     #the folders in the DATASETS_FOLDER should be named like the datasets here
 MACHINE_PARAPHRASED_DATASETS = ["MPC", "SAv2", "MPCBert", "ParaNMT", "APT"]
+FILLER_DATASETS = ["ETPC", "TURL"]      # datasets that provide original samples to add to other datasets for balancing (make sure these contain mixed types of paraphrases)
 OUT_DIR = "output"      #the directory to output the formatted json in
 FIGURES_FOLDER = "figures"
 EMBEDDINGS_FOLDER = "embeddings"
 EXAMPLES_FOLDER = "examples"
+DETECTION_FOLDER = "detection"
 
 FUZZY = "fuzzy_based_result"
 SEMANTIC = "semantic_based_result"
@@ -16,6 +18,7 @@ SEMANTIC = "semantic_based_result"
 STOPWORDS = ['the', 'and', 'are', 'a']
 FIGURE_SIZE = 1000  
 MAX_DATASET_INPUT = 100000
+EXAMPLE_AMOUNT = 100    # how many examples to extract (top sim, low sim & random sim)
 PARAGRAM_PHRASE_SCORE = [0.4, 0.9]  # the span in which dataset entries will be taken into parsing (throw out other entries), only for ParaNMT
 
 # Variable Names for the outputs:
