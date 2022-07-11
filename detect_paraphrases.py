@@ -75,7 +75,6 @@ def fuzzy_sim(df):
 
 #################################################################################
 
-
 for embedded_file in os.listdir(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER)):
     print(f"Processing {embedded_file}...")
     df = pd.read_json(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER, embedded_file), orient = "index")
@@ -109,4 +108,5 @@ for embedded_file in os.listdir(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER)):
 
     #Output data to json format
     df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, embedded_file.split("_")[0]+"_result.json"), orient = "index", index = True, indent = 4)
+
 

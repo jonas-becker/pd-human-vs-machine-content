@@ -3,6 +3,7 @@ import xml.etree.ElementTree as ET
 
 DATASETS_FOLDER = "datasets"    #the folder that contains the dataset directories to read in
 FORMATTED_DATA_FILENAME = "true_data.json"  #the name of the file that contains the data to read in
+EVALUATION_RESULTS_FILENAME = "evaluation.json"
 DATASETS = ["MPC", "ETPC", "SAv2", "TURL", "MPCBert", "QQP", "ParaNMT", "APH", "APT"]     #the folders in the DATASETS_FOLDER should be named like the datasets here
 MACHINE_PARAPHRASED_DATASETS = ["MPC", "SAv2", "MPCBert", "ParaNMT", "APT"]
 FILLER_DATASETS = ["ETPC", "TURL"]      # datasets that provide original samples to add to other datasets for balancing (make sure these contain mixed types of paraphrases)
@@ -11,9 +12,13 @@ FIGURES_FOLDER = "figures"
 EMBEDDINGS_FOLDER = "embeddings"
 EXAMPLES_FOLDER = "examples"
 DETECTION_FOLDER = "detection"
+EVALUATION_FOLDER = "evaluation"
 
 FUZZY = "fuzzy_based_result"
 SEMANTIC = "semantic_based_result"
+
+FUZZY_BIN = "fuzzy_binary"
+SEMANTIC_BIN = "semantic_binary"
 
 STOPWORDS = ['the', 'and', 'are', 'a']
 FIGURE_SIZE = 1000  
@@ -43,7 +48,6 @@ TEXT1_SCOPE = "text1_scope"     # the token id scope x,y that marks the part of 
 TEXT2_SCOPE = "text2_scope"
 SENSE_PRESERVING = "sense_preserving"
 
-
 TRAIN_LABELS = [True, False]
 
 # Variables for Embeddings
@@ -56,6 +60,20 @@ TEXT_PREVIEW2 = "text_preview_2"
 EMBEDDINGS = "embeddings"
 TEXT_ID = "text_id"
 EMBED = "embed"
+
+#Eval Variables
+DATASET_NAME = "dataset"
+METHOD = "detection_method"
+PAIRS = "pairs"
+TP = "TP"
+TN = "TN"
+FP = "FP"
+FN = "FN"
+ACCURACY = "accuracy"
+PRECISION = "precision"
+RECALL = "recall"
+F1 = "f1"
+THRESHOLD = "threshold"
 
 # Paraphrase Types (EPT Annotation)
 PARAPHRASE_TYPES = {}
