@@ -20,7 +20,6 @@ SEMANTIC = "semantic_based_result"
 FUZZY_BIN = "fuzzy_binary"
 SEMANTIC_BIN = "semantic_binary"
 
-STOPWORDS = ['the', 'and', 'are', 'a']
 FIGURE_SIZE = 1000  
 MAX_DATASET_INPUT = 100000
 EXAMPLE_AMOUNT = 100    # how many examples to extract (top sim, low sim & random sim)
