@@ -75,6 +75,8 @@ RECALL = "recall"
 F1 = "f1"
 THRESHOLD = "threshold"
 
+STOPWORDS = ['the', 'and', 'are', 'a', 'of', 'an', 'is', 'in', 'for', 'where', 'when', 'to', 'at']
+
 # Paraphrase Types (EPT Annotation)
 PARAPHRASE_TYPES = {}
 TYPE_NAME = "type_name"

@@ -4,7 +4,6 @@ from tqdm import tqdm
 from re import sub
 import numpy as np
 from thefuzz import fuzz
-import shortuuid
 from setup import *
 import xml.etree.ElementTree as ET
 from sklearn.utils import shuffle
@@ -15,16 +14,6 @@ import gensim.downloader as api
 from gensim.corpora import Dictionary
 from gensim.models import TfidfModel
 from gensim.similarities import SparseTermSimilarityMatrix, WordEmbeddingSimilarityIndex, SoftCosineSimilarity, Similarity
-
-DATASETS_FOLDER = "datasets"    #the folder that contains the dataset directories to read in
-FORMATTED_DATA_FILENAME = "true_data.json"  #the name of the file that contains the data to read in
-OUT_DIR = "output"      #the directory to output the formatted json in
-
-FUZZY = "fuzzy_based_result"
-SEMANTIC = "semantic_based_result"
-
-STOPWORDS = ['the', 'and', 'are', 'a']
-
 
 def preprocess(doc):
     # Tokenize and clean data
@@ -101,7 +90,7 @@ for embedded_file in os.listdir(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER)):
     df = shuffle(df).reset_index(drop=True)
     print("Balanced dataset with the following paraphrased-statistics:")
     print(df[PARAPHRASE].value_counts())
-
+ 
     # Calculate the similarities with each method
     df[FUZZY] = fuzzy_sim(df)
     df[SEMANTIC] = semantic_sim(df)
