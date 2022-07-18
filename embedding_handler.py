@@ -291,5 +291,5 @@ embed_dict = { }
 stats_dict = mean_cos_distance(df, stats_dict)
 
 # Output Stats
-with open('stats.json', 'w') as f:
+with open(os.path.join(OUT_DIR, 'stats.json'), 'w') as f:
     json.dump(stats_dict, f)

@@ -37,6 +37,10 @@ def eval(df, bin_id, threshold, method, eval_df):
     except Exception as e:
         fn = 0
         pass
+    
+    specificity = None
+    if (tn+fp) != 0:
+        specificity = float(tn / (tn+fp))
 
     eval_df.loc[len(eval_df.index)] = [
         file.split("_")[0], 
@@ -46,11 +50,10 @@ def eval(df, bin_id, threshold, method, eval_df):
         tn, 
         fp, 
         fn, 
-        (tn+tp) / len(df),   # accuracy
-        tp / (tp+fp),   # precision
-        tp / (tp+fn),   # recall
-        tn / (tn+fp),    # specificity (true negative rate)
-        fp / (tn+fp),   # false positive rate
+        float((tn+tp) / len(df)),   # accuracy
+        float(tp / (tp+fp)),   # precision
+        float(tp / (tp+fn)),   # recall
+        specificity,    # specificity (true negative rate)
         threshold, 
         f1
         ]
@@ -143,7 +146,7 @@ def find_optimal_thresholds(df):
     return TFIDF_THRESHOLD, SEM_BERT_THRESHOLD, SEM_T5_THRESHOLD, FUZZY_THRESHOLD, NGRAM_THRESHOLD 
     
 
-eval_df = pd.DataFrame(columns=[DATASET_NAME, METHOD, PAIRS, TP, TN, FP, FN, ACCURACY, PRECISION, RECALL, SPECIFICITY, TRUE_NEG_RATE, THRESHOLD, F1])
+eval_df = pd.DataFrame(columns=[DATASET_NAME, METHOD, PAIRS, TP, TN, FP, FN, ACCURACY, PRECISION, RECALL, SPECIFICITY, THRESHOLD, F1])
 
 eval_string = ""
 eval_string += "-------------------------" + "\n"
@@ -161,8 +164,7 @@ threshold_df = threshold_df[(threshold_df[TEXT1] != "") & (threshold_df[TEXT2] !
 
 for file in os.listdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):
     print(f"---> Evaluating {file}...")
-    if "MPCBert" not in file:
-        continue
+    
     df = pd.read_json(os.path.join(OUT_DIR, DETECTION_FOLDER, file), orient = "index")
 
     # Find the optimal thresholds:
@@ -215,7 +217,7 @@ for file in os.listdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):
     df[SEM_T5_BIN] = sem_t5_bin
     df[FUZZY_BIN] = fuzzy_bin
     df[NGRAM_BIN] = ngram_bin
-    df[TFIDF_COSINE] = tfidf_bin
+    df[TFIDF_COSINE_BIN] = tfidf_bin
 
     print("Calculating precision-recall curves...")
     precision_sem_bert, recall_sem_bert, thresholds_sem_bert = precision_recall_curve(df["is_paraphrase"], df[SEM_BERT])
