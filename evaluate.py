@@ -3,11 +3,13 @@ import pandas as pd
 from tqdm import tqdm
 from re import sub
 import numpy as np
+from sklearn.utils import shuffle
 import re
 import sys
 from setup import *
 from sklearn.metrics import f1_score, precision_recall_curve, confusion_matrix
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 def eval(df, bin_id, threshold, method, eval_df):
     actual = pd.Series(df[PARAPHRASE], name='Actual')
@@ -146,7 +148,7 @@ def find_optimal_thresholds(df):
     return TFIDF_THRESHOLD, SEM_BERT_THRESHOLD, SEM_T5_THRESHOLD, FUZZY_THRESHOLD, NGRAM_THRESHOLD 
     
 
-eval_df = pd.DataFrame(columns=[DATASET_NAME, METHOD, PAIRS, TP, TN, FP, FN, ACCURACY, PRECISION, RECALL, SPECIFICITY, THRESHOLD, F1])
+eval_df = pd.DataFrame(columns=[DATASET_NAME, METHOD, PAIRS, TP, TN, FP, FN, ACCURACY, PRECISION, RECALL, SPECIFICITY ,THRESHOLD, F1])
 
 eval_string = ""
 eval_string += "-------------------------" + "\n"
@@ -161,7 +163,7 @@ eval_string = eval_string[:-2] + "\n"
 # use etpc for threshold choosing as it is a very balanced and diverse dataset
 threshold_df =  pd.read_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "APH_result.json"), orient = "index")
 threshold_df = threshold_df[(threshold_df[TEXT1] != "") & (threshold_df[TEXT2] != "")].reset_index(drop=True)
-
+'''
 for file in os.listdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):
     print(f"---> Evaluating {file}...")
     
@@ -264,5 +266,42 @@ for file in os.listdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):
 
 eval_df.to_json(os.path.join(OUT_DIR, EVALUATION_FOLDER, EVALUATION_RESULTS_FILENAME), orient = "index", index = True, indent = 4)
 eval_df.to_csv(os.path.join(OUT_DIR, EVALUATION_FOLDER, EVALUATION_RESULTS_FILENAME.replace(".json", ".csv")), index = True)
+'''
+# Make correlation graphs
+methods_to_correlate = [TFIDF_COSINE, FUZZY, SEM_BERT, SEM_T5]
+c_pal = sns.color_palette("colorblind")
+
+# machine-paraphrases
+df = pd.DataFrame()
+for file in os.listdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):
+    if file.split("_")[0] in MACHINE_PARAPHRASED_DATASETS:
+        tmp_df = pd.read_json(os.path.join(OUT_DIR, DETECTION_FOLDER, file), orient = "index")
+        df = pd.concat([df,tmp_df])
+df = shuffle(df)
+corr_df_m = df[df[PARAPHRASE] == True].reset_index(drop=True)
+corr_df_m = corr_df_m.truncate(after=CORR_GRAPH_SIZE)
+
+# human-paraphrases
+df = pd.DataFrame()
+for file in os.listdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):
+    if file.split("_")[0] not in MACHINE_PARAPHRASED_DATASETS:
+        tmp_df = pd.read_json(os.path.join(OUT_DIR, DETECTION_FOLDER, file), orient = "index")
+        df = pd.concat([df,tmp_df])
+df = shuffle(df)
+print(f"Generating correlation graphs for human datasets. Found {df.shape[0]} pairs.")
+corr_df_h = df[df[PARAPHRASE] == True].reset_index(drop=True)
+corr_df_h = corr_df_h.truncate(after=CORR_GRAPH_SIZE)
+
+
+for method1 in tqdm(methods_to_correlate):
+    for method2 in methods_to_correlate:
+        if method1 != method2:
+            sns.regplot(x=corr_df_m[method1], y=corr_df_m[method2], scatter_kws={"color": c_pal[0]}, line_kws={"color": c_pal[3]}).set(title='Correlation on Machine-Paraphrases')
+            plt.savefig(os.path.join(OUT_DIR, EVALUATION_FOLDER, CORRELATIONS_FOLDER, method1 + "_" + method2 + "_machine.jpg"))
+            plt.clf()
+            sns.regplot(x=corr_df_h[method1], y=corr_df_h[method2], scatter_kws={"color": c_pal[0]}, line_kws={"color": c_pal[3]}).set(title='Correlation on Human-Paraphrases')
+            plt.savefig(os.path.join(OUT_DIR, EVALUATION_FOLDER, CORRELATIONS_FOLDER, method1 + "_" + method2 + "_human.jpg"))
+            plt.clf()
+
 
 print("Done.")

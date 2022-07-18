@@ -13,6 +13,7 @@ EMBEDDINGS_FOLDER = "embeddings"
 EXAMPLES_FOLDER = "examples"
 DETECTION_FOLDER = "detection"
 EVALUATION_FOLDER = "evaluation"
+CORRELATIONS_FOLDER = "correlations"
 
 FUZZY = "fuzzy"
 SEM_GLOVE = "semantic_glove"
@@ -82,6 +83,8 @@ TRUE_NEG_RATE = "true_negative_rate"
 RECALL = "recall"
 F1 = "f1"
 THRESHOLD = "threshold"
+
+CORR_GRAPH_SIZE = 3000
 
 STOPWORDS = ['the', 'and', 'are', 'a', 'of', 'an', 'is', 'in', 'for', 'where', 'when', 'to', 'at']
 
