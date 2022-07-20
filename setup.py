@@ -22,6 +22,8 @@ SEM_T5 = "semantic_t5"
 NGRAM = "ngram"
 TFIDF_COSINE = "tfidf_cosine"
 
+DETECTION_METHODS = [FUZZY, SEM_BERT, SEM_T5, TFIDF_COSINE]
+
 FUZZY_BIN = "fuzzy_binary"
 SEM_BERT_BIN = "sem_bert_binary"
 SEM_T5_BIN = "sem_t5_binary"
