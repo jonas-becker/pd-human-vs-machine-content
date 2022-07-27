@@ -44,22 +44,41 @@ def create_tsne_figure(embed_data, out_filename):
     fig.write_html(os.path.join(OUT_DIR, FIGURES_FOLDER, out_filename + ".html"))
 
 def visualize_embeddings(embed_dict, dataset, stats_dict):
-    # Create visualization per dataset (paraphrase & non-paraphrase pairs combined)
-    print("Creating visualizations for dataset...")
-    embed_data = embed_dict[dataset][EMBEDDINGS]
-    if len(embed_data) > 1:
-        print("Visualizing " + str(len(embed_data)) + " texts for the " + dataset + " dataset. That makes " + str(len(embed_data)/2) + " text pairs.")
-        stats_dict[dataset]["total_pairs"] = stats_dict[dataset]["total_pairs"] + int(len(embed_data)/2)
-        create_tsne_figure(embed_data, dataset+"_embeddings")
 
-    # Create visualization per dataset (paraphrase pairs only)
-    print("Creating visualizations for dataset (paraphrase-pairs only)...")
-    # Filter the data to only contain paraphrased pairs:
-    embed_data = [e for e in embed_data if e[PARAPHRASE] == True]
-    if len(embed_data) > 1:
-        print("Visualizing " + str(len(embed_data)) + " texts for the " + dataset + " dataset. That makes " + str(len(embed_data)/2) + " text pairs.")
-        stats_dict[dataset]["paraphrase_pairs"] = stats_dict[dataset]["paraphrase_pairs"] + int(len(embed_data)/2)
-        create_tsne_figure(embed_data, dataset+"_paraphrasedOnly_embeddings")
+    if dataset == "total":
+        # Create visualization for all datasets (paraphrase & non-paraphrase pairs combined)
+        print("Creating visualizations for dataset...")
+        embed_data = []
+        for d in embed_dict.keys():
+            embed_data = embed_data + embed_dict[d][EMBEDDINGS]  # combine dataset embeds
+            print(len(embed_data))
+
+        if len(embed_data) > 1:
+            print("Visualizing " + str(len(embed_data)) + " texts for the " + dataset + " dataset. That makes " + str(len(embed_data)/2) + " text pairs.")
+            create_tsne_figure(embed_data, dataset)
+        
+        embed_data = [e for e in embed_data if e[PARAPHRASE] == True]
+        if len(embed_data) > 1:
+            print("Visualizing " + str(len(embed_data)) + " texts for the " + dataset + " dataset. That makes " + str(len(embed_data)/2) + " text pairs.")
+            create_tsne_figure(embed_data, dataset+"_paraphrasedOnly")
+
+    else:
+        # Create visualization per dataset (paraphrase & non-paraphrase pairs combined)
+        print("Creating visualizations for dataset...")
+        embed_data = embed_dict[dataset][EMBEDDINGS]
+        if len(embed_data) > 1:
+            print("Visualizing " + str(len(embed_data)) + " texts for the " + dataset + " dataset. That makes " + str(len(embed_data)/2) + " text pairs.")
+            stats_dict[dataset]["total_pairs"] = stats_dict[dataset]["total_pairs"] + int(len(embed_data)/2)
+            create_tsne_figure(embed_data, dataset)
+
+        # Create visualization per dataset (paraphrase pairs only)
+        print("Creating visualizations for dataset (paraphrase-pairs only)...")
+        # Filter the data to only contain paraphrased pairs:
+        embed_data = [e for e in embed_data if e[PARAPHRASE] == True]
+        if len(embed_data) > 1:
+            print("Visualizing " + str(len(embed_data)) + " texts for the " + dataset + " dataset. That makes " + str(len(embed_data)/2) + " text pairs.")
+            stats_dict[dataset]["paraphrase_pairs"] = stats_dict[dataset]["paraphrase_pairs"] + int(len(embed_data)/2)
+            create_tsne_figure(embed_data, dataset+"_paraphrasedOnly")
 
     return stats_dict
 
@@ -153,16 +172,17 @@ print('1 - all datasets \n2 - a specific dataset')
 x = int(input("Enter a number: "))
 if x == 2:
     while True:
-        print('Please enter the dataset you want to process (folder name):')
-        x = input("Dataset: ")
-        if x in DATASETS:
+        print('Please enter the dataset you want to process (folder name). You can enter multiple datasets by seperating them by \",\" (no spaces).')
+        x = input("Dataset: ").split(",")
+        if all(x_item in DATASETS for x_item in x):
             print("Okay.")
-            DATASETS = [x]
+            DATASETS = x
             break
         else:
-            print("This is not a valid dataset. Please use the correct casing. Example: \"ETPC\" or \"SAv2\"")
+            print("This is not a valid dataset. Please use the correct casing. Example: \"ETPC\" or \"SAv2\" or \"ETPC,SAv2\".")
 
 embed_dict = { }
+embed_dict_total = { }
 tokenized_texts = { }
 tokenized_pairs = { }
 visualized_datasets = []
@@ -214,6 +234,13 @@ for i, pair_id in enumerate(tqdm(list(tokenized_pairs.keys()))):
         df[df[DATASET] == last_dataset_viewed].to_json(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER, last_dataset_viewed+"_embedded.json"), orient = "index", index = True, indent = 4)
         last_dataset_viewed = dataset
         last_index = i
+
+       # pop out unneccessary embeds (for final total tsne-figure)
+        for d in DATASETS:
+            embed_dict[dataset][EMBEDDINGS] = embed_dict[dataset][EMBEDDINGS][:2*FIGURE_SIZE]    # only leave FIGURE_SIZE pairs for this dataset in total figure
+        print(len(embed_dict[dataset]))
+        embed_dict_total = dict(embed_dict_total, **embed_dict) # update total dict
+
         embed_dict = { }  
         skipped_counter = 0
         gc.collect()  
@@ -223,11 +250,11 @@ for i, pair_id in enumerate(tqdm(list(tokenized_pairs.keys()))):
             stats_dict = visualize_embeddings(embed_dict, dataset, stats_dict)
             visualized_datasets.append(last_dataset_viewed)
 
-        df = calculate_cosine_dists(df, embed_dict, dataset)
-        track_stats(embed_dict, last_dataset_viewed, stats_dict)
+        #df = calculate_cosine_dists(df, embed_dict, dataset)
+        #track_stats(embed_dict, last_dataset_viewed, stats_dict)
 
         last_index = i
-        embed_dict = { }
+        #embed_dict = { }
         skipped_counter = 0
         gc.collect()
 
@@ -282,10 +309,20 @@ if dataset not in visualized_datasets:
     print(visualized_datasets)
     stats_dict = visualize_embeddings(embed_dict, dataset, stats_dict)
     visualized_datasets.append(dataset)
+    
+# pop out unneccessary embeds (for final total tsne-figure)
+for d in DATASETS:
+    embed_dict[dataset][EMBEDDINGS] = embed_dict[dataset][EMBEDDINGS][:2*FIGURE_SIZE]    # only leave FIGURE_SIZE pairs for this dataset in total figure
+print(len(embed_dict[dataset]))
+embed_dict_total = dict(embed_dict_total, **embed_dict) # update total dict
+
 df = calculate_cosine_dists(df, embed_dict, dataset)
+track_stats(embed_dict, dataset, stats_dict)
+
 df[df[DATASET] == dataset].to_json(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER, dataset+"_embedded.json"), orient = "index", index = True, indent = 4)
-last_index = i
-embed_dict = { }    
+
+# visualize all datasets in one tsne-figure
+visualize_embeddings(embed_dict_total, "total", stats_dict)
 
 # get mean cos distance per dataset
 stats_dict = mean_cos_distance(df, stats_dict)

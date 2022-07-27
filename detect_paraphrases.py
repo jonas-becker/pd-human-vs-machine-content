@@ -68,7 +68,7 @@ def semantic_sim_bert(df):
     corpus1 = list(df[TEXT1])
     corpus2 = list(df[TEXT2])
     # use bert to embed
-    model = SentenceTransformer('all-mpnet-base-v2')
+    model = SentenceTransformer('bert-base-uncased')
     print("Encoding text_1's...")
     text1_embeddings = model.encode(corpus1)
     print("Encoding text_2's...")

@@ -30,7 +30,7 @@ SEM_T5_BIN = "sem_t5_binary"
 NGRAM_BIN = "ngram_binary"
 TFIDF_COSINE_BIN = "tfidf_cosine_binary"
 
-FIGURE_SIZE = 1000  
+FIGURE_SIZE = 2000  
 MAX_DATASET_INPUT = 100000
 EXAMPLE_AMOUNT = 100    # how many examples to extract (top sim, low sim & random sim)
 PARAGRAM_PHRASE_SCORE = [0.4, 0.9]  # the span in which dataset entries will be taken into parsing (throw out other entries), only for ParaNMT
