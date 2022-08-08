@@ -271,6 +271,15 @@ eval_df.to_csv(os.path.join(OUT_DIR, EVALUATION_FOLDER, EVALUATION_RESULTS_FILEN
 methods_to_correlate = [TFIDF_COSINE, FUZZY, SEM_BERT, SEM_T5]
 c_pal = sns.color_palette("colorblind")
 
+# machine-paraphrases & human-paraphrases
+df = pd.DataFrame()
+for file in os.listdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):
+    tmp_df = pd.read_json(os.path.join(OUT_DIR, DETECTION_FOLDER, file), orient = "index")
+    df = pd.concat([df,tmp_df])
+df = shuffle(df)
+corr_df = df[df[PARAPHRASE] == True].reset_index(drop=True)
+corr_df = corr_df.truncate(after=CORR_GRAPH_SIZE)
+
 # machine-paraphrases
 df = pd.DataFrame()
 for file in os.listdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):
@@ -292,7 +301,6 @@ print(f"Generating correlation graphs for human datasets. Found {df.shape[0]} pa
 corr_df_h = df[df[PARAPHRASE] == True].reset_index(drop=True)
 corr_df_h = corr_df_h.truncate(after=CORR_GRAPH_SIZE)
 
-
 for method1 in tqdm(methods_to_correlate):
     for method2 in methods_to_correlate:
         if method1 != method2:
@@ -302,6 +310,18 @@ for method1 in tqdm(methods_to_correlate):
             sns.regplot(x=corr_df_h[method1], y=corr_df_h[method2], scatter_kws={"color": c_pal[0]}, line_kws={"color": c_pal[3]}).set(title='Correlation on Human-Paraphrases')
             plt.savefig(os.path.join(OUT_DIR, EVALUATION_FOLDER, CORRELATIONS_FOLDER, method1 + "_" + method2 + "_human.jpg"))
             plt.clf()
+
+# Generate Correlation Matrix & Output Heatmap
+corr_h_matrix = corr_df_h.drop(columns=[PARAPHRASE]).corr()
+print(corr_h_matrix)
+sns.heatmap(corr_h_matrix, annot=True)
+plt.savefig(os.path.join(OUT_DIR, EVALUATION_FOLDER, CORRELATIONS_FOLDER, "corr_matrix_human.jpg"), bbox_inches="tight")
+plt.clf()
+corr_m_matrix = corr_df_m.drop(columns=[PARAPHRASE]).corr()
+print(corr_m_matrix)
+sns.heatmap(corr_m_matrix, annot=True)
+plt.savefig(os.path.join(OUT_DIR, EVALUATION_FOLDER, CORRELATIONS_FOLDER, "corr_matrix_machine.jpg"), bbox_inches="tight")
+plt.clf()
 
 
 print("Done.")
