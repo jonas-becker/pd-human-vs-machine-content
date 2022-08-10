@@ -160,10 +160,7 @@ for d in DATASETS:
 eval_string = eval_string[:-2] + "\n"
 
 
-# use etpc for threshold choosing as it is a very balanced and diverse dataset
-threshold_df =  pd.read_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "APH_result.json"), orient = "index")
-threshold_df = threshold_df[(threshold_df[TEXT1] != "") & (threshold_df[TEXT2] != "")].reset_index(drop=True)
-'''
+# find the optimal thresholds for each method and dataset and evaluate with said thresholds
 for file in os.listdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):
     print(f"---> Evaluating {file}...")
     
@@ -173,6 +170,7 @@ for file in os.listdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):
     if len(df[df[PARAPHRASE] == False]) > 10:
         TFIDF_THRESHOLD, SEM_BERT_THRESHOLD, SEM_T5_THRESHOLD, FUZZY_THRESHOLD, NGRAM_THRESHOLD = find_optimal_thresholds(df)
     else:
+        # if the dataset has only paraphrase-pairs
         TFIDF_THRESHOLD, SEM_BERT_THRESHOLD, SEM_T5_THRESHOLD, FUZZY_THRESHOLD, NGRAM_THRESHOLD = 0.8, 0.8, 0.8, 0.8, 0.8
 
     print("Continue with thresholds: ")
@@ -266,7 +264,61 @@ for file in os.listdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):
 
 eval_df.to_json(os.path.join(OUT_DIR, EVALUATION_FOLDER, EVALUATION_RESULTS_FILENAME), orient = "index", index = True, indent = 4)
 eval_df.to_csv(os.path.join(OUT_DIR, EVALUATION_FOLDER, EVALUATION_RESULTS_FILENAME.replace(".json", ".csv")), index = True)
-'''
+
+# Reevaluate all methods & datasets with the same thresholds
+eval_df = pd.DataFrame(columns=[DATASET_NAME, METHOD, PAIRS, TP, TN, FP, FN, ACCURACY, PRECISION, RECALL, SPECIFICITY ,THRESHOLD, F1])
+for file in os.listdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):    
+    for threshold in DEFAULT_THRESHOLDS:
+        df = pd.read_json(os.path.join(OUT_DIR, DETECTION_FOLDER, file), orient = "index")
+        print(f"---> Evaluating {file} with threshold {threshold}...")
+
+        sem_bert_bin = []
+        sem_t5_bin = []
+        fuzzy_bin = []
+        ngram_bin = []
+        tfidf_bin = []
+        print("Checking determined thresholds for every pair...")
+        for i, row in df.iterrows():
+            # sem_bert
+            if row[SEM_BERT] >= SEM_BERT_THRESHOLD:
+                sem_bert_bin.append(True)
+            else:
+                sem_bert_bin.append(False)
+            # sem_t5
+            if row[SEM_T5] >= SEM_T5_THRESHOLD:
+                sem_t5_bin.append(True)
+            else:
+                sem_t5_bin.append(False)
+            # fuzzy
+            if row[FUZZY] >= FUZZY_THRESHOLD:
+                fuzzy_bin.append(True)
+            else:
+                fuzzy_bin.append(False)
+            # ngram
+            if row[NGRAM] >= NGRAM_THRESHOLD:
+                ngram_bin.append(True)
+            else:
+                ngram_bin.append(False)
+            # tfidf cosine
+            if row[TFIDF_COSINE] >= TFIDF_THRESHOLD:
+                tfidf_bin.append(True)
+            else:
+                tfidf_bin.append(False)
+
+        df[SEM_BERT_BIN] = sem_bert_bin
+        df[SEM_T5_BIN] = sem_t5_bin
+        df[FUZZY_BIN] = fuzzy_bin
+        df[NGRAM_BIN] = ngram_bin
+        df[TFIDF_COSINE_BIN] = tfidf_bin
+
+        eval_df = eval(df, SEM_BERT_BIN, threshold, SEM_BERT, eval_df)
+        eval_df = eval(df, SEM_T5_BIN, threshold, SEM_T5, eval_df)
+        eval_df = eval(df, FUZZY_BIN, threshold, FUZZY, eval_df)
+        eval_df = eval(df, TFIDF_COSINE_BIN, threshold, TFIDF_COSINE, eval_df)
+
+eval_df.to_json(os.path.join(OUT_DIR, EVALUATION_FOLDER, "thresholds_"+EVALUATION_RESULTS_FILENAME), orient = "index", index = True, indent = 4)
+eval_df.to_csv(os.path.join(OUT_DIR, EVALUATION_FOLDER, "thresholds_"+EVALUATION_RESULTS_FILENAME.replace(".json", ".csv")), index = True)
+
 # Make correlation graphs
 methods_to_correlate = [TFIDF_COSINE, FUZZY, SEM_BERT, SEM_T5]
 c_pal = sns.color_palette("colorblind")

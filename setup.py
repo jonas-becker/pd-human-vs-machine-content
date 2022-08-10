@@ -58,6 +58,7 @@ TEXT2_SCOPE = "text2_scope"
 SENSE_PRESERVING = "sense_preserving"
 
 TRAIN_LABELS = [True, False]
+DEFAULT_THRESHOLDS = [0.5, 0.7, 0.9]
 
 # Variables for Embeddings
 TOKENS = "tokens"
