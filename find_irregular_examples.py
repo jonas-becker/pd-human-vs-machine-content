@@ -4,7 +4,7 @@ from tqdm import tqdm
 from setup import *
 
 '''
-Finds examples with very low results for a specific methods that others did not perform as bad in
+Finds examples with very low results for specific methods that others did not perform as bad in
 Requires the get_examples.py being processed beforehand as it takes the json example files from the files generated with the script
 '''
 

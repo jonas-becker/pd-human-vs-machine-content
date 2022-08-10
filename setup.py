@@ -32,7 +32,7 @@ TFIDF_COSINE_BIN = "tfidf_cosine_binary"
 
 FIGURE_SIZE = 2000  
 MAX_DATASET_INPUT = 100000
-EXAMPLE_AMOUNT = 100    # how many examples to extract (top sim, low sim & random sim)
+EXAMPLE_AMOUNT = 500    # how many examples to extract (top sim, low sim & random sim)
 PARAGRAM_PHRASE_SCORE = [0.4, 0.9]  # the span in which dataset entries will be taken into parsing (throw out other entries), only for ParaNMT
 
 # Variable Names for the outputs:
