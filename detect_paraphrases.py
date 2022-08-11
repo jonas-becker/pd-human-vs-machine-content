@@ -107,28 +107,6 @@ def semantic_sim_t5(df):
             continue
     return semantic_results
 
-def semantic_sim_t5(df):
-    print("Calculating semantic similarity with T5.")
-    corpus1 = list(df[TEXT1])
-    corpus2 = list(df[TEXT2])
-    # use bert to embed
-    model = SentenceTransformer('sentence-t5-base')
-    print("Encoding text_1's...")
-    text1_embeddings = model.encode(corpus1)
-    print("Encoding text_2's...")
-    text2_embeddings = model.encode(corpus2)
-
-    print("Processing texts...")
-    semantic_results = []
-    for i, row in tqdm(df.iterrows(), total=df.shape[0]):
-        sim = cosine_similarity([text1_embeddings[i]], [text2_embeddings[i]])[0][0]
-        try:
-            semantic_results.append(sim)
-        except Exception as e:
-            semantic_results.append(float(sim.item()))
-            continue
-    return semantic_results
-
 def semantic_sim_gpt3(df):
     # TODO: Write this function
     print("Calculating semantic similarity with GPT-3.")
