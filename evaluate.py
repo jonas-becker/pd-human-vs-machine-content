@@ -356,12 +356,12 @@ corr_df_h = corr_df_h.truncate(after=CORR_GRAPH_SIZE)
 for method1 in tqdm(methods_to_correlate):
     for method2 in methods_to_correlate:
         if method1 != method2:
+            plt.clf()
             sns.regplot(x=corr_df_m[method1], y=corr_df_m[method2], scatter_kws={"color": c_pal[0]}, line_kws={"color": c_pal[3]}).set(title='Correlation on Machine-Paraphrases')
             plt.savefig(os.path.join(OUT_DIR, EVALUATION_FOLDER, CORRELATIONS_FOLDER, method1 + "_" + method2 + "_machine.jpg"))
             plt.clf()
             sns.regplot(x=corr_df_h[method1], y=corr_df_h[method2], scatter_kws={"color": c_pal[0]}, line_kws={"color": c_pal[3]}).set(title='Correlation on Human-Paraphrases')
             plt.savefig(os.path.join(OUT_DIR, EVALUATION_FOLDER, CORRELATIONS_FOLDER, method1 + "_" + method2 + "_human.jpg"))
-            plt.clf()
 
 # Generate Correlation Matrix & Output Heatmap
 corr_h_matrix = corr_df_h.drop(columns=[PARAPHRASE]).corr()
