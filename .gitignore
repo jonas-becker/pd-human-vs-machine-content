@@ -1,2 +1,9 @@
 datasets/*
-output/*
+output/embeddings/*
+output/detection/*
+output/evaluation/*
+output/examples/*
+output/figures/*
+output/true_data.json
+output/true_data_big.json
+output/true_data_small.json

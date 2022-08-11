@@ -217,8 +217,6 @@ last_index = 0
 skipped_counter = 0
 
 for i, pair_id in enumerate(tqdm(list(tokenized_pairs.keys()))):
-    #if i < 560000:
-    #    continue
 
     dataset = tokenized_pairs[pair_id][DATASET]
     
@@ -237,8 +235,8 @@ for i, pair_id in enumerate(tqdm(list(tokenized_pairs.keys()))):
 
        # pop out unneccessary embeds (for final total tsne-figure)
         for d in DATASETS:
-            embed_dict[dataset][EMBEDDINGS] = embed_dict[dataset][EMBEDDINGS][:2*FIGURE_SIZE]    # only leave FIGURE_SIZE pairs for this dataset in total figure
-        print(len(embed_dict[dataset]))
+            if d in embed_dict:
+                embed_dict[d][EMBEDDINGS] = embed_dict[d][EMBEDDINGS][:2*FIGURE_SIZE]    # only leave FIGURE_SIZE pairs for this dataset in total figure
         embed_dict_total = dict(embed_dict_total, **embed_dict) # update total dict
 
         embed_dict = { }  
@@ -312,8 +310,8 @@ if dataset not in visualized_datasets:
     
 # pop out unneccessary embeds (for final total tsne-figure)
 for d in DATASETS:
-    embed_dict[dataset][EMBEDDINGS] = embed_dict[dataset][EMBEDDINGS][:2*FIGURE_SIZE]    # only leave FIGURE_SIZE pairs for this dataset in total figure
-print(len(embed_dict[dataset]))
+    if d in embed_dict:
+        embed_dict[d][EMBEDDINGS] = embed_dict[d][EMBEDDINGS][:2*FIGURE_SIZE]    # only leave FIGURE_SIZE pairs for this dataset in total figure
 embed_dict_total = dict(embed_dict_total, **embed_dict) # update total dict
 
 df = calculate_cosine_dists(df, embed_dict, dataset)
@@ -322,7 +320,7 @@ track_stats(embed_dict, dataset, stats_dict)
 df[df[DATASET] == dataset].to_json(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER, dataset+"_embedded.json"), orient = "index", index = True, indent = 4)
 
 # visualize all datasets in one tsne-figure
-visualize_embeddings(embed_dict_total, "total", stats_dict)
+stats_dict = visualize_embeddings(embed_dict_total, "total", stats_dict)
 
 # get mean cos distance per dataset
 stats_dict = mean_cos_distance(df, stats_dict)

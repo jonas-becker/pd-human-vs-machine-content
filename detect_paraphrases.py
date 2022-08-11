@@ -107,6 +107,43 @@ def semantic_sim_t5(df):
             continue
     return semantic_results
 
+def semantic_sim_t5(df):
+    print("Calculating semantic similarity with T5.")
+    corpus1 = list(df[TEXT1])
+    corpus2 = list(df[TEXT2])
+    # use bert to embed
+    model = SentenceTransformer('sentence-t5-base')
+    print("Encoding text_1's...")
+    text1_embeddings = model.encode(corpus1)
+    print("Encoding text_2's...")
+    text2_embeddings = model.encode(corpus2)
+
+    print("Processing texts...")
+    semantic_results = []
+    for i, row in tqdm(df.iterrows(), total=df.shape[0]):
+        sim = cosine_similarity([text1_embeddings[i]], [text2_embeddings[i]])[0][0]
+        try:
+            semantic_results.append(sim)
+        except Exception as e:
+            semantic_results.append(float(sim.item()))
+            continue
+    return semantic_results
+
+def semantic_sim_gpt3(df):
+    # TODO: Write this function
+    print("Calculating semantic similarity with GPT-3.")
+    # Add a function that calculates the semantic similarity of each text pair within the dataframe 
+    # (similar to the above semantic similarity functions)
+    # use GPT-3
+
+    # Should return a list semantic_results (float type: 0 being least similar and 1 being identical pair)
+    # Should use cosine similarity 
+    semantic_results = []
+
+    return semantic_results
+
+
+'''
 def ngram_sim(df):
     print("Calculating similarity with N-Grams and their TF-IDF cosine similarity.")
     corpus1 = list(df[TEXT1])
@@ -121,6 +158,7 @@ def ngram_sim(df):
         sim = cosine_similarity(tf_idf_matrix[i], tf_idf_matrix[len(corpus1)+i])    #calculate sim between text1 and text2 pairwise
         results.append(sim[0][0])
     return results
+'''
 
 def fuzzy_sim(df):
     #Check for paraphrase with fuzzy based
@@ -179,10 +217,11 @@ for embedded_file in os.listdir(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER)):
  
     # Calculate the similarities with each method
     df[TFIDF_COSINE] = tfidf_cosine_sim(df)
-    df[NGRAM] = ngram_sim(df)  # maybe not working for strings of different length
+    # df[NGRAM] = ngram_sim(df)  # not working reliably for strings of different length, so leave out for now
     df[FUZZY] = fuzzy_sim(df)
     df[SEM_BERT] = semantic_sim_bert(df)
     df[SEM_T5] = semantic_sim_t5(df)
+    df[SEM_GPT3] = semantic_sim_gpt3(df)
     #df[SEM_GLOVE] = semantic_sim_glove(df)
 
     #Output data to json format

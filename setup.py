@@ -4,8 +4,8 @@ import xml.etree.ElementTree as ET
 DATASETS_FOLDER = "datasets"    #the folder that contains the dataset directories to read in
 FORMATTED_DATA_FILENAME = "true_data.json"  #the name of the file that contains the data to read in
 EVALUATION_RESULTS_FILENAME = "evaluation.json"
-DATASETS = ["MPC", "ETPC", "SAv2", "TURL", "MPCBert", "QQP", "ParaNMT", "APH", "APT"]     #the folders in the DATASETS_FOLDER should be named like the datasets here
-MACHINE_PARAPHRASED_DATASETS = ["MPC", "SAv2", "MPCBert", "ParaNMT", "APT"]
+DATASETS = ["ETPC", "SAv2", "TURL", "MPCBert", "QQP", "ParaNMT", "APH", "APT"]     #the folders in the DATASETS_FOLDER should be named like the datasets here
+MACHINE_PARAPHRASED_DATASETS = ["SAv2", "MPCBert", "ParaNMT", "APT"]
 FILLER_DATASETS = ["ETPC", "TURL"]      # datasets that provide original samples to add to other datasets for balancing (make sure these contain mixed types of paraphrases)
 OUT_DIR = "output"      #the directory to output the formatted json in
 FIGURES_FOLDER = "figures"
@@ -19,6 +19,7 @@ FUZZY = "fuzzy"
 SEM_GLOVE = "semantic_glove"
 SEM_BERT = "semantic_bert"
 SEM_T5 = "semantic_t5"
+SEM_GPT3 = "semantic_gpt3"
 NGRAM = "ngram"
 TFIDF_COSINE = "tfidf_cosine"
 
@@ -27,6 +28,7 @@ DETECTION_METHODS = [FUZZY, SEM_BERT, SEM_T5, TFIDF_COSINE]
 FUZZY_BIN = "fuzzy_binary"
 SEM_BERT_BIN = "sem_bert_binary"
 SEM_T5_BIN = "sem_t5_binary"
+SEM_GPT3_BIN = "sem_gpt3_binary"
 NGRAM_BIN = "ngram_binary"
 TFIDF_COSINE_BIN = "tfidf_cosine_binary"
 

@@ -14,7 +14,7 @@ pd.set_option("display.max_colwidth", None)
 # For Debugging:
 #DATASETS = ["ETPC"]
 
-#Bring datasets to the same format (standardized)
+# Bring datasets to the same format (standardized)
 
 df = pd.DataFrame(columns= [DATASET, ORIGIN, PAIR_ID, ID1, ID2, TEXT1, TEXT2, PARAPHRASE, PARAPHRASE_TYPE] )
 
@@ -26,6 +26,7 @@ for dataset in DATASETS:
 
     df_tmp = pd.DataFrame(columns= [DATASET, ORIGIN, PAIR_ID, ID1, ID2, TEXT1, TEXT2, PARAPHRASE, PARAPHRASE_TYPE] )
 
+    '''
     if dataset == "MPC":
         dmop_path = os.path.join(path_to_dataset, "wikipedia_documents_train", "machined")      #read train data
         for file in tqdm(os.listdir(os.path.join(dmop_path, "og"))):
@@ -39,10 +40,6 @@ for dataset in DATASETS:
                     mg_lines = [l for l in mg_lines if l != ""]
 
                     for i, og_line in enumerate(og_lines):
-                        #counter = counter+1
-                        #if counter > 30:
-                        #    break
-
                         if og_line != "\n" and og_line != mg_lines[i]:
                             df_tmp.loc[i] = np.array([dataset, "wikipedia", shortuuid.uuid()[:8], shortuuid.uuid()[:8], shortuuid.uuid()[:8], og_line, mg_lines[i], True, [0]], dtype=object)
         
@@ -61,22 +58,17 @@ for dataset in DATASETS:
                     mg_lines = [l for l in mg_lines if l != ""]
 
                     for i, og_line in enumerate(og_lines):
-                        #counter = counter+1
-                        #if counter > 30:
-                        #    break
                         if og_line != "\n":
                             df_tmp.loc[i] = np.array([dataset, "wikipedia", shortuuid.uuid()[:8], shortuuid.uuid()[:8], shortuuid.uuid()[:8], og_line, mg_lines[i], True, [0]], dtype=object)
-    
-    elif dataset == "MPCBert":
+    '''
+
+    if dataset == "MPCBert":
         mpcbert_og_path = os.path.join(path_to_dataset, "og")      #read og data
         mpcbert_mg_path = os.path.join(path_to_dataset, "bert-large-cased_parallel_mlm_prob_0.3", "mg")      #read og data
         processed_texts = 0
         for j, origin_folder in enumerate(os.listdir(mpcbert_og_path)):
             print("Reading " + str(origin_folder))
             for i, file in enumerate(tqdm(os.listdir(os.path.join(mpcbert_og_path, origin_folder)))):
-                #counter = counter+1
-                #if i > 30:
-                #    break
                 with open(os.path.join(mpcbert_og_path, origin_folder, file), encoding="utf8", mode = "r") as f1:
                     with open(os.path.join(mpcbert_mg_path, origin_folder, str(file.replace("ORIG", "SPUN"))), encoding="utf8", mode = "r") as f2:
                         og_line = f1.readlines()
@@ -147,9 +139,6 @@ for dataset in DATASETS:
             tree = ET.parse(file)
             root = tree.getroot()
             for i, elem in enumerate(tqdm(root)):
-                #counter = counter+1
-                #if counter > 30:
-                #    break
                 paraphrase_types_list = [type_dict[TYPE_ID] for type_dict in paraphrase_types[elem[0].text][PARAPHRASE_TYPE] ]
                 df_tmp.loc[i] = np.array([dataset, "newswire", shortuuid.uuid()[:8], elem[1].text, elem[2].text, elem[3].text, elem[4].text, bool(int(elem[8].text)), paraphrase_types_list], dtype=object)
 
@@ -165,9 +154,6 @@ for dataset in DATASETS:
                 mg_lines = [l for l in mg_lines if l != ""]
 
                 for i, og_line in enumerate(tqdm(og_lines)):
-                    #counter = counter+1
-                    #if counter > 30:
-                    #    break
                     if og_line != "\n":
                         df_tmp.loc[i] = np.array([
                             dataset, 
@@ -188,9 +174,6 @@ for dataset in DATASETS:
         qqp_path = os.path.join(path_to_dataset, "questions.csv")  
         quora_df = pd.read_csv(qqp_path)
         for i, row in tqdm(quora_df.iterrows(), total=quora_df.shape[0]):
-            #counter = counter+1
-            #   if counter > 30:
-            #       break
             df_tmp.loc[i] = np.array([
                 dataset, 
                 "quora",
@@ -219,9 +202,6 @@ for dataset in DATASETS:
                 lines = test_lines + train_lines
 
                 for i, line in enumerate(tqdm(lines)):
-                    #counter = counter+1
-                    #if counter > 30:
-                    #    break
                     if line != "\n" and int(line.split("\t")[2][1]) != 3:   # if amazon workers could not decide, skip
                         # based on the datasets paper, we value a phrase as paraphrase when >=4 out of 6 amazon workers marked it a such
                         is_paraphrase = int(line.split("\t")[2][1]) >= 4
@@ -270,9 +250,6 @@ for dataset in DATASETS:
             lines = [line.rstrip() for line in lines]
             lines = [l for l in lines if l != ""][1:]
             for i, line in enumerate(tqdm(lines)):
-                #counter = counter+1
-                #if counter > 30:
-                #    break
                 is_paraphrase = bool(int(line.split("\t")[2]))
                 df_tmp.loc[i] = np.array([
                     dataset, 
@@ -298,9 +275,6 @@ for dataset in DATASETS:
             lines = [line.rstrip() for line in lines]
             lines = [l for l in lines if l != ""][1:]
             for i, line in enumerate(tqdm(lines)):
-                #counter = counter+1
-                #if counter > 30:
-                #    break
                 is_paraphrase = bool(int(line.split("\t")[2]))
                 df_tmp.loc[i] = np.array([
                     dataset, 
