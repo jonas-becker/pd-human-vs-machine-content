@@ -98,12 +98,12 @@ PARAPHRASE_TYPES = {}
 TYPE_NAME = "type_name"
 TYPE_CATEGORY = "type_category"
 
-with open(os.path.join(os.path.join(DATASETS_FOLDER, "ETPC"), "paraphrase_types.xml"), encoding='utf-8', mode = "r") as file:
-    tree = ET.parse(file)
-    root = tree.getroot()
-    for i, elem in enumerate(root):
-        PARAPHRASE_TYPES[int(elem[0].text)] = { TYPE_NAME: elem[1].text, TYPE_CATEGORY: elem[2].text }
-    PARAPHRASE_TYPES[0] = { TYPE_NAME: "Unknown", TYPE_CATEGORY: "Unknown" }  # Add the "Unknown" type (needed for other unclassified datasets)
+#with open(os.path.join(os.path.join(DATASETS_FOLDER, "ETPC"), "paraphrase_types.xml"), encoding='utf-8', mode = "r") as file:
+#    tree = ET.parse(file)
+#    root = tree.getroot()
+#    for i, elem in enumerate(root):
+#        PARAPHRASE_TYPES[int(elem[0].text)] = { TYPE_NAME: elem[1].text, TYPE_CATEGORY: elem[2].text }
+#    PARAPHRASE_TYPES[0] = { TYPE_NAME: "Unknown", TYPE_CATEGORY: "Unknown" }  # Add the "Unknown" type (needed for other unclassified datasets)
 
 # Paraphrase Types explained (numbers different from ETPC Paper as they skipped some numbers in EPT dev code):
 '''

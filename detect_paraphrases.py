@@ -16,6 +16,7 @@ import gensim.downloader as api
 from sentence_transformers import SentenceTransformer
 from gensim.corpora import Dictionary
 from gensim.models import TfidfModel
+import zipfile
 from gensim.similarities import SparseTermSimilarityMatrix, WordEmbeddingSimilarityIndex, SoftCosineSimilarity, Similarity
 
 def preprocess(doc):
@@ -110,13 +111,23 @@ def semantic_sim_t5(df):
 def semantic_sim_gpt3(df):
     # TODO: Write this function
     print("Calculating semantic similarity with GPT-3.")
-    # Add a function that calculates the semantic similarity of each text pair within the dataframe 
-    # (similar to the above semantic similarity functions)
-    # use GPT-3
-
-    # Should return a list semantic_results (float type: 0 being least similar and 1 being identical pair)
-    # Should use cosine similarity 
     semantic_results = []
+    archive = zipfile.ZipFile(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER, 'embeddings-gpt-3.zip'), 'r')
+
+    for i, row in tqdm(df.iterrows(), total=df.shape[0]):
+        if "embeddings-gpt-3/"+str(row[PAIR_ID])+"_text_1.txt" not in archive.namelist():
+            sim = None
+        else:
+            text1_embedding = archive.open("./embeddings-gpt-3/"+str(row[PAIR_ID])+"_text_1.txt")
+            print(text1_embedding)
+            break
+            text2_embedding = archive.open("./embeddings-gpt-3/"+str(row[PAIR_ID])+"_text_2.txt")
+            #print(text1_embedding)
+
+            sim = None # cosine_similarity([text1_embedding], [text2_embedding])[0][0]
+            #print(sim)
+
+        semantic_results.append(sim)
 
     return semantic_results
 
@@ -165,6 +176,10 @@ def tfidf_cosine_sim(df):
 #################################################################################
 
 for embedded_file in os.listdir(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER)):
+
+    if ".zip" in embedded_file or "AP" in embedded_file:
+        continue
+
     print(f"Processing {embedded_file}...")
     df = pd.read_json(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER, embedded_file), orient = "index")
     df = df[(df[TEXT1] != "") & (df[TEXT2] != "")].reset_index(drop=True)
@@ -194,12 +209,12 @@ for embedded_file in os.listdir(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER)):
     print(df[PARAPHRASE].value_counts())
  
     # Calculate the similarities with each method
+    df[SEM_GPT3] = semantic_sim_gpt3(df)
     df[TFIDF_COSINE] = tfidf_cosine_sim(df)
     # df[NGRAM] = ngram_sim(df)  # not working reliably for strings of different length, so leave out for now
     df[FUZZY] = fuzzy_sim(df)
     df[SEM_BERT] = semantic_sim_bert(df)
     df[SEM_T5] = semantic_sim_t5(df)
-    df[SEM_GPT3] = semantic_sim_gpt3(df)
     #df[SEM_GLOVE] = semantic_sim_glove(df)
 
     #Output data to json format
