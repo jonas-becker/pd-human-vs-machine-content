@@ -266,7 +266,7 @@ for i, pair_id in enumerate(tqdm(list(tokenized_pairs.keys()))):
 
     elif i - skipped_counter - last_index >= FIGURE_SIZE and dataset == last_dataset_viewed:     # specified figure size (max) to avoid high memory usage
         if last_dataset_viewed not in visualized_datasets:
-            stats_dict = visualize_embeddings(embed_dict, dataset, stats_dict)
+            stats_dict = visualize_embeddings(embed_dict, dataset)
             visualized_datasets.append(last_dataset_viewed)
 
         #df = calculate_cosine_dists(df, embed_dict, dataset)
