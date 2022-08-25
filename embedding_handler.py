@@ -185,7 +185,7 @@ for dataset in DATASETS:
 df = new_df.reset_index(drop=True)
 print("Shuffled.")
 
-
+DATASETS = ["APT"]
 '''
 print("Welcome! Do you want to embed all datasets or a specific one?")
 print('1 - all datasets \n2 - a specific dataset')
@@ -269,11 +269,7 @@ for i, pair_id in enumerate(tqdm(list(tokenized_pairs.keys()))):
             visualize_embeddings(embed_dict, dataset)
             visualized_datasets.append(last_dataset_viewed)
 
-        #df = calculate_cosine_dists(df, embed_dict, dataset)
-        #track_stats(embed_dict, last_dataset_viewed, stats_dict)
-
         last_index = i
-        #embed_dict = { }
         skipped_counter = 0
         gc.collect()
 
@@ -326,8 +322,9 @@ for i, pair_id in enumerate(tqdm(list(tokenized_pairs.keys()))):
 if dataset not in visualized_datasets:
     visualize_embeddings(embed_dict, dataset)
     visualized_datasets.append(dataset)
-    df = calculate_cosine_dists(df, embed_dict, dataset)
-    stats_dict = track_stats(embed_dict, dataset, stats_dict)
+
+df = calculate_cosine_dists(df, embed_dict, dataset)
+stats_dict = track_stats(embed_dict, dataset, stats_dict)
 
 df[df[DATASET] == dataset].to_json(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER, dataset+"_embedded.json"), orient = "index", index = True, indent = 4)
 

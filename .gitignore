@@ -7,3 +7,7 @@ output/figures/*
 output/true_data.json
 output/true_data_big.json
 output/true_data_small.json
+output/figures.zip
+output/stats_embedding_handler.json
+output/stats_embedding_handler.zip
+output/embeddings.zip
