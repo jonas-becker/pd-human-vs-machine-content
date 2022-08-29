@@ -20,7 +20,9 @@ SEM_GLOVE = "semantic_glove"
 SEM_BERT = "semantic_bert"
 SEM_T5 = "semantic_t5"
 SEM_GPT3 = "semantic_gpt3"
-NGRAM = "ngram"
+NGRAM3 = "3gram"
+NGRAM4 = "4gram"
+NGRAM5 = "5gram"
 TFIDF_COSINE = "tfidf_cosine"
 
 DETECTION_METHODS = [FUZZY, SEM_BERT, SEM_T5, TFIDF_COSINE]

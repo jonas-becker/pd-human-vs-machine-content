@@ -160,6 +160,24 @@ def ngram_sim(df):
     return results
 '''
 
+def ngram_sim(df, n):
+    # done after http://webdocs.cs.ualberta.ca/~kondrak/papers/spire05.pdf
+    print(f"Calculating similarity with {n}-Grams.")
+    corpus1 = list(df[TEXT1])
+    corpus2 = list(df[TEXT2])
+
+    print("Processing texts...")
+    results = []
+    ngram = NGram(n)
+    for i, row in tqdm(df.iterrows(), total=df.shape[0]):
+        ngram = NGram(n)
+        sim = ngram.distance(corpus1[i], corpus2[i])    #calculate sim between text1 and text2 pairwise
+        print(row[TEXT1])
+        print(row[TEXT2])
+        print(sim)
+        results.append(sim)
+    return results
+
 def fuzzy_sim(df):
     #Check for paraphrase with fuzzy based
     fuzzy_results = []
@@ -220,10 +238,12 @@ for embedded_file in os.listdir(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER)):
     print(df[PARAPHRASE].value_counts())
  
     # Calculate the similarities with each method
-    df[SEM_GPT3] = semantic_sim_gpt3(df)
     df[TFIDF_COSINE] = tfidf_cosine_sim(df)
-    # df[NGRAM] = ngram_sim(df)  # not working reliably for strings of different length, so leave out for now
+    df[NGRAM3] = ngram_sim(df, 3)
+    df[NGRAM4] = ngram_sim(df, 4)
+    df[NGRAM5] = ngram_sim(df, 5)
     df[FUZZY] = fuzzy_sim(df)
+    df[SEM_GPT3] = semantic_sim_gpt3(df)
     df[SEM_BERT] = semantic_sim_bert(df)
     df[SEM_T5] = semantic_sim_t5(df)
     #df[SEM_GLOVE] = semantic_sim_glove(df)
