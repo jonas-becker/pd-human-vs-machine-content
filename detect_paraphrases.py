@@ -161,7 +161,6 @@ def ngram_sim(df, n):
     results = []
     ngram = NGram(n)
     for i, row in tqdm(df.iterrows(), total=df.shape[0]):
-        ngram = NGram(n)
         sim = ngram.distance(corpus1[i], corpus2[i])    #calculate sim between text1 and text2 pairwise
         results.append(sim)
     return results
@@ -228,8 +227,8 @@ for embedded_file in os.listdir(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER)):
     # Calculate the similarities with each method
     df[TFIDF_COSINE] = tfidf_cosine_sim(df)
     df[NGRAM3] = ngram_sim(df, 3)
-    df[NGRAM4] = ngram_sim(df, 4)
-    df[NGRAM5] = ngram_sim(df, 5)
+    #df[NGRAM4] = ngram_sim(df, 4)
+    #df[NGRAM5] = ngram_sim(df, 5)
     df[FUZZY] = fuzzy_sim(df)
     df[SEM_GPT3] = semantic_sim_gpt3(df)
     df[SEM_BERT] = semantic_sim_bert(df)
