@@ -111,11 +111,9 @@ def semantic_sim_t5(df):
     return semantic_results
 
 def semantic_sim_gpt3(df):
-    # TODO: Write this function
     print("Calculating semantic similarity with GPT-3.")
     semantic_results = []
     with zipfile.ZipFile(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER, 'embeddings-gpt-3.zip'), 'r') as archive:
-
         for i, row in tqdm(df.iterrows(), total=df.shape[0]):
             if "embeddings-gpt-3/"+str(row[PAIR_ID])+"_text_1.txt" not in archive.namelist():
                 sim = None
@@ -130,14 +128,7 @@ def semantic_sim_gpt3(df):
                     t2_embed = []
                     for e in list(text2_embedding.split("\n"))[:-1]:
                         t2_embed.append(float(e))
-
-                sim = cosine_similarity([t1_embed], [t2_embed])
-            try:
-                semantic_results.append(sim)
-            except Exception as e:
-                semantic_results.append(float(sim.item()))
-                continue
-
+                sim = cosine_similarity([t1_embed], [t2_embed])[0][0]
             semantic_results.append(sim)
 
     return semantic_results
@@ -172,16 +163,13 @@ def ngram_sim(df, n):
     for i, row in tqdm(df.iterrows(), total=df.shape[0]):
         ngram = NGram(n)
         sim = ngram.distance(corpus1[i], corpus2[i])    #calculate sim between text1 and text2 pairwise
-        print(row[TEXT1])
-        print(row[TEXT2])
-        print(sim)
         results.append(sim)
     return results
 
 def fuzzy_sim(df):
     #Check for paraphrase with fuzzy based
     fuzzy_results = []
-    print("Checking for paraphrases with the fuzzy-based method. Dataframe rows to process: " + str(len(df)))
+    print("Checking for paraphrases with the fuzzy-based method.")
     for i, row in tqdm(df.iterrows(), total=df.shape[0]):
         fuzzy_results.append(float(fuzz.ratio(row[TEXT1], row[TEXT2])/100))
     return fuzzy_results
