@@ -5,6 +5,8 @@ from re import sub
 import numpy as np
 from thefuzz import fuzz
 from setup import *
+from strsimpy.ngram import NGram
+import io
 import xml.etree.ElementTree as ET
 from sklearn.utils import shuffle
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -112,22 +114,31 @@ def semantic_sim_gpt3(df):
     # TODO: Write this function
     print("Calculating semantic similarity with GPT-3.")
     semantic_results = []
-    archive = zipfile.ZipFile(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER, 'embeddings-gpt-3.zip'), 'r')
+    with zipfile.ZipFile(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER, 'embeddings-gpt-3.zip'), 'r') as archive:
 
-    for i, row in tqdm(df.iterrows(), total=df.shape[0]):
-        if "embeddings-gpt-3/"+str(row[PAIR_ID])+"_text_1.txt" not in archive.namelist():
-            sim = None
-        else:
-            text1_embedding = archive.open("./embeddings-gpt-3/"+str(row[PAIR_ID])+"_text_1.txt")
-            print(text1_embedding)
-            break
-            text2_embedding = archive.open("./embeddings-gpt-3/"+str(row[PAIR_ID])+"_text_2.txt")
-            #print(text1_embedding)
+        for i, row in tqdm(df.iterrows(), total=df.shape[0]):
+            if "embeddings-gpt-3/"+str(row[PAIR_ID])+"_text_1.txt" not in archive.namelist():
+                sim = None
+            else:
+                with io.TextIOWrapper(archive.open("embeddings-gpt-3/"+str(row[PAIR_ID])+"_text_1.txt")) as f1:
+                    text1_embedding = f1.read()#[2:]
+                    t1_embed = []
+                    for e in list(text1_embedding.split("\n"))[:-1]:
+                        t1_embed.append(float(e))
+                with io.TextIOWrapper(archive.open("embeddings-gpt-3/"+str(row[PAIR_ID])+"_text_2.txt")) as f2:
+                    text2_embedding = f2.read()#[2:]
+                    t2_embed = []
+                    for e in list(text2_embedding.split("\n"))[:-1]:
+                        t2_embed.append(float(e))
 
-            sim = None # cosine_similarity([text1_embedding], [text2_embedding])[0][0]
-            #print(sim)
+                sim = cosine_similarity([t1_embed], [t2_embed])
+            try:
+                semantic_results.append(sim)
+            except Exception as e:
+                semantic_results.append(float(sim.item()))
+                continue
 
-        semantic_results.append(sim)
+            semantic_results.append(sim)
 
     return semantic_results
 
