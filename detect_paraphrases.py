@@ -191,6 +191,9 @@ def tfidf_cosine_sim(df):
 
 #################################################################################
 
+if not os.path.isdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):
+    os.makedirs(os.path.join(OUT_DIR, DETECTION_FOLDER))
+
 for embedded_file in os.listdir(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER)):
 
     if ".zip" in embedded_file or "AP" in embedded_file:
