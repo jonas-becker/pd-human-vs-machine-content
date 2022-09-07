@@ -6,10 +6,12 @@ import numpy as np
 from thefuzz import fuzz
 from setup import *
 from strsimpy.ngram import NGram
+import numpy
 import io
 import xml.etree.ElementTree as ET
 from sklearn.utils import shuffle
 from sklearn.feature_extraction.text import TfidfVectorizer
+import zipfile
 import re
 import sys
 from gensim.utils import simple_preprocess
@@ -29,11 +31,6 @@ def preprocess(doc):
     doc = sub(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', " url_token ", doc)
     return [token for token in simple_preprocess(doc, min_len=0, max_len=float("inf")) if token not in STOPWORDS]
 
-def ngrams(string, n=3):
-    string = re.sub(r'[,-./]|\sBD',r'', string)
-    ngrams = zip(*[string[i:] for i in range(n)])
-    return [''.join(ngram) for ngram in ngrams]
-
 def check_semantic(corpus, string_2, similarity_matrix, tfidf, dictionary):
     # returns the semantic similarity based on the corpus
     query = preprocess(string_2)
@@ -41,33 +38,8 @@ def check_semantic(corpus, string_2, similarity_matrix, tfidf, dictionary):
     index = SoftCosineSimilarity(tfidf[[dictionary.doc2bow(document) for document in corpus]], similarity_matrix)
     return index[query_tf]
 
-def semantic_sim_glove(df):
-    print("Calculating semantic similarity with GLoVe.")
-    corpus = [ preprocess(document) for document in list(df[TEXT1]) ]
-    # use a pre trained model: https://huggingface.co/fse/glove-wiki-gigaword-50 , https://nlp.stanford.edu/pubs/glove.pdf
-    glove = api.load("glove-wiki-gigaword-50")
-    similarity_index = WordEmbeddingSimilarityIndex(glove)
-    # Build the term dictionary and the tfidf model
-    dictionary = Dictionary(corpus)
-    tfidf = TfidfModel(dictionary=dictionary)
-    # Create the term similarity matrix.    
-    print("Creating the similarity matrix...")
-    similarity_matrix = SparseTermSimilarityMatrix(similarity_index, dictionary, tfidf)     #takes a long time
-    print("Processing texts...")
-    semantic_results = []
-    for i, row in tqdm(df.iterrows(), total=df.shape[0]):
-        sim = check_semantic(corpus, row[TEXT2], similarity_matrix, tfidf, dictionary)
-        try:
-            semantic_results.append(sim[i])
-        except Exception as e:
-            #print("result is " + str(sim) + ". Appending the only result value: " + str(float(sim.item())))
-            #print(e)
-            semantic_results.append(float(sim.item()))
-            continue
-    return semantic_results
-
 def semantic_sim_bert(df):
-    print("Calculating semantic similarity with BERT (general purpose model).")
+    print("Calculating semantic similarity with BERT.")
     corpus1 = list(df[TEXT1])
     corpus2 = list(df[TEXT2])
     # use bert to embed
@@ -76,6 +48,18 @@ def semantic_sim_bert(df):
     text1_embeddings = model.encode(corpus1)
     print("Encoding text_2's...")
     text2_embeddings = model.encode(corpus2)
+
+    with zipfile.ZipFile(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER, 'embeddings-BERT.zip'), 'a') as archive:
+        print("Exporting embeddings (text 1)...")
+        for i, text1_embedding in tqdm(enumerate(text1_embeddings)):
+            with open("tmp.txt", "w") as f1:
+                f1.write(np.array2string(numpy.array(text1_embedding), separator='\n'))
+                archive.write( "tmp.txt", os.path.basename(df.iloc[i][PAIR_ID]+"_text_1.txt"))
+        print("Exporting embeddings (text 2)...")
+        for i, text2_embedding in tqdm(enumerate(text2_embeddings)):
+            with open("tmp.txt", "w") as f2:
+                f2.write(np.array2string(numpy.array(text2_embedding), separator='\n'))
+                archive.write( "tmp.txt", os.path.basename(df.iloc[i][PAIR_ID]+"_text_2.txt"))
 
     print("Processing texts...")
     semantic_results = []
@@ -98,6 +82,18 @@ def semantic_sim_t5(df):
     text1_embeddings = model.encode(corpus1)
     print("Encoding text_2's...")
     text2_embeddings = model.encode(corpus2)
+
+    with zipfile.ZipFile(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER, 'embeddings-T5.zip'), 'a') as archive:
+        print("Exporting embeddings (text 1)...")
+        for i, text1_embedding in tqdm(enumerate(text1_embeddings)):
+            with open("tmp.txt", "w") as f1:
+                f1.write(np.array2string(numpy.array(text1_embedding), separator='\n'))
+                archive.write( "tmp.txt", os.path.basename(df.iloc[i][PAIR_ID]+"_text_1.txt"))
+        print("Exporting embeddings (text 2)...")
+        for i, text2_embedding in tqdm(enumerate(text2_embeddings)):
+            with open("tmp.txt", "w") as f2:
+                f2.write(np.array2string(numpy.array(text2_embedding), separator='\n'))
+                archive.write( "tmp.txt", os.path.basename(df.iloc[i][PAIR_ID]+"_text_2.txt"))
 
     print("Processing texts...")
     semantic_results = []
@@ -132,24 +128,6 @@ def semantic_sim_gpt3(df):
             semantic_results.append(sim)
 
     return semantic_results
-
-
-'''
-def ngram_sim(df):
-    print("Calculating similarity with N-Grams and their TF-IDF cosine similarity.")
-    corpus1 = list(df[TEXT1])
-    corpus2 = list(df[TEXT2])
-
-    print("Processing texts...")
-    vectorizer = TfidfVectorizer(min_df=1, analyzer=ngrams)
-    tf_idf_matrix = vectorizer.fit_transform(corpus1+corpus2)   # combine text1 and text2 to one corpus
-    
-    results = []
-    for i, row in tqdm(df.iterrows(), total=df.shape[0]):
-        sim = cosine_similarity(tf_idf_matrix[i], tf_idf_matrix[len(corpus1)+i])    #calculate sim between text1 and text2 pairwise
-        results.append(sim[0][0])
-    return results
-'''
 
 def ngram_sim(df, n):
     # done after http://webdocs.cs.ualberta.ca/~kondrak/papers/spire05.pdf
@@ -205,22 +183,8 @@ for embedded_file in os.listdir(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER)):
     df = pd.read_json(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER, embedded_file), orient = "index")
     df = df[(df[TEXT1] != "") & (df[TEXT2] != "")].reset_index(drop=True)
     print(f"{df.shape[0]} pairs found in the embedded dataset file.")
-    #df = df.truncate(after=500)  #cut part of dataframe for testing
+    #df = df.truncate(after=200)  #cut part of dataframe for testing
     dataset = df.iloc[0][DATASET]
-
-    # Modify datasets to be balanced (paraphrase & non-paraphrase)
-    '''
-    if len(df[df[PARAPHRASE] == False]) < 10:    # if there is no noteworthy amount of original pairs, add them from other datasets (e.g. machine-datasets)
-        # get paraphrase types for all pair IDs (read from different files)
-        paraphrase_types = {}
-        for filler_dataset in FILLER_DATASETS:
-            df_tmp = pd.read_json(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER, filler_dataset+"_embedded.json"), orient= "index")
-            df_tmp = df_tmp[df_tmp[PARAPHRASE] == False]
-            print(f"Adding {df_tmp.shape[0]} original pairs from {filler_dataset} to {dataset} for balancing.")
-            df = pd.concat([df, df_tmp], ignore_index = True)   #concat the lastly processed dataset to the combined dataset
-    '''
-    #if len(df[df[PARAPHRASE] == False]) > 10:
-    #    max_para_or_notpara = max(len(df[df[PARAPHRASE] == False]), len(df[df[PARAPHRASE] == True]))
 
     # Truncate "to much" data for balancing
     if len(df[df[PARAPHRASE] == False]) > 10:   # only truncate datasets that are not paraphrase-pairs only
@@ -242,7 +206,6 @@ for embedded_file in os.listdir(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER)):
     df[SEM_GPT3] = semantic_sim_gpt3(df)
     df[SEM_BERT] = semantic_sim_bert(df)
     df[SEM_T5] = semantic_sim_t5(df)
-    #df[SEM_GLOVE] = semantic_sim_glove(df)
 
     #Output data to json format
     df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, embedded_file.split("_")[0]+"_result.json"), orient = "index", index = True, indent = 4)
