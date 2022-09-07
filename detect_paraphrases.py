@@ -67,7 +67,7 @@ def semantic_sim_glove(df):
     return semantic_results
 
 def semantic_sim_bert(df):
-    print("Calculating semantic similarity with BERT.")
+    print("Calculating semantic similarity with BERT (general purpose model).")
     corpus1 = list(df[TEXT1])
     corpus2 = list(df[TEXT2])
     # use bert to embed
@@ -194,9 +194,11 @@ def tfidf_cosine_sim(df):
 if not os.path.isdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):
     os.makedirs(os.path.join(OUT_DIR, DETECTION_FOLDER))
 
+stats_str = "STATISTICS OF DETECTION SCRIPT\n\n"
+
 for embedded_file in os.listdir(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER)):
 
-    if ".zip" in embedded_file or "AP" in embedded_file:
+    if ".zip" in embedded_file:
         continue
 
     print(f"Processing {embedded_file}...")
@@ -217,21 +219,25 @@ for embedded_file in os.listdir(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER)):
             print(f"Adding {df_tmp.shape[0]} original pairs from {filler_dataset} to {dataset} for balancing.")
             df = pd.concat([df, df_tmp], ignore_index = True)   #concat the lastly processed dataset to the combined dataset
     '''
+    #if len(df[df[PARAPHRASE] == False]) > 10:
+    #    max_para_or_notpara = max(len(df[df[PARAPHRASE] == False]), len(df[df[PARAPHRASE] == True]))
 
     # Truncate "to much" data for balancing
-    if len(df[df[PARAPHRASE] == False]) < 10:   # only truncate datasets that are not paraphrase-pairs only
+    if len(df[df[PARAPHRASE] == False]) > 10:   # only truncate datasets that are not paraphrase-pairs only
         df = shuffle(df).reset_index(drop=True)
         df = df.groupby(PARAPHRASE)
         df = pd.DataFrame(df.apply(lambda x: x.sample(df.size().min()).reset_index(drop=True)))
     df = shuffle(df).reset_index(drop=True)
+
     print("Balanced dataset with the following paraphrased-statistics:")
     print(df[PARAPHRASE].value_counts())
- 
+    stats_str = stats_str + "Dataset: " + str(embedded_file) + "\nBalanced dataset with the following paraphrased-statistics: \n" + str(df[PARAPHRASE].value_counts()) + "\n\n"
+    with open(os.path.join(OUT_DIR, "stats_detection_script.txt"), "w") as text_file:
+        text_file.write(stats_str)
+
     # Calculate the similarities with each method
     df[TFIDF_COSINE] = tfidf_cosine_sim(df)
     df[NGRAM3] = ngram_sim(df, 3)
-    #df[NGRAM4] = ngram_sim(df, 4)
-    #df[NGRAM5] = ngram_sim(df, 5)
     df[FUZZY] = fuzzy_sim(df)
     df[SEM_GPT3] = semantic_sim_gpt3(df)
     df[SEM_BERT] = semantic_sim_bert(df)

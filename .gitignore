@@ -11,3 +11,8 @@ output/figures.zip
 output/stats_embedding_handler.json
 output/stats_embedding_handler.zip
 output/embeddings.zip
+output/rest_to_process_with_gpt3.json
+output/gpt3-remaining-embeddings.csv
+tmp1.txt
+tmp2.txt
+tmp.txt
