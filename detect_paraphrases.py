@@ -8,7 +8,6 @@ from setup import *
 from strsimpy.ngram import NGram
 import numpy
 import io
-import xml.etree.ElementTree as ET
 from sklearn.utils import shuffle
 from sklearn.feature_extraction.text import TfidfVectorizer
 import zipfile
@@ -18,10 +17,7 @@ from gensim.utils import simple_preprocess
 from sklearn.metrics.pairwise import cosine_similarity
 import gensim.downloader as api
 from sentence_transformers import SentenceTransformer
-from gensim.corpora import Dictionary
-from gensim.models import TfidfModel
 import zipfile
-from gensim.similarities import SparseTermSimilarityMatrix, WordEmbeddingSimilarityIndex, SoftCosineSimilarity, Similarity
 
 def preprocess(doc):
     # Tokenize and clean data
@@ -30,13 +26,6 @@ def preprocess(doc):
     doc = sub(r'\[img_assist[^]]*?\]', " ", doc)
     doc = sub(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', " url_token ", doc)
     return [token for token in simple_preprocess(doc, min_len=0, max_len=float("inf")) if token not in STOPWORDS]
-
-def check_semantic(corpus, string_2, similarity_matrix, tfidf, dictionary):
-    # returns the semantic similarity based on the corpus
-    query = preprocess(string_2)
-    query_tf = tfidf[dictionary.doc2bow(query)]
-    index = SoftCosineSimilarity(tfidf[[dictionary.doc2bow(document) for document in corpus]], similarity_matrix)
-    return index[query_tf]
 
 def semantic_sim_bert(df):
     print("Calculating semantic similarity with BERT.")
