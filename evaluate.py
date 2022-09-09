@@ -163,6 +163,8 @@ def find_optimal_thresholds(df):
     return TFIDF_THRESHOLD, SEM_BERT_THRESHOLD, SEM_T5_THRESHOLD, FUZZY_THRESHOLD, NGRAM_THRESHOLD, GPT3_THRESHOLD
     
 c_pal = sns.color_palette("colorblind")
+plt.rcParams.update({'font.size': 16})
+
 eval_df = pd.DataFrame(columns=[DATASET_NAME, METHOD, PAIRS, TP, TN, FP, FN, ACCURACY, PRECISION, RECALL, SPECIFICITY ,THRESHOLD, F1])
 
 eval_string = ""
@@ -268,8 +270,8 @@ for file in os.listdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):
     ax.set_ylabel('Precision')
     plt.xlim(0, 1)
     plt.ylim(0, 1)
-    plt.legend()
-    plt.savefig(os.path.join(OUT_DIR, EVALUATION_FOLDER, file.split("_")[0]+"_pr.pdf"))
+    plt.legend(loc = 4)
+    plt.savefig(os.path.join(OUT_DIR, EVALUATION_FOLDER, file.split("_")[0]+"_pr.pdf"), bbox_inches='tight')
 
     # Confusion Matrix and f1 score for the defined threshold
     print("Constructing confusion matrix & calculating f1-score...")
@@ -341,7 +343,7 @@ eval_df.to_json(os.path.join(OUT_DIR, EVALUATION_FOLDER, "thresholds_"+EVALUATIO
 eval_df.to_csv(os.path.join(OUT_DIR, EVALUATION_FOLDER, "thresholds_"+EVALUATION_RESULTS_FILENAME.replace(".json", ".csv")), index = True)
 '''
 
-# Make correlation graphs
+# Make correlation graphs (mixed)
 methods_to_correlate = [TFIDF_COSINE, NGRAM3, FUZZY, SEM_BERT, SEM_T5, SEM_GPT3]
 
 # machine-paraphrases & human-paraphrases
@@ -409,14 +411,91 @@ for method1 in tqdm(methods_to_correlate):
             plt.ylabel(ylabel)
             plt.xlim(0, 1)
             plt.ylim(0, 1)
-            plt.savefig(os.path.join(OUT_DIR, EVALUATION_FOLDER, CORRELATIONS_FOLDER, method1 + "_" + method2 + "_machine.pdf"))
+            plt.savefig(os.path.join(OUT_DIR, EVALUATION_FOLDER, CORRELATIONS_FOLDER, "mixed", method1 + "_" + method2 + "_machine.pdf"), bbox_inches='tight')
             plt.clf()
             sns.regplot(x=this_corr_df_h[method1], y=this_corr_df_h[method2], scatter_kws={"color": c_pal[0]}, line_kws={"color": c_pal[3]})
             plt.xlabel(xlabel)
             plt.ylabel(ylabel)
             plt.xlim(0, 1)
             plt.ylim(0, 1)
-            plt.savefig(os.path.join(OUT_DIR, EVALUATION_FOLDER, CORRELATIONS_FOLDER, method1 + "_" + method2 + "_human.pdf"))
+            plt.savefig(os.path.join(OUT_DIR, EVALUATION_FOLDER, CORRELATIONS_FOLDER, "mixed", method1 + "_" + method2 + "_human.pdf"), bbox_inches='tight')
+
+# Make correlation graphs (paraphrases only)
+methods_to_correlate = [TFIDF_COSINE, NGRAM3, FUZZY, SEM_BERT, SEM_T5, SEM_GPT3]
+
+# machine-paraphrases & human-paraphrases
+df = pd.DataFrame()
+for file in os.listdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):
+    tmp_df = pd.read_json(os.path.join(OUT_DIR, DETECTION_FOLDER, file), orient = "index")
+    df = pd.concat([df,tmp_df])
+df = shuffle(df)
+corr_df = df[df[PARAPHRASE] == True].reset_index(drop=True)
+#corr_df = corr_df.truncate(after=CORR_GRAPH_SIZE)
+# machine-paraphrases
+df = pd.DataFrame()
+for file in os.listdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):
+    if file.split("_")[0] in MACHINE_PARAPHRASED_DATASETS:
+        tmp_df = pd.read_json(os.path.join(OUT_DIR, DETECTION_FOLDER, file), orient = "index")
+        df = pd.concat([df,tmp_df])
+df = shuffle(df)
+corr_df_m = df[df[PARAPHRASE] == True].reset_index(drop=True)
+#corr_df_m = corr_df_m.truncate(after=CORR_GRAPH_SIZE)
+# human-paraphrases
+df = pd.DataFrame()
+for file in os.listdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):
+    if file.split("_")[0] not in MACHINE_PARAPHRASED_DATASETS:
+        tmp_df = pd.read_json(os.path.join(OUT_DIR, DETECTION_FOLDER, file), orient = "index")
+        df = pd.concat([df,tmp_df])
+df = shuffle(df)
+print(f"Generating correlation graphs for datasets. Found {df.shape[0]} pairs.")
+corr_df_h = df[df[PARAPHRASE] == True].reset_index(drop=True)
+#corr_df_h = corr_df_h.truncate(after=CORR_GRAPH_SIZE)
+
+for method1 in tqdm(methods_to_correlate):
+    for method2 in methods_to_correlate:
+        if method1 != method2:
+            if method1 == SEM_BERT:
+                xlabel = "BERT Cosine Distance"
+            elif method1 == SEM_GPT3:
+                xlabel = "GPT-3 Cosine Distance"
+            elif method1 == SEM_T5:
+                xlabel = "T5 Cosine Distance"
+            elif method1 == FUZZY:
+                xlabel = "Fuzzy Similarity"
+            elif method1 == TFIDF_COSINE:
+                xlabel = "TF-IDF Cosine Distance"
+            elif method1 == NGRAM3:
+                xlabel = "3-Gram Similarity"
+            if method2 == SEM_BERT:
+                ylabel = "BERT Cosine Distance"
+            elif method2 == SEM_GPT3:
+                ylabel = "GPT-3 Cosine Distance"
+            elif method2 == SEM_T5:
+                ylabel = "T5 Cosine Distance"
+            elif method2 == FUZZY:
+                ylabel = "Fuzzy Similarity"
+            elif method2 == TFIDF_COSINE:
+                ylabel = "TF-IDF Cosine Distance"
+            elif method2 == NGRAM3:
+                ylabel = "3-Gram Similarity"
+
+            this_corr_df_m = corr_df_m[corr_df_m[method1].notnull() & corr_df_m[method2].notnull()].truncate(after=CORR_GRAPH_SIZE)
+            this_corr_df_h = corr_df_h[corr_df_h[method1].notnull() & corr_df_h[method2].notnull()].truncate(after=CORR_GRAPH_SIZE)
+
+            plt.clf()
+            sns.regplot(x=this_corr_df_m[method1], y=this_corr_df_m[method2], scatter_kws={"color": c_pal[0]}, line_kws={"color": c_pal[3]})
+            plt.xlabel(xlabel)
+            plt.ylabel(ylabel)
+            plt.xlim(0, 1)
+            plt.ylim(0, 1)
+            plt.savefig(os.path.join(OUT_DIR, EVALUATION_FOLDER, CORRELATIONS_FOLDER, "paraphrases_only", method1 + "_" + method2 + "_machine.pdf"), bbox_inches='tight')
+            plt.clf()
+            sns.regplot(x=this_corr_df_h[method1], y=this_corr_df_h[method2], scatter_kws={"color": c_pal[0]}, line_kws={"color": c_pal[3]})
+            plt.xlabel(xlabel)
+            plt.ylabel(ylabel)
+            plt.xlim(0, 1)
+            plt.ylim(0, 1)
+            plt.savefig(os.path.join(OUT_DIR, EVALUATION_FOLDER, CORRELATIONS_FOLDER, "paraphrases_only", method1 + "_" + method2 + "_human.pdf"), bbox_inches='tight')
 
 # Generate Correlation Matrix & Output Heatmap
 plt.clf()
