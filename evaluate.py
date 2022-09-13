@@ -353,7 +353,6 @@ for file in os.listdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):
     df = pd.concat([df,tmp_df])
 df = shuffle(df)
 corr_df = df.reset_index(drop=True)
-#corr_df = corr_df.truncate(after=CORR_GRAPH_SIZE)
 # machine-paraphrases
 df = pd.DataFrame()
 for file in os.listdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):
@@ -362,17 +361,15 @@ for file in os.listdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):
         df = pd.concat([df,tmp_df])
 df = shuffle(df)
 corr_df_m = df.reset_index(drop=True)
-#corr_df_m = corr_df_m.truncate(after=CORR_GRAPH_SIZE)
 # human-paraphrases
 df = pd.DataFrame()
 for file in os.listdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):
-    if file.split("_")[0] not in MACHINE_PARAPHRASED_DATASETS:
+    if file.split("_")[0] in HUMAN_PARAPHRASED_DATASETS:
         tmp_df = pd.read_json(os.path.join(OUT_DIR, DETECTION_FOLDER, file), orient = "index")
         df = pd.concat([df,tmp_df])
 df = shuffle(df)
-print(f"Generating correlation graphs for datasets. Found {df.shape[0]} pairs.")
+print(f"Generating correlation graphs for datasets.")
 corr_df_h = df.reset_index(drop=True)
-#corr_df_h = corr_df_h.truncate(after=CORR_GRAPH_SIZE)
 
 for method1 in tqdm(methods_to_correlate):
     for method2 in methods_to_correlate:
@@ -430,7 +427,6 @@ for file in os.listdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):
     df = pd.concat([df,tmp_df])
 df = shuffle(df)
 corr_df = df[df[PARAPHRASE] == True].reset_index(drop=True)
-#corr_df = corr_df.truncate(after=CORR_GRAPH_SIZE)
 # machine-paraphrases
 df = pd.DataFrame()
 for file in os.listdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):
@@ -439,17 +435,15 @@ for file in os.listdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):
         df = pd.concat([df,tmp_df])
 df = shuffle(df)
 corr_df_m = df[df[PARAPHRASE] == True].reset_index(drop=True)
-#corr_df_m = corr_df_m.truncate(after=CORR_GRAPH_SIZE)
 # human-paraphrases
 df = pd.DataFrame()
 for file in os.listdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):
-    if file.split("_")[0] not in MACHINE_PARAPHRASED_DATASETS:
+    if file.split("_")[0] in HUMAN_PARAPHRASED_DATASETS:
         tmp_df = pd.read_json(os.path.join(OUT_DIR, DETECTION_FOLDER, file), orient = "index")
         df = pd.concat([df,tmp_df])
 df = shuffle(df)
-print(f"Generating correlation graphs for datasets. Found {df.shape[0]} pairs.")
+print(f"Generating correlation graphs for datasets.")
 corr_df_h = df[df[PARAPHRASE] == True].reset_index(drop=True)
-#corr_df_h = corr_df_h.truncate(after=CORR_GRAPH_SIZE)
 
 for method1 in tqdm(methods_to_correlate):
     for method2 in methods_to_correlate:

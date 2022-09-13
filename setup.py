@@ -5,7 +5,8 @@ DATASETS_FOLDER = "datasets"    #the folder that contains the dataset directorie
 FORMATTED_DATA_FILENAME = "true_data.json"  #the name of the file that contains the data to read in
 EVALUATION_RESULTS_FILENAME = "evaluation.json"
 DATASETS = ["ETPC", "SAv2", "TURL", "MPCBert", "QQP", "ParaNMT", "APH", "APT"]     #the folders in the DATASETS_FOLDER should be named like the datasets here
-MACHINE_PARAPHRASED_DATASETS = ["SAv2", "MPCBert", "ParaNMT"]   # make sure to handle special case "APT" as it contains both human- and machine-generated data
+MACHINE_PARAPHRASED_DATASETS = ["SAv2", "MPCBert", "ParaNMT", "APT"]  
+HUMAN_PARAPHRASED_DATASETS = ["ETPC", "TURL", "QQP", "APH"]
 FILLER_DATASETS = ["ETPC", "TURL"]      # datasets that provide original samples to add to other datasets for balancing (make sure these contain mixed types of paraphrases)
 OUT_DIR = "output"      #the directory to output the formatted json in
 FIGURES_FOLDER = "figures"
@@ -25,7 +26,7 @@ NGRAM4 = "4gram"
 NGRAM5 = "5gram"
 TFIDF_COSINE = "tfidf_cosine"
 
-DETECTION_METHODS = [FUZZY, SEM_BERT, SEM_T5, TFIDF_COSINE]
+DETECTION_METHODS = [FUZZY, NGRAM3, SEM_BERT, SEM_T5, TFIDF_COSINE, SEM_GPT3]
 
 FUZZY_BIN = "fuzzy_binary"
 SEM_BERT_BIN = "sem_bert_binary"
@@ -37,6 +38,7 @@ TFIDF_COSINE_BIN = "tfidf_cosine_binary"
 FIGURE_SIZE = 2000  
 MAX_DATASET_INPUT = 100000
 EXAMPLE_AMOUNT = 500    # how many examples to extract (top sim, low sim & random sim)
+STUDY_EXAMPLE_AMOUNT = 10
 PARAGRAM_PHRASE_SCORE = [0.4, 0.9]  # the span in which dataset entries will be taken into parsing (throw out other entries), only for ParaNMT
 
 # Variable Names for the outputs:
