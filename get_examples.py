@@ -81,6 +81,7 @@ def get_detection_examples():
     df = pd.DataFrame()
     for dataset_file in os.listdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):
         df = pd.concat([df, pd.read_json(os.path.join(OUT_DIR, DETECTION_FOLDER, dataset_file), orient = "index")])
+    df = df[df[COSINE_DISTANCE] != 1.0]
     
     for detection_method in DETECTION_METHODS:
         print("Method: " + detection_method)

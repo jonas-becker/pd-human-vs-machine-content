@@ -16,3 +16,7 @@ output/gpt3-remaining-embeddings.csv
 tmp1.txt
 tmp2.txt
 tmp.txt
+output/true_data.zip
+output/stats_detection_script.txt
+output/examples.zip
+output/stats_detection_script.txt

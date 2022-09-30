@@ -2,46 +2,7 @@ STATISTICS OF DETECTION SCRIPT
 
 Dataset: APH_embedded.json
 Balanced dataset with the following paraphrased-statistics: 
-False    1743
 True     1743
-Name: is_paraphrase, dtype: int64
-
-Dataset: APT_embedded.json
-Balanced dataset with the following paraphrased-statistics: 
-True     44215
-False    44215
-Name: is_paraphrase, dtype: int64
-
-Dataset: ETPC_embedded.json
-Balanced dataset with the following paraphrased-statistics: 
-False    2474
-True     2474
-Name: is_paraphrase, dtype: int64
-
-Dataset: MPCBert_embedded.json
-Balanced dataset with the following paraphrased-statistics: 
-True    100000
-Name: is_paraphrase, dtype: int64
-
-Dataset: ParaNMT_embedded.json
-Balanced dataset with the following paraphrased-statistics: 
-True    100000
-Name: is_paraphrase, dtype: int64
-
-Dataset: QQP_embedded.json
-Balanced dataset with the following paraphrased-statistics: 
-True     37261
-False    37261
-Name: is_paraphrase, dtype: int64
-
-Dataset: SAv2_embedded.json
-Balanced dataset with the following paraphrased-statistics: 
-True    100000
-Name: is_paraphrase, dtype: int64
-
-Dataset: TURL_embedded.json
-Balanced dataset with the following paraphrased-statistics: 
-False    12988
-True     12988
+False    1743
 Name: is_paraphrase, dtype: int64
 

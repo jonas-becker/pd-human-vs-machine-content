@@ -1,3 +1,4 @@
+from audioop import avg
 import os
 import pandas as pd
 from tqdm import tqdm
@@ -60,6 +61,35 @@ def eval(df, bin_id, threshold, method, eval_df):
         f1
         ]
     return eval_df
+
+def get_avg_distances(df, avg_df, dataset):
+    print("Getting average distances...")
+    df_paraphrases = df[df[PARAPHRASE] == True]
+    df_originals = df[df[PARAPHRASE] == False]
+
+    avg_df.loc[len(avg_df.index)] = [
+            dataset,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+        ]
+
+    for method in DETECTION_METHODS:
+        avg_df.loc[len(avg_df.index)-1][method+"_paraphrases"] = df_paraphrases[method].mean()
+        avg_df.loc[len(avg_df.index)-1][method+"_originals"] = df_originals[method].mean()
+
+    return avg_df
+
+
 
 def find_optimal_thresholds(df):
     print("Finding the optimal thresholds for each method...")
@@ -163,9 +193,10 @@ def find_optimal_thresholds(df):
     return TFIDF_THRESHOLD, SEM_BERT_THRESHOLD, SEM_T5_THRESHOLD, FUZZY_THRESHOLD, NGRAM_THRESHOLD, GPT3_THRESHOLD
     
 c_pal = sns.color_palette("colorblind")
-plt.rcParams.update({'font.size': 16})
+plt.rcParams.update({'font.size': 30})
 
 eval_df = pd.DataFrame(columns=[DATASET_NAME, METHOD, PAIRS, TP, TN, FP, FN, ACCURACY, PRECISION, RECALL, SPECIFICITY ,THRESHOLD, F1])
+avg_df = pd.DataFrame(columns=[DATASET_NAME, TFIDF_COSINE+"_paraphrases", TFIDF_COSINE+"_originals", NGRAM3+"_paraphrases", NGRAM3+"_originals", FUZZY+"_paraphrases", FUZZY+"_originals", SEM_BERT+"_paraphrases", SEM_BERT+"_originals", SEM_T5+"_paraphrases", SEM_T5+"_originals", SEM_GPT3+"_paraphrases", SEM_GPT3+"_originals"])
 
 eval_string = ""
 eval_string += "-------------------------" + "\n"
@@ -179,72 +210,16 @@ eval_string = eval_string[:-2] + "\n"
 
 # find the optimal thresholds for each method and dataset and evaluate with said thresholds
 for file in os.listdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):
-    if file.split("_")[0] in MACHINE_PARAPHRASED_DATASETS:
+    df = pd.read_json(os.path.join(OUT_DIR, DETECTION_FOLDER, file), orient = "index")
+    print("Data size before filtering: " + str(len(df)))
+    df = df[df[COSINE_DISTANCE] != 1.0]
+    print("Data size after filtering: " + str(len(df)))
+    avg_df = get_avg_distances(df, avg_df, df.iloc[1][DATASET])
+
+    if file.split("_")[0] in MACHINE_PARAPHRASED_DATASETS and file.split("_")[0] != "APT":
         print(f"---> Skipping evaluation of {file} because it is machine-paraphrased and only contains positive pairs...")
         continue
     print(f"---> Evaluating {file}...")
-    
-    df = pd.read_json(os.path.join(OUT_DIR, DETECTION_FOLDER, file), orient = "index")
-
-    # Find the optimal thresholds:
-    if len(df[df[PARAPHRASE] == False]) > 10:
-        TFIDF_THRESHOLD, SEM_BERT_THRESHOLD, SEM_T5_THRESHOLD, FUZZY_THRESHOLD, NGRAM_THRESHOLD, SEM_GPT3_THRESHOLD = find_optimal_thresholds(df)
-    else:
-        # if the dataset has only paraphrase-pairs
-        TFIDF_THRESHOLD, SEM_BERT_THRESHOLD, SEM_T5_THRESHOLD, FUZZY_THRESHOLD, NGRAM_THRESHOLD, SEM_GPT3_THRESHOLD = 0.7, 0.7, 0.7, 0.7, 0.7, 0.7
-
-    print("Continue with thresholds: ")
-    print("sem_bert: " + str(SEM_BERT_THRESHOLD))
-    print("sem_t5: " + str(SEM_T5_THRESHOLD))
-    print("fuzzy: " + str(FUZZY_THRESHOLD))
-    print("ngram: " + str(NGRAM_THRESHOLD))
-
-    # evaluate results with the optimal thresholds:
-    sem_bert_bin = []
-    sem_t5_bin = []
-    fuzzy_bin = []
-    ngram_bin = []
-    tfidf_bin = []
-    gpt3_bin = []
-    print("Checking determined thresholds for every pair...")
-    for i, row in df.iterrows():
-        # sem_bert
-        if row[SEM_BERT] >= SEM_BERT_THRESHOLD:
-            sem_bert_bin.append(True)
-        else:
-            sem_bert_bin.append(False)
-        # sem_t5
-        if row[SEM_T5] >= SEM_T5_THRESHOLD:
-            sem_t5_bin.append(True)
-        else:
-            sem_t5_bin.append(False)
-        # fuzzy
-        if row[FUZZY] >= FUZZY_THRESHOLD:
-            fuzzy_bin.append(True)
-        else:
-            fuzzy_bin.append(False)
-        # ngram
-        if row[NGRAM3] >= NGRAM_THRESHOLD:
-            ngram_bin.append(True)
-        else:
-            ngram_bin.append(False)
-        # tfidf cosine
-        if row[TFIDF_COSINE] >= TFIDF_THRESHOLD:
-            tfidf_bin.append(True)
-        else:
-            tfidf_bin.append(False)
-        # sem_gpt3
-        if row[SEM_GPT3] >= SEM_GPT3_THRESHOLD:
-            gpt3_bin.append(True)
-        else:
-            gpt3_bin.append(False)
-
-    df[SEM_BERT_BIN] = sem_bert_bin
-    df[SEM_T5_BIN] = sem_t5_bin
-    df[FUZZY_BIN] = fuzzy_bin
-    df[NGRAM_BIN] = ngram_bin
-    df[TFIDF_COSINE_BIN] = tfidf_bin
-    df[SEM_GPT3_BIN] = gpt3_bin
 
     print("Calculating precision-recall curves...")
     precision_sem_bert, recall_sem_bert, thresholds_sem_bert = precision_recall_curve(df["is_paraphrase"], df[SEM_BERT])
@@ -270,80 +245,25 @@ for file in os.listdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):
     ax.set_ylabel('Precision')
     plt.xlim(0, 1)
     plt.ylim(0, 1)
-    plt.legend(loc = 4)
     plt.savefig(os.path.join(OUT_DIR, EVALUATION_FOLDER, file.split("_")[0]+"_pr.pdf"), bbox_inches='tight')
 
-    # Confusion Matrix and f1 score for the defined threshold
-    print("Constructing confusion matrix & calculating f1-score...")
-
-    eval_df = eval(df, SEM_BERT_BIN, SEM_BERT_THRESHOLD, SEM_BERT, eval_df)
-    eval_df = eval(df, SEM_T5_BIN, SEM_T5_THRESHOLD, SEM_T5, eval_df)
-    eval_df = eval(df, FUZZY_BIN, FUZZY_THRESHOLD, FUZZY, eval_df)
-    eval_df = eval(df, TFIDF_COSINE_BIN, TFIDF_THRESHOLD, TFIDF_COSINE, eval_df)
-    eval_df = eval(df, NGRAM_BIN, NGRAM_THRESHOLD, NGRAM3, eval_df)
     if df_gpt3.shape[0] != 0:
-        eval_df = eval(df, SEM_GPT3_BIN, SEM_GPT3_THRESHOLD, SEM_GPT3, eval_df)
+        legend = plt.legend(loc = 3, framealpha=1, ncol=len(ax.lines))
+        for line in legend.get_lines():
+            line.set_linewidth(3.0)
+        legend_fig = legend.figure
+        legend_fig.canvas.draw()
+        bbox  = legend.get_window_extent().transformed(legend_fig.dpi_scale_trans.inverted())
+        legend_fig.savefig(os.path.join(OUT_DIR, EVALUATION_FOLDER, "legend.pdf"), dpi="figure", bbox_inches=bbox)
+
 
 eval_df.to_json(os.path.join(OUT_DIR, EVALUATION_FOLDER, EVALUATION_RESULTS_FILENAME), orient = "index", index = True, indent = 4)
 eval_df.to_csv(os.path.join(OUT_DIR, EVALUATION_FOLDER, EVALUATION_RESULTS_FILENAME.replace(".json", ".csv")), index = True)
 
-# Reevaluate all methods & datasets with the same thresholds
-'''
-eval_df = pd.DataFrame(columns=[DATASET_NAME, METHOD, PAIRS, TP, TN, FP, FN, ACCURACY, PRECISION, RECALL, SPECIFICITY ,THRESHOLD, F1])
-for file in os.listdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):    
-    for threshold in DEFAULT_THRESHOLDS:
-        df = pd.read_json(os.path.join(OUT_DIR, DETECTION_FOLDER, file), orient = "index")
-        print(f"---> Evaluating {file} with threshold {threshold}...")
-
-        sem_bert_bin = []
-        sem_t5_bin = []
-        fuzzy_bin = []
-        ngram_bin = []
-        tfidf_bin = []
-        print("Checking determined thresholds for every pair...")
-        for i, row in df.iterrows():
-            # sem_bert
-            if row[SEM_BERT] >= SEM_BERT_THRESHOLD:
-                sem_bert_bin.append(True)
-            else:
-                sem_bert_bin.append(False)
-            # sem_t5
-            if row[SEM_T5] >= SEM_T5_THRESHOLD:
-                sem_t5_bin.append(True)
-            else:
-                sem_t5_bin.append(False)
-            # fuzzy
-            if row[FUZZY] >= FUZZY_THRESHOLD:
-                fuzzy_bin.append(True)
-            else:
-                fuzzy_bin.append(False)
-            # ngram
-            if row[NGRAM3] >= NGRAM_THRESHOLD:
-                ngram_bin.append(True)
-            else:
-                ngram_bin.append(False)
-            # tfidf cosine
-            if row[TFIDF_COSINE] >= TFIDF_THRESHOLD:
-                tfidf_bin.append(True)
-            else:
-                tfidf_bin.append(False)
-
-        df[SEM_BERT_BIN] = sem_bert_bin
-        df[SEM_T5_BIN] = sem_t5_bin
-        df[FUZZY_BIN] = fuzzy_bin
-        df[NGRAM_BIN] = ngram_bin
-        df[TFIDF_COSINE_BIN] = tfidf_bin
-
-        eval_df = eval(df, SEM_BERT_BIN, threshold, SEM_BERT, eval_df)
-        eval_df = eval(df, SEM_T5_BIN, threshold, SEM_T5, eval_df)
-        eval_df = eval(df, FUZZY_BIN, threshold, FUZZY, eval_df)
-        eval_df = eval(df, TFIDF_COSINE_BIN, threshold, TFIDF_COSINE, eval_df)
-
-eval_df.to_json(os.path.join(OUT_DIR, EVALUATION_FOLDER, "thresholds_"+EVALUATION_RESULTS_FILENAME), orient = "index", index = True, indent = 4)
-eval_df.to_csv(os.path.join(OUT_DIR, EVALUATION_FOLDER, "thresholds_"+EVALUATION_RESULTS_FILENAME.replace(".json", ".csv")), index = True)
-'''
+avg_df.to_json(os.path.join(OUT_DIR, EVALUATION_FOLDER, "avg_distances.json"), orient = "index", index = True, indent = 4)
 
 # Make correlation graphs (mixed)
+plt.rcParams.update({'font.size': 16})
 methods_to_correlate = [TFIDF_COSINE, NGRAM3, FUZZY, SEM_BERT, SEM_T5, SEM_GPT3]
 
 # machine-paraphrases & human-paraphrases
@@ -495,14 +415,17 @@ for method1 in tqdm(methods_to_correlate):
 plt.clf()
 corr_h_matrix = corr_df_h.drop(columns=[PARAPHRASE, COSINE_DISTANCE]).corr()
 mask = np.triu(np.ones_like(corr_h_matrix, dtype=bool)) # Generate a mask for the upper triangle
+np.fill_diagonal(mask, False)
 sns.heatmap(corr_h_matrix, mask=mask, annot=True, xticklabels=["TF-IDF", "3-Gram", "Fuzzy", "GPT-3", "BERT", "T5"], yticklabels=["TF-IDF", "3-Gram", "Fuzzy", "GPT-3", "BERT", "T5"], vmin=-1, vmax=1)
 plt.yticks(rotation=0)
+plt.xticks(rotation=45)
 plt.savefig(os.path.join(OUT_DIR, EVALUATION_FOLDER, CORRELATIONS_FOLDER, "corr_human.pdf"), bbox_inches="tight")
 
 plt.clf()
 corr_m_matrix = corr_df_m.drop(columns=[PARAPHRASE, COSINE_DISTANCE]).corr()
 sns.heatmap(corr_m_matrix, mask=mask, annot=True, xticklabels=["TF-IDF", "3-Gram", "Fuzzy", "GPT-3", "BERT", "T5"], yticklabels=["TF-IDF", "3-Gram", "Fuzzy", "GPT-3", "BERT", "T5"], vmin=-1, vmax=1)   #, xticklabels=None, yticklabels=None
 plt.yticks(rotation=0)
+plt.xticks(rotation=45)
 plt.savefig(os.path.join(OUT_DIR, EVALUATION_FOLDER, CORRELATIONS_FOLDER, "corr_machine.pdf"), bbox_inches="tight")
 plt.clf()
 
@@ -510,14 +433,17 @@ plt.clf()
 plt.clf()
 corr_h_matrix = corr_df_h.drop(columns=[PARAPHRASE, COSINE_DISTANCE, NGRAM3]).corr()
 mask = np.triu(np.ones_like(corr_h_matrix, dtype=bool)) # Generate a mask for the upper triangle
+np.fill_diagonal(mask, False)
 sns.heatmap(corr_h_matrix, mask=mask, annot=True, xticklabels=["TF-IDF", "Fuzzy", "GPT-3", "BERT", "T5"], yticklabels=["TF-IDF", "Fuzzy", "GPT-3", "BERT", "T5"], vmin=-1, vmax=1)
 plt.yticks(rotation=0)
+plt.xticks(rotation=45)
 plt.savefig(os.path.join(OUT_DIR, EVALUATION_FOLDER, CORRELATIONS_FOLDER, "corr_human_nongram.pdf"), bbox_inches="tight")
 
 plt.clf()
 corr_m_matrix = corr_df_m.drop(columns=[PARAPHRASE, COSINE_DISTANCE, NGRAM3]).corr()
 sns.heatmap(corr_m_matrix, mask=mask, annot=True, xticklabels=["TF-IDF", "Fuzzy", "GPT-3", "BERT", "T5"], yticklabels=["TF-IDF", "Fuzzy", "GPT-3", "BERT", "T5"], vmin=-1, vmax=1)   #, xticklabels=None, yticklabels=None
 plt.yticks(rotation=0)
+plt.xticks(rotation=45)
 plt.savefig(os.path.join(OUT_DIR, EVALUATION_FOLDER, CORRELATIONS_FOLDER, "corr_machine_nongram.pdf"), bbox_inches="tight")
 plt.clf()
 
