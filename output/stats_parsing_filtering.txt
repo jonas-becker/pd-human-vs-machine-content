@@ -1,0 +1,32 @@
+FILTERING STATS 
+
+ETPC: 5801
+filtered pairs: 0
+
+SAv2: 167689
+filtered pairs: 42161
+
+TURL: 56787
+filtered pairs: 5253
+
+MPC: 163715
+filtered pairs: 329
+
+QQP: 404351
+filtered pairs: 0
+
+ParaNMT: 51409584
+filtered pairs: 1624
+
+APH: 5007
+filtered pairs: 32
+
+APT (msrp split): 62993
+filtered pairs: 3
+
+APT (ppdb split): 75011
+filtered pairs: 3
+
+PAWSWiki: 65401
+filtered pairs: 0
+
