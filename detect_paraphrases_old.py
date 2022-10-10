@@ -16,19 +16,8 @@ import gensim.downloader as api
 from sentence_transformers import SentenceTransformer
 import zipfile
 from transformers import AutoTokenizer
-import tensorflow as tf
-from sklearn.svm import SVC
-#from classification.text_mining.Evaluation import Classification
-#from classification.text_mining.CommandLine import CLClassification
-#from classification.text_mining.Evaluation import Classification
-#from classification.text_mining.GridSearch import GridSearch
-from sklearn.model_selection import train_test_split
-from sklearn.utils.class_weight import compute_class_weight
-from sklearn.metrics import classification_report
-from sklearn.linear_model import LogisticRegression
 
-
-bert_tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+bert_tokenizer = AutoTokenizer.from_pretrained("destilbert-base-uncased")
 
 def preprocess_function_text1(df):
     return bert_tokenizer(df[TEXT1], truncation=True)
@@ -41,58 +30,37 @@ def semantic_sim_bert_new(df):
 
 def semantic_sim_bert(df):
     print("Calculating semantic similarity with BERT.")
-
-    text1_train, text1_test, text2_train, text2_test, y_train, y_test = train_test_split(list(df[TEXT1]), list(df[TEXT2]), list(df[PARAPHRASE]))
-
+    corpus1 = list(df[TEXT1])
+    corpus2 = list(df[TEXT2])
+    # use bert to embed
     model = SentenceTransformer('bert-base-uncased')
+    print("Encoding text_1's...")
+    text1_embeddings = model.encode(corpus1)
+    print("Encoding text_2's...")
+    text2_embeddings = model.encode(corpus2)
 
-    X1_test = model.encode(text1_test)
-    X2_test = model.encode(text2_test)
-
-    print(X1_test.shape)
-    print(X2_test.shape)
-
-    X_test = np.column_stack((X1_test, X2_test))
-
-    print(X_test.shape)
-
-    X1_train = model.encode(text1_train)
-    X2_train = model.encode(text2_train)
-    X_train = np.column_stack((X1_train, X2_train))
-
-
-    '''
     with zipfile.ZipFile(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER, 'embeddings-BERT.zip'), 'a') as archive:
         print("Exporting embeddings (text 1)...")
-        for i, text1_embedding in tqdm(enumerate(X1_test)):
+        for i, text1_embedding in tqdm(enumerate(text1_embeddings)):
             with open("tmp.txt", "w") as f1:
                 f1.write(np.array2string(numpy.array(text1_embedding), separator='\n'))
                 archive.write( "tmp.txt", os.path.basename(df.iloc[i][PAIR_ID]+"_text_1.txt"))
         print("Exporting embeddings (text 2)...")
-        for i, text2_embedding in tqdm(enumerate(X2_test)):
+        for i, text2_embedding in tqdm(enumerate(text2_embeddings)):
             with open("tmp.txt", "w") as f2:
                 f2.write(np.array2string(numpy.array(text2_embedding), separator='\n'))
                 archive.write("tmp.txt", os.path.basename(df.iloc[i][PAIR_ID]+"_text_2.txt"))
-    '''
 
     print("Processing texts...")
-    # take care, maybe train data has to be processed in batches
-    class_weight = compute_class_weight(
-        class_weight='balanced', classes=[False, True], y=y_train
-    )
-    print(class_weight)
-
-    # initialize the model and assign weights to each class
-    clf = SVC(class_weight={False: class_weight[0], True: class_weight[1]})
-    # train the model
-    clf.fit(X_train, y_train)
-    # use the model to predict the testing instances
-    y_pred = clf.predict(X_test)
-    # generate the classification report
-    print(classification_report(y_test, y_pred))
-
-    return y_pred
-
+    semantic_results = []
+    for i, row in tqdm(df.iterrows(), total=df.shape[0]):
+        sim = cosine_similarity([text1_embeddings[i]], [text2_embeddings[i]])[0][0]
+        try:
+            semantic_results.append(sim)
+        except Exception as e:
+            semantic_results.append(float(sim.item()))
+            continue
+    return semantic_results
 
 def semantic_sim_t5(df):
     print("Calculating semantic similarity with T5.")
@@ -196,20 +164,40 @@ if not os.path.isdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):
 
 stats_str = "STATISTICS OF DETECTION SCRIPT\n\n"
 
-df = pd.read_json(os.path.join(OUT_DIR, FORMATTED_DATA_FILENAME), orient = "index")
+for embedded_file in os.listdir(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER)):
 
-print(f"{df.shape[0]} pairs found in the file.")
-#df = df.truncate(after=200)  #cut part of dataframe for testing
+    if ".zip" in embedded_file:
+        continue
 
-# Calculate the similarities with each method
-df[SEM_BERT] = semantic_sim_bert(df)
-df[TFIDF_COSINE] = tfidf_cosine_sim(df)
-df[NGRAM3] = ngram_sim(df, 3)
-df[FUZZY] = fuzzy_sim(df)
-df[SEM_GPT3] = semantic_sim_gpt3(df)
-df[SEM_T5] = semantic_sim_t5(df)
+    print(f"Processing {embedded_file}...")
+    df = pd.read_json(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER, embedded_file), orient = "index")
+    df = df[(df[TEXT1] != "") & (df[TEXT2] != "")].reset_index(drop=True)
+    print(f"{df.shape[0]} pairs found in the embedded dataset file.")
+    #df = df.truncate(after=200)  #cut part of dataframe for testing
+    dataset = df.iloc[0][DATASET]
 
-#Output data to json format
-df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, embedded_file.split("_")[0]+"_result.json"), orient = "index", index = True, indent = 4)
+    # Truncate "to much" data for balancing
+    if len(df[df[PARAPHRASE] == False]) > 10:   # only truncate datasets that are not paraphrase-pairs only
+        df = shuffle(df).reset_index(drop=True)
+        df = df.groupby(PARAPHRASE)
+        df = pd.DataFrame(df.apply(lambda x: x.sample(df.size().min()).reset_index(drop=True)))
+    df = shuffle(df).reset_index(drop=True)
+
+    print("Balanced dataset with the following paraphrased-statistics:")
+    print(df[PARAPHRASE].value_counts())
+    stats_str = stats_str + "Dataset: " + str(embedded_file) + "\nBalanced dataset with the following paraphrased-statistics: \n" + str(df[PARAPHRASE].value_counts()) + "\n\n"
+    with open(os.path.join(OUT_DIR, "stats_detection_script.txt"), "w") as text_file:
+        text_file.write(stats_str)
+
+    # Calculate the similarities with each method
+    df[TFIDF_COSINE] = tfidf_cosine_sim(df)
+    df[NGRAM3] = ngram_sim(df, 3)
+    df[FUZZY] = fuzzy_sim(df)
+    df[SEM_GPT3] = semantic_sim_gpt3(df)
+    df[SEM_BERT] = semantic_sim_bert(df)
+    df[SEM_T5] = semantic_sim_t5(df)
+
+    #Output data to json format
+    df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, embedded_file.split("_")[0]+"_result.json"), orient = "index", index = True, indent = 4)
 
 print("Done.")

@@ -64,7 +64,7 @@ def parse_datasets():
             random.shuffle(temp)
             og_lines, mg_lines = zip(*temp)
             og_lines, mg_lines = list(og_lines), list(mg_lines)
-            
+
             for i, og_line in tqdm(enumerate(og_lines), total=len(og_lines)):
                 mg_line = mg_lines[i]
                 if og_line not in filter_strings and mg_line not in filter_strings and og_line != mg_line:
@@ -134,11 +134,16 @@ def parse_datasets():
             with open(os.path.join(path_to_dataset, "text_pairs.xml"), encoding='utf-8', mode = "r") as file:
                 tree = ET.parse(file)
                 root = tree.getroot()
+                processed_texts = 0
                 for i, elem in enumerate(tqdm(root)):
                     paraphrase_types_list = [type_dict[TYPE_ID] for type_dict in paraphrase_types[elem[0].text][PARAPHRASE_TYPE] ]
                     
                     if elem[3].text not in filter_strings and elem[4].text not in filter_strings and elem[3].text != elem[4].text:
-                        df_tmp.loc[i] = np.array([dataset, "newswire", shortuuid.uuid()[:8], elem[1].text, elem[2].text, elem[3].text, elem[4].text, bool(int(elem[8].text)), paraphrase_types_list], dtype=object)
+                        df_tmp.loc[processed_texts] = np.array([dataset, "newswire", shortuuid.uuid()[:8], elem[1].text, elem[2].text, elem[3].text, elem[4].text, bool(int(elem[8].text)), paraphrase_types_list], dtype=object)
+                        processed_texts = processed_texts + 1
+                        if processed_texts >= MAX_DATASET_INPUT:
+                            print("\nReached the max. amount: " + str(MAX_DATASET_INPUT))
+                            break
                     else:
                         filtered_amount = filtered_amount + 1
                 df_tmp.reset_index(drop=True, inplace=True)
@@ -147,7 +152,7 @@ def parse_datasets():
                 filtered_str = filtered_str + "filtered pairs: " + str(filtered_amount) + "\n\n"
 
         elif dataset == "SAv2":
-            asv2_path = os.path.join(path_to_dataset) 
+            asv2_path = os.path.join(path_to_dataset)
             with open(os.path.join(asv2_path, "normal.aligned"), encoding="utf8", mode = "r") as f1:
                 with open(os.path.join(asv2_path, "simple.aligned"), encoding="utf8", mode = "r") as f2:
                     og_lines = f1.readlines()
@@ -178,7 +183,7 @@ def parse_datasets():
                                 True,
                                 [16]    # simplification dataset ( => only ellipsis)
                             ], dtype=object)
-                            if df_tmp.shape[0] >= MAX_DATASET_INPUT:  
+                            if df_tmp.shape[0] >= MAX_DATASET_INPUT:
                                 print("\nReached the max. amount: " + str(MAX_DATASET_INPUT))
                                 break
                         else:
@@ -205,7 +210,7 @@ def parse_datasets():
                         bool(row["is_duplicate"]),
                         [0]     # unknown type
                     ], dtype=object)
-                    if df_tmp.shape[0] >= MAX_DATASET_INPUT: 
+                    if df_tmp.shape[0] >= MAX_DATASET_INPUT:
                         print("\nReached the max. amount: " + str(MAX_DATASET_INPUT))
                         break
                 else:
@@ -243,7 +248,7 @@ def parse_datasets():
                                 is_paraphrase,
                                 [0]
                             ], dtype=object)
-                            if df_tmp.shape[0] >= MAX_DATASET_INPUT: 
+                            if df_tmp.shape[0] >= MAX_DATASET_INPUT:
                                 print("\nReached the max. amount: " + str(MAX_DATASET_INPUT))
                                 break
                         else:
@@ -609,7 +614,7 @@ def parse_datasets():
         print(filtered_str)
 
     #Output data to json format
-    df.to_json(os.path.join(OUT_DIR, "true_data.json"), orient = "index", index = True, indent = 4)
+    df.to_json(os.path.join(OUT_DIR, "small_data.json"), orient = "index", index = True, indent = 4)
     print("Done.")
 
     return filtered_str
