@@ -46,6 +46,7 @@ TEXT1 = "text_1"
 TEXT2 = "text_2"
 DATASET = "dataset"
 PAIR_ID = "pair_id"
+SPLIT = "split"     # should be either "test", "train", "dev", "val" or None
 TUPLE_ID = "tuple_id" 
 ID1 = "id_1"
 ID2 = "id_2"

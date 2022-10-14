@@ -1,54 +1,54 @@
 FILTERING STATS 
 
 ETPC: 5801
-after filtering: 100
+after filtering: 4948
 filtered pairs: 0
 
 SAv2: 167689
-after filtering: 100
-filtered pairs: 40
+after filtering: 100000
+filtered pairs: 42237
 
 TURL: 56787
-after filtering: 100
-filtered pairs: 9
+after filtering: 25976
+filtered pairs: 5253
 
 MPC: 163715
-after filtering: 100
-filtered pairs: 0
+after filtering: 100000
+filtered pairs: 351
 
 QQP: 404351
-after filtering: 100
+after filtering: 99998
 filtered pairs: 0
 
 ParaNMT: 51409584
-after filtering: 100
-filtered pairs: 1
+after filtering: 100000
+filtered pairs: 1481
 
 APH: 5007
-after filtering: 100
-filtered pairs: 1
+after filtering: 3486
+filtered pairs: 32
 
 APT (msrp split): 62993
-after filtering: 50
-filtered pairs: 0
+after filtering: 50000
+filtered pairs: 2
 
 APT (ppdb split): 75011
-after filtering: 50
-filtered pairs: 0
+after filtering: 43570
+filtered pairs: 3
 
 PAWSWiki: 65401
-after filtering: 100
+after filtering: 57808
 filtered pairs: 0
 
-ParaSCI (ACL split): 33981
-after filtering: 50
-filtered pairs: 0
+ParaSCI (ACL split): 33970
+after filtering: 33970
+filtered pairs: 11
 
 ParaSCI (arXiv split): 316063
-after filtering: 100
-filtered pairs: 0
+after filtering: 66030
+filtered pairs: 42
 
 MSCOCO (unique image ids): 118287
-after filtering: 100
-filtered pairs: 0
+after filtering: 100000
+filtered pairs: 12
 

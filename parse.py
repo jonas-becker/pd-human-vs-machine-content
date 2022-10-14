@@ -11,12 +11,24 @@ from setup import *
 import numpy as np
 import json
 import random
+from sklearn.utils import shuffle
 
 pd.set_option("display.max_colwidth", None)
 filter_strings = ["\n", "", " "]    # the strings we want to filter out
 
 # For debugging or selecting specific datasets to parse:
-# DATASETS = ["MSCOCO"]
+# DATASETS = ["ETPC"]
+
+def balance_dataset(df_tmp):
+    # balance datasets that are not paraphrase-pairs only
+    if df_tmp[df_tmp[PARAPHRASE] == False].shape[0] > 10:
+        df_tmp = shuffle(df_tmp).reset_index(drop=True)
+        print(df_tmp.head())
+        df_tmp = df_tmp.groupby(PARAPHRASE)
+        df_tmp = pd.DataFrame(df_tmp.apply(lambda x: x.sample(df_tmp.size().min()).reset_index(drop=True)))
+        print("Balanced dataset:")
+        print(df_tmp[PARAPHRASE].value_counts())
+    return df_tmp
 
 def parse_datasets():
     '''
@@ -24,17 +36,27 @@ def parse_datasets():
     :return: the statistics about the data during the parsing
     '''
 
-    df = pd.DataFrame(columns= [DATASET, ORIGIN, PAIR_ID, ID1, ID2, TEXT1, TEXT2, PARAPHRASE, PARAPHRASE_TYPE] )
+    df = pd.DataFrame(columns=[DATASET, ORIGIN, PAIR_ID, ID1, ID2, TEXT1, TEXT2, PARAPHRASE, PARAPHRASE_TYPE, SPLIT])
     filtered_str = "FILTERING STATS \n\n"
 
     for dataset in DATASETS:
         path_to_dataset = os.path.join(DATASETS_FOLDER, dataset)
         print("Processing dataset: " + str(path_to_dataset))
 
-        counter = 0
         filtered_amount = 0
 
-        df_tmp = pd.DataFrame(columns= [DATASET, ORIGIN, PAIR_ID, ID1, ID2, TEXT1, TEXT2, PARAPHRASE, PARAPHRASE_TYPE] )
+        df_tmp = pd.DataFrame(columns=[
+            DATASET,
+            ORIGIN,
+            PAIR_ID,
+            ID1,
+            ID2,
+            TEXT1,
+            TEXT2,
+            PARAPHRASE,
+            PARAPHRASE_TYPE,
+            SPLIT
+        ])
 
         if dataset == "MPC":
             mpcbert_og_path = os.path.join(path_to_dataset, "og")      #read og data
@@ -77,7 +99,8 @@ def parse_datasets():
                         og_line, 
                         mg_line, 
                         True, 
-                        [0]
+                        [0],
+                        None
                         ], dtype=object)
                     processed_texts = processed_texts + 1
                     if df_tmp.shape[0] >= MAX_DATASET_INPUT:    # stop (do not process all)
@@ -139,13 +162,27 @@ def parse_datasets():
                     paraphrase_types_list = [type_dict[TYPE_ID] for type_dict in paraphrase_types[elem[0].text][PARAPHRASE_TYPE] ]
                     
                     if elem[3].text not in filter_strings and elem[4].text not in filter_strings and elem[3].text != elem[4].text:
-                        df_tmp.loc[processed_texts] = np.array([dataset, "newswire", shortuuid.uuid()[:8], elem[1].text, elem[2].text, elem[3].text, elem[4].text, bool(int(elem[8].text)), paraphrase_types_list], dtype=object)
+                        if df_tmp[df_tmp[PARAPHRASE] == bool(int(elem[8].text))].shape[0] > MAX_DATASET_INPUT/2:
+                            continue    # make sure the read in data is balanced
+                        df_tmp.loc[processed_texts] = np.array([
+                            dataset,
+                            "newswire",
+                            shortuuid.uuid()[:8],
+                            elem[1].text,
+                            elem[2].text,
+                            elem[3].text,
+                            elem[4].text,
+                            bool(int(elem[8].text)),
+                            paraphrase_types_list,
+                            None
+                        ], dtype=object)
                         processed_texts = processed_texts + 1
                         if processed_texts >= MAX_DATASET_INPUT:
                             print("\nReached the max. amount: " + str(MAX_DATASET_INPUT))
                             break
                     else:
                         filtered_amount = filtered_amount + 1
+                df_tmp = balance_dataset(df_tmp)
                 df_tmp.reset_index(drop=True, inplace=True)
                 filtered_str = filtered_str + str(dataset) + ": " + str(len(root)) + "\n"
                 filtered_str = filtered_str + "after filtering: " + str(df_tmp.shape[0]) + "\n"
@@ -181,7 +218,8 @@ def parse_datasets():
                                 og_line.split("\t")[2], 
                                 mg_lines[i].split("\t")[2], 
                                 True,
-                                [16]    # simplification dataset ( => only ellipsis)
+                                [16],    # simplification dataset ( => only ellipsis)
+                                None
                             ], dtype=object)
                             if df_tmp.shape[0] >= MAX_DATASET_INPUT:
                                 print("\nReached the max. amount: " + str(MAX_DATASET_INPUT))
@@ -198,6 +236,8 @@ def parse_datasets():
             quora_df = pd.read_csv(qqp_path)
             quora_df = quora_df.sample(frac=1)  # shuffle for random sampling
             for i, row in tqdm(quora_df.iterrows(), total=quora_df.shape[0]):
+                if df_tmp[df_tmp[PARAPHRASE] == bool(row["is_duplicate"])].shape[0] > MAX_DATASET_INPUT / 2:
+                    continue  # make sure the read in data is balanced
                 if row["question1"] not in filter_strings and row["question2"] not in filter_strings and row["question1"] != row["question2"]:
                     df_tmp.loc[i] = np.array([
                         dataset, 
@@ -208,13 +248,15 @@ def parse_datasets():
                         row["question1"], 
                         row["question2"], 
                         bool(row["is_duplicate"]),
-                        [0]     # unknown type
+                        [0],     # unknown type
+                        None
                     ], dtype=object)
                     if df_tmp.shape[0] >= MAX_DATASET_INPUT:
                         print("\nReached the max. amount: " + str(MAX_DATASET_INPUT))
                         break
                 else:
                     filtered_amount = filtered_amount + 1
+            df_tmp = balance_dataset(df_tmp)
             df_tmp.reset_index(drop=True, inplace=True)
             filtered_str = filtered_str + str(dataset) + ": " + str(quora_df.shape[0]) + "\n"
             filtered_str = filtered_str + "after filtering: " + str(df_tmp.shape[0]) + "\n"
@@ -222,41 +264,78 @@ def parse_datasets():
 
         elif dataset == "TURL":
             turl_path = os.path.join(path_to_dataset)
-            with open(os.path.join(turl_path, "Twitter_URL_Corpus_test.txt"), encoding="utf8", mode = "r") as f1:
-                with open(os.path.join(turl_path, "Twitter_URL_Corpus_train.txt"), encoding="utf8", mode = "r") as f2:
-                    test_lines = f1.readlines()
-                    test_lines = [line.rstrip() for line in test_lines]
-                    test_lines = [l for l in test_lines if l != ""]
-                    train_lines = f2.readlines()
-                    train_lines = [line.rstrip() for line in train_lines]
-                    train_lines = [l for l in train_lines if l != ""]
-                    lines = test_lines + train_lines
-                    random.shuffle(lines)   # shuffle for random sampling
+            processed_texts = 0
 
-                    for i, line in enumerate(tqdm(lines)):
-                        if line != "\n" and line.split("\t")[0] not in filter_strings and line.split("\t")[1] not in filter_strings and line.split("\t")[0] != line.split("\t")[1] and int(line.split("\t")[2][1]) != 3:   # if amazon workers could not decide, skip (3/6)
-                            # based on the datasets paper, we value a phrase as paraphrase when >=4 out of 6 amazon workers marked it a such
-                            is_paraphrase = int(line.split("\t")[2][1]) >= 4
-                            df_tmp.loc[i] = np.array([
-                                dataset, 
-                                "twitter news", 
-                                shortuuid.uuid()[:8], 
-                                shortuuid.uuid()[:8], 
-                                shortuuid.uuid()[:8], 
-                                line.split("\t")[0], 
-                                line.split("\t")[1], 
-                                is_paraphrase,
-                                [0]
-                            ], dtype=object)
-                            if df_tmp.shape[0] >= MAX_DATASET_INPUT:
-                                print("\nReached the max. amount: " + str(MAX_DATASET_INPUT))
-                                break
-                        else:
-                            filtered_amount = filtered_amount + 1
-                    df_tmp.reset_index(drop=True, inplace=True)
-                    filtered_str = filtered_str + str(dataset) + ": " + str(len(lines)) + "\n"
-                    filtered_str = filtered_str + "after filtering: " + str(df_tmp.shape[0]) + "\n"
-                    filtered_str = filtered_str + "filtered pairs: " + str(filtered_amount) + "\n\n"
+            with open(os.path.join(turl_path, "Twitter_URL_Corpus_test.txt"), encoding="utf8", mode = "r") as f1:
+                test_lines = f1.readlines()
+                test_lines = [line.rstrip() for line in test_lines]
+                test_lines = [l for l in test_lines if l != ""]
+                random.shuffle(test_lines)  # shuffle for random sampling
+
+                for i, line in enumerate(tqdm(test_lines)):
+                    if line != "\n" and line.split("\t")[0] not in filter_strings and line.split("\t")[
+                        1] not in filter_strings and line.split("\t")[0] != line.split("\t")[1] and int(
+                            line.split("\t")[2][1]) != 3:  # if amazon workers could not decide, skip (3/6)
+                        # based on the datasets paper, we value a phrase as paraphrase when >=4 out of 6 amazon workers marked it a such
+                        is_paraphrase = int(line.split("\t")[2][1]) >= 4
+                        if df_tmp[df_tmp[PARAPHRASE] == is_paraphrase].shape[0] > MAX_DATASET_INPUT / 2:
+                            continue  # make sure the read in data is balanced
+
+                        df_tmp.loc[processed_texts] = np.array([
+                            dataset,
+                            "twitter news",
+                            shortuuid.uuid()[:8],
+                            shortuuid.uuid()[:8],
+                            shortuuid.uuid()[:8],
+                            line.split("\t")[0],
+                            line.split("\t")[1],
+                            is_paraphrase,
+                            [0],
+                            "test"
+                        ], dtype=object)
+                        processed_texts = processed_texts + 1
+                        if df_tmp.shape[0] >= MAX_DATASET_INPUT:
+                            print("\nReached the max. amount: " + str(MAX_DATASET_INPUT))
+                            break
+                    else:
+                        filtered_amount = filtered_amount + 1
+
+            with open(os.path.join(turl_path, "Twitter_URL_Corpus_train.txt"), encoding="utf8", mode = "r") as f2:
+                train_lines = f2.readlines()
+                train_lines = [line.rstrip() for line in train_lines]
+                train_lines = [l for l in train_lines if l != ""]
+                random.shuffle(train_lines)   # shuffle for random sampling
+
+                for i, line in enumerate(tqdm(train_lines)):
+                    if line != "\n" and line.split("\t")[0] not in filter_strings and line.split("\t")[1] not in filter_strings and line.split("\t")[0] != line.split("\t")[1] and int(line.split("\t")[2][1]) != 3:   # if amazon workers could not decide, skip (3/6)
+                        # based on the datasets paper, we value a phrase as paraphrase when >=4 out of 6 amazon workers marked it a such
+                        is_paraphrase = int(line.split("\t")[2][1]) >= 4
+                        if df_tmp[df_tmp[PARAPHRASE] == is_paraphrase].shape[0] > MAX_DATASET_INPUT / 2:
+                            continue  # make sure the read in data is balanced
+
+                        df_tmp.loc[processed_texts] = np.array([
+                            dataset,
+                            "twitter news",
+                            shortuuid.uuid()[:8],
+                            shortuuid.uuid()[:8],
+                            shortuuid.uuid()[:8],
+                            line.split("\t")[0],
+                            line.split("\t")[1],
+                            is_paraphrase,
+                            [0],
+                            "train"
+                        ], dtype=object)
+                        processed_texts = processed_texts + 1
+                        if df_tmp.shape[0] >= MAX_DATASET_INPUT:
+                            print("\nReached the max. amount: " + str(MAX_DATASET_INPUT))
+                            break
+                    else:
+                        filtered_amount = filtered_amount + 1
+            df_tmp = balance_dataset(df_tmp)
+            df_tmp.reset_index(drop=True, inplace=True)
+            filtered_str = filtered_str + str(dataset) + ": " + str(len(test_lines+train_lines)) + "\n"
+            filtered_str = filtered_str + "after filtering: " + str(df_tmp.shape[0]) + "\n"
+            filtered_str = filtered_str + "filtered pairs: " + str(filtered_amount) + "\n\n"
         
         elif dataset == "ParaNMT":
             nmt_path = os.path.join(path_to_dataset)      #read train data
@@ -275,7 +354,8 @@ def parse_datasets():
                                 l[0], 
                                 l[1], 
                                 True,
-                                [0]
+                                [0],
+                                None
                             ], dtype=object)
                         if df_tmp.shape[0] >= MAX_DATASET_INPUT:
                             print("\nReached the max. amount: " + str(MAX_DATASET_INPUT))
@@ -299,6 +379,9 @@ def parse_datasets():
                 for i, line in enumerate(tqdm(lines)):
                     if line.split("\t")[0] not in filter_strings and line.split("\t")[1] not in filter_strings and line.split("\t")[0] != line.split("\t")[1]:
                         is_paraphrase = bool(int(line.split("\t")[2]))
+                        if df_tmp[df_tmp[PARAPHRASE] == is_paraphrase].shape[0] > MAX_DATASET_INPUT / 2:
+                            continue  # make sure the read in data is balanced
+
                         df_tmp.loc[processed_texts] = np.array([
                             dataset, 
                             "msrp", 
@@ -308,7 +391,8 @@ def parse_datasets():
                             line.split("\t")[0], 
                             line.split("\t")[1], 
                             is_paraphrase,
-                            [0]
+                            [0],
+                            None
                         ], dtype=object)
                         processed_texts = processed_texts + 1
                         if df_tmp.shape[0] >= MAX_DATASET_INPUT / 2:  
@@ -331,6 +415,9 @@ def parse_datasets():
                 for i, line in enumerate(tqdm(lines)):
                     if line.split("\t")[0] not in filter_strings and line.split("\t")[1] not in filter_strings and line.split("\t")[0] != line.split("\t")[1]:
                         is_paraphrase = bool(int(line.split("\t")[2]))
+                        if df_tmp[df_tmp[PARAPHRASE] == is_paraphrase].shape[0] > MAX_DATASET_INPUT / 2:
+                            continue  # make sure the read in data is balanced
+
                         df_tmp.loc[processed_texts] = np.array([
                             dataset, 
                             "twitterppdb", 
@@ -340,7 +427,8 @@ def parse_datasets():
                             line.split("\t")[0], 
                             line.split("\t")[1], 
                             is_paraphrase,
-                            [0]
+                            [0],
+                            None
                         ], dtype=object)
                         processed_texts = processed_texts + 1
                         if df_tmp.shape[0] >= MAX_DATASET_INPUT: 
@@ -348,6 +436,7 @@ def parse_datasets():
                             break
                     else:
                         filtered_amount = filtered_amount + 1
+                df_tmp = balance_dataset(df_tmp)
                 df_tmp.reset_index(drop=True, inplace=True)
                 filtered_str = filtered_str + str(dataset) + " (ppdb split): " + str(len(lines)) + "\n"
                 filtered_str = filtered_str + "after filtering: " + str(df_tmp.shape[0] - amount_msrp_split) + "\n"
@@ -355,80 +444,176 @@ def parse_datasets():
 
         elif dataset == "APH":
             aph_path = os.path.join(path_to_dataset)
-            with open(os.path.join(aph_path, "ap-h-test"), encoding="utf8", mode = "r") as f1: 
-                with open(os.path.join(aph_path, "ap-h-train"), encoding="utf8", mode = "r") as f2: 
-                    test_lines = f1.readlines()
-                    test_lines = [line.rstrip() for line in test_lines]
-                    test_lines = [l for l in test_lines if l != ""][1:]
-                    train_lines = f2.readlines()
-                    train_lines = [line.rstrip() for line in train_lines]
-                    train_lines = [l for l in train_lines if l != ""][1:]
-                    lines = test_lines + train_lines
-                    random.shuffle(lines)   # shuffle for random sampling
+            processed_texts = 0
+            with open(os.path.join(aph_path, "ap-h-test"), encoding="utf8", mode = "r") as f1:
+                test_lines = f1.readlines()
+                test_lines = [line.rstrip() for line in test_lines]
+                test_lines = [l for l in test_lines if l != ""][1:]
+                random.shuffle(test_lines)  # shuffle for random sampling
 
-                    for i, line in enumerate(tqdm(lines)):
-                        if line.split("\t")[0] not in filter_strings and line.split("\t")[1] not in filter_strings and line.split("\t")[0] != line.split("\t")[1]:
-                            is_paraphrase = bool(int(line.split("\t")[2]))
-                            df_tmp.loc[i] = np.array([
-                                dataset, 
-                                "msrp,ppnmt", 
-                                shortuuid.uuid()[:8], 
-                                shortuuid.uuid()[:8], 
-                                shortuuid.uuid()[:8], 
-                                line.split("\t")[0], 
-                                line.split("\t")[1], 
-                                is_paraphrase,
-                                [0]
-                            ], dtype=object)
-                            if df_tmp.shape[0] >= MAX_DATASET_INPUT: 
-                                print("\nReached the max. amount: " + str(MAX_DATASET_INPUT))
-                                break
-                        else:
-                            filtered_amount = filtered_amount + 1
-                    df_tmp.reset_index(drop=True, inplace=True)
-                    filtered_str = filtered_str + str(dataset) + ": " + str(len(lines)) + "\n"
-                    filtered_str = filtered_str + "after filtering: " + str(df_tmp.shape[0]) + "\n"
-                    filtered_str = filtered_str + "filtered pairs: " + str(filtered_amount) + "\n\n"
+                for i, line in enumerate(tqdm(test_lines)):
+                    if line.split("\t")[0] not in filter_strings and line.split("\t")[1] not in filter_strings and \
+                            line.split("\t")[0] != line.split("\t")[1]:
+                        is_paraphrase = bool(int(line.split("\t")[2]))
+                        if df_tmp[df_tmp[PARAPHRASE] == is_paraphrase].shape[0] > MAX_DATASET_INPUT / 2:
+                            continue  # make sure the read in data is balanced
+
+                        df_tmp.loc[processed_texts] = np.array([
+                            dataset,
+                            "msrp,ppnmt",
+                            shortuuid.uuid()[:8],
+                            shortuuid.uuid()[:8],
+                            shortuuid.uuid()[:8],
+                            line.split("\t")[0],
+                            line.split("\t")[1],
+                            is_paraphrase,
+                            [0],
+                            "test"
+                        ], dtype=object)
+                        processed_texts = processed_texts + 1
+                        if df_tmp.shape[0] >= MAX_DATASET_INPUT:
+                            print("\nReached the max. amount: " + str(MAX_DATASET_INPUT))
+                            break
+                    else:
+                        filtered_amount = filtered_amount + 1
+
+            with open(os.path.join(aph_path, "ap-h-train"), encoding="utf8", mode = "r") as f2:
+                train_lines = f2.readlines()
+                train_lines = [line.rstrip() for line in train_lines]
+                train_lines = [l for l in train_lines if l != ""][1:]
+                random.shuffle(train_lines)   # shuffle for random sampling
+
+                for i, line in enumerate(tqdm(train_lines)):
+                    if line.split("\t")[0] not in filter_strings and line.split("\t")[1] not in filter_strings and line.split("\t")[0] != line.split("\t")[1]:
+                        is_paraphrase = bool(int(line.split("\t")[2]))
+                        if df_tmp[df_tmp[PARAPHRASE] == is_paraphrase].shape[0] > MAX_DATASET_INPUT / 2:
+                            continue  # make sure the read in data is balanced
+
+                        df_tmp.loc[processed_texts] = np.array([
+                            dataset,
+                            "msrp,ppnmt",
+                            shortuuid.uuid()[:8],
+                            shortuuid.uuid()[:8],
+                            shortuuid.uuid()[:8],
+                            line.split("\t")[0],
+                            line.split("\t")[1],
+                            is_paraphrase,
+                            [0],
+                            "train"
+                        ], dtype=object)
+                        processed_texts = processed_texts + 1
+                        if df_tmp.shape[0] >= MAX_DATASET_INPUT:
+                            print("\nReached the max. amount: " + str(MAX_DATASET_INPUT))
+                            break
+                    else:
+                        filtered_amount = filtered_amount + 1
+            df_tmp = balance_dataset(df_tmp)
+            df_tmp.reset_index(drop=True, inplace=True)
+            filtered_str = filtered_str + str(dataset) + ": " + str(len(test_lines+train_lines)) + "\n"
+            filtered_str = filtered_str + "after filtering: " + str(df_tmp.shape[0]) + "\n"
+            filtered_str = filtered_str + "filtered pairs: " + str(filtered_amount) + "\n\n"
         
         elif dataset == "PAWSWiki":
             paws_path = os.path.join(path_to_dataset)
-            with open(os.path.join(paws_path, "dev.tsv"), encoding="utf8", mode = "r") as f1: 
-                with open(os.path.join(paws_path, "test.tsv"), encoding="utf8", mode = "r") as f2: 
-                    with open(os.path.join(paws_path, "train.tsv"), encoding="utf8", mode = "r") as f3: 
-                        # read train, test and dev files
-                        dev_lines = f1.readlines()
-                        dev_lines = [line.rstrip() for line in dev_lines]
-                        dev_lines = ["dev"+l for l in dev_lines if l != ""][1:]
-                        test_lines = f2.readlines()
-                        test_lines = [line.rstrip() for line in test_lines]
-                        test_lines = ["test"+l for l in test_lines if l != ""][1:]
-                        train_lines = f3.readlines()
-                        train_lines = [line.rstrip() for line in train_lines]
-                        train_lines = ["train"+l for l in train_lines if l != ""][1:]
-                        lines = test_lines + train_lines + dev_lines
-                        random.shuffle(lines)   # shuffle for random sampling
+            processed_texts = 0
+            with open(os.path.join(paws_path, "dev.tsv"), encoding="utf8", mode = "r") as f1:
+                dev_lines = f1.readlines()
+                dev_lines = [line.rstrip() for line in dev_lines]
+                dev_lines = ["dev" + l for l in dev_lines if l != ""][1:]
+                random.shuffle(dev_lines)  # shuffle for random sampling
 
-                        for i, line in enumerate(tqdm(lines)):
-                            if line.split("\t")[0] not in filter_strings and line.split("\t")[1] not in filter_strings and line.split("\t")[0] != line.split("\t")[1]:
-                                is_paraphrase = bool(int(line.split("\t")[3]))
-                                df_tmp.loc[i] = np.array([
-                                    dataset, 
-                                    "wikipedia", 
-                                    line.split("\t")[0]+"_"+shortuuid.uuid()[:8], 
-                                    shortuuid.uuid()[:8], 
-                                    shortuuid.uuid()[:8], 
-                                    line.split("\t")[1], 
-                                    line.split("\t")[2], 
-                                    is_paraphrase,
-                                    [0]
-                                ], dtype=object)
-                                if df_tmp.shape[0] >= MAX_DATASET_INPUT: 
-                                    print("\nReached the max. amount: " + str(MAX_DATASET_INPUT))
-                                    break
-                            else:
-                                filtered_amount = filtered_amount + 1
+                for i, line in enumerate(tqdm(dev_lines)):
+                    if line.split("\t")[0] not in filter_strings and line.split("\t")[1] not in filter_strings and \
+                            line.split("\t")[0] != line.split("\t")[1]:
+                        is_paraphrase = bool(int(line.split("\t")[3]))
+                        if df_tmp[df_tmp[PARAPHRASE] == is_paraphrase].shape[0] > MAX_DATASET_INPUT / 2:
+                            continue  # make sure the read in data is balanced
+
+                        df_tmp.loc[processed_texts] = np.array([
+                            dataset,
+                            "wikipedia",
+                            line.split("\t")[0] + "_" + shortuuid.uuid()[:8],
+                            shortuuid.uuid()[:8],
+                            shortuuid.uuid()[:8],
+                            line.split("\t")[1],
+                            line.split("\t")[2],
+                            is_paraphrase,
+                            [0],
+                            "dev"
+                        ], dtype=object)
+                        processed_texts = processed_texts + 1
+                        if df_tmp.shape[0] >= MAX_DATASET_INPUT:
+                            print("\nReached the max. amount: " + str(MAX_DATASET_INPUT))
+                            break
+                    else:
+                        filtered_amount = filtered_amount + 1
+
+            with open(os.path.join(paws_path, "test.tsv"), encoding="utf8", mode = "r") as f2:
+                test_lines = f2.readlines()
+                test_lines = [line.rstrip() for line in test_lines]
+                test_lines = ["test" + l for l in test_lines if l != ""][1:]
+                random.shuffle(test_lines)  # shuffle for random sampling
+
+                for i, line in enumerate(tqdm(test_lines)):
+                    if line.split("\t")[0] not in filter_strings and line.split("\t")[1] not in filter_strings and \
+                            line.split("\t")[0] != line.split("\t")[1]:
+                        is_paraphrase = bool(int(line.split("\t")[3]))
+                        if df_tmp[df_tmp[PARAPHRASE] == is_paraphrase].shape[0] > MAX_DATASET_INPUT / 2:
+                            continue  # make sure the read in data is balanced
+
+                        df_tmp.loc[processed_texts] = np.array([
+                            dataset,
+                            "wikipedia",
+                            line.split("\t")[0] + "_" + shortuuid.uuid()[:8],
+                            shortuuid.uuid()[:8],
+                            shortuuid.uuid()[:8],
+                            line.split("\t")[1],
+                            line.split("\t")[2],
+                            is_paraphrase,
+                            [0],
+                            "test"
+                        ], dtype=object)
+                        processed_texts = processed_texts + 1
+                        if df_tmp.shape[0] >= MAX_DATASET_INPUT:
+                            print("\nReached the max. amount: " + str(MAX_DATASET_INPUT))
+                            break
+                    else:
+                        filtered_amount = filtered_amount + 1
+
+            with open(os.path.join(paws_path, "train.tsv"), encoding="utf8", mode = "r") as f3:
+                train_lines = f3.readlines()
+                train_lines = [line.rstrip() for line in train_lines]
+                train_lines = ["train"+l for l in train_lines if l != ""][1:]
+                random.shuffle(train_lines)   # shuffle for random sampling
+
+                for i, line in enumerate(tqdm(train_lines)):
+                    if line.split("\t")[0] not in filter_strings and line.split("\t")[1] not in filter_strings and line.split("\t")[0] != line.split("\t")[1]:
+                        is_paraphrase = bool(int(line.split("\t")[3]))
+                        if df_tmp[df_tmp[PARAPHRASE] == is_paraphrase].shape[0] > MAX_DATASET_INPUT / 2:
+                            continue  # make sure the read in data is balanced
+
+                        df_tmp.loc[processed_texts] = np.array([
+                            dataset,
+                            "wikipedia",
+                            line.split("\t")[0]+"_"+shortuuid.uuid()[:8],
+                            shortuuid.uuid()[:8],
+                            shortuuid.uuid()[:8],
+                            line.split("\t")[1],
+                            line.split("\t")[2],
+                            is_paraphrase,
+                            [0],
+                            "train"
+                        ], dtype=object)
+                        processed_texts = processed_texts + 1
+                        if df_tmp.shape[0] >= MAX_DATASET_INPUT:
+                            print("\nReached the max. amount: " + str(MAX_DATASET_INPUT))
+                            break
+                    else:
+                        filtered_amount = filtered_amount + 1
+
+            df_tmp = balance_dataset(df_tmp)
             df_tmp.reset_index(drop=True, inplace=True)
-            filtered_str = filtered_str + str(dataset) + ": " + str(len(lines)) + "\n"
+            filtered_str = filtered_str + str(dataset) + ": " + str(len(train_lines+test_lines+dev_lines)) + "\n"
             filtered_str = filtered_str + "after filtering: " + str(df_tmp.shape[0]) + "\n"
             filtered_str = filtered_str + "filtered pairs: " + str(filtered_amount) + "\n\n"
 
@@ -437,8 +622,6 @@ def parse_datasets():
             processed_texts = 0
 
             # --> ACL split
-            all_og_lines = []
-            all_hg_lines = []
             print("Processing ACL split...")
             with open(os.path.join(parasci_paths[0], "test", "test.src"), encoding="utf8", mode = "r") as f1: 
                 with open(os.path.join(parasci_paths[0], "test", "test.tgt"), encoding="utf8", mode = "r") as f2: 
@@ -446,59 +629,110 @@ def parse_datasets():
                     og_lines = [line.rstrip() for line in og_lines]
                     hg_lines = f2.readlines()
                     hg_lines = [line.rstrip() for line in hg_lines]
-                    all_og_lines = all_og_lines + og_lines
-                    all_hg_lines = all_hg_lines + hg_lines
+
+                    # shuffle both lists with the same order keeping them aligned (random sampling)
+                    temp = list(zip(og_lines, hg_lines))
+                    random.shuffle(temp)
+                    og_lines, hg_lines = zip(*temp)
+                    og_lines, hg_lines = list(og_lines), list(hg_lines)
+
+                    for i, og_line in tqdm(enumerate(og_lines), total=len(og_lines)):
+                        hg_line = hg_lines[i]
+                        if og_line not in filter_strings and hg_line not in filter_strings and og_line != hg_line:
+                            df_tmp.loc[processed_texts] = np.array([
+                                dataset,
+                                "ACL",
+                                shortuuid.uuid()[:8],
+                                shortuuid.uuid()[:8],
+                                shortuuid.uuid()[:8],
+                                og_line,
+                                hg_line,
+                                True,
+                                [0],
+                                "test"
+                            ], dtype=object)
+                            processed_texts = processed_texts + 1
+                            if df_tmp.shape[0] >= MAX_DATASET_INPUT / 2:  # stop (do not process all)
+                                break
+                        else:
+                            filtered_amount = filtered_amount + 1
+
             with open(os.path.join(parasci_paths[0], "train", "train.src"), encoding="utf8", mode = "r") as f1: 
                 with open(os.path.join(parasci_paths[0], "train", "train.tgt"), encoding="utf8", mode = "r") as f2: 
                     og_lines = f1.readlines()
                     og_lines = [line.rstrip() for line in og_lines]
                     hg_lines = f2.readlines()
                     hg_lines = [line.rstrip() for line in hg_lines]
-                    all_og_lines = all_og_lines + og_lines
-                    all_hg_lines = all_hg_lines + hg_lines
+
+                    # shuffle both lists with the same order keeping them aligned (random sampling)
+                    temp = list(zip(og_lines, hg_lines))
+                    random.shuffle(temp)
+                    og_lines, hg_lines = zip(*temp)
+                    og_lines, hg_lines = list(og_lines), list(hg_lines)
+
+                    for i, og_line in tqdm(enumerate(og_lines), total=len(og_lines)):
+                        hg_line = hg_lines[i]
+                        if og_line not in filter_strings and hg_line not in filter_strings and og_line != hg_line:
+                            df_tmp.loc[processed_texts] = np.array([
+                                dataset,
+                                "ACL",
+                                shortuuid.uuid()[:8],
+                                shortuuid.uuid()[:8],
+                                shortuuid.uuid()[:8],
+                                og_line,
+                                hg_line,
+                                True,
+                                [0],
+                                "train"
+                            ], dtype=object)
+                            processed_texts = processed_texts + 1
+                            if df_tmp.shape[0] >= MAX_DATASET_INPUT / 2:  # stop (do not process all)
+                                break
+                        else:
+                            filtered_amount = filtered_amount + 1
+
             with open(os.path.join(parasci_paths[0], "val", "val.src"), encoding="utf8", mode = "r") as f1: 
                 with open(os.path.join(parasci_paths[0], "val", "val.tgt"), encoding="utf8", mode = "r") as f2: 
                     og_lines = f1.readlines()
                     og_lines = [line.rstrip() for line in og_lines]
                     hg_lines = f2.readlines()
                     hg_lines = [line.rstrip() for line in hg_lines]
-                    all_og_lines = all_og_lines + og_lines
-                    all_hg_lines = all_hg_lines + hg_lines
-            
-            # shuffle both lists with the same order keeping them aligned (random sampling)
-            print("Shuffle dataset entries to produce random sampling...")
-            temp = list(zip(all_og_lines, all_hg_lines))
-            random.shuffle(temp)
-            all_og_lines, all_hg_lines = zip(*temp)
-            all_og_lines, all_hg_lines = list(all_og_lines), list(all_hg_lines)
-            
-            print("Reading data...")
-            for i, og_line in tqdm(enumerate(all_og_lines), total=len(all_og_lines)):
-                hg_line = all_hg_lines[i]
-                if og_line not in filter_strings and hg_line not in filter_strings and og_line != hg_line:
-                    df_tmp.loc[processed_texts] = np.array([
-                        dataset, 
-                        "ACL", 
-                        shortuuid.uuid()[:8], 
-                        shortuuid.uuid()[:8], 
-                        shortuuid.uuid()[:8], 
-                        og_line, 
-                        hg_line, 
-                        True, 
-                        [0]
-                        ], dtype=object)
-                    processed_texts = processed_texts + 1
-                    if df_tmp.shape[0] >= MAX_DATASET_INPUT / 2:    # stop (do not process all)
-                        break
-                else:
-                    filtered_amount = filtered_amount + 1
+
+                    # shuffle both lists with the same order keeping them aligned (random sampling)
+                    temp = list(zip(og_lines, hg_lines))
+                    random.shuffle(temp)
+                    og_lines, hg_lines = zip(*temp)
+                    og_lines, hg_lines = list(og_lines), list(hg_lines)
+
+                    for i, og_line in tqdm(enumerate(og_lines), total=len(og_lines)):
+                        hg_line = hg_lines[i]
+                        if og_line not in filter_strings and hg_line not in filter_strings and og_line != hg_line:
+                            df_tmp.loc[processed_texts] = np.array([
+                                dataset,
+                                "ACL",
+                                shortuuid.uuid()[:8],
+                                shortuuid.uuid()[:8],
+                                shortuuid.uuid()[:8],
+                                og_line,
+                                hg_line,
+                                True,
+                                [0],
+                                "val"
+                            ], dtype=object)
+                            processed_texts = processed_texts + 1
+                            if df_tmp.shape[0] >= MAX_DATASET_INPUT / 2:  # stop (do not process all)
+                                break
+                        else:
+                            filtered_amount = filtered_amount + 1
+
             df_tmp.reset_index(drop=True, inplace=True)
-            filtered_str = filtered_str + str(dataset) + " (ACL split): " + str(len(all_og_lines)) + "\n"
+            amount_acl_split = int(df_tmp.shape[0])
+            filtered_str = filtered_str + str(dataset) + " (ACL split): " + str(amount_acl_split) + "\n"
             filtered_str = filtered_str + "after filtering: " + str(df_tmp.shape[0]) + "\n"
             filtered_str = filtered_str + "filtered pairs: " + str(filtered_amount) + "\n\n"
-            amount_acl_split = int(df_tmp.shape[0])
 
             # --> arXiv split
+            filtered_amount = 0
             all_og_lines = []
             all_hg_lines = []
             print("Processing arXiv split...")
@@ -547,7 +781,8 @@ def parse_datasets():
                         og_line, 
                         hg_line, 
                         True, 
-                        [0]
+                        [0],
+                        None    # do not use splits since ParaSCI data is larger than MAX_DATASET_INPUT, create own later
                         ], dtype=object)
                     processed_texts = processed_texts + 1
                     if df_tmp.shape[0] >= MAX_DATASET_INPUT:    # stop (do not process all)
@@ -557,7 +792,7 @@ def parse_datasets():
                     filtered_amount = filtered_amount + 1
             df_tmp.reset_index(drop=True, inplace=True)
             filtered_str = filtered_str + str(dataset) + " (arXiv split): " + str(len(all_og_lines)) + "\n"
-            filtered_str = filtered_str + "after filtering: " + str(df_tmp.shape[0]) + "\n"
+            filtered_str = filtered_str + "after filtering: " + str(df_tmp.shape[0] - amount_acl_split) + "\n"
             filtered_str = filtered_str + "filtered pairs: " + str(filtered_amount) + "\n\n"
         
         elif dataset == "MSCOCO":
@@ -594,7 +829,8 @@ def parse_datasets():
                         og_line, 
                         hg_line, 
                         True, 
-                        [0]
+                        [0],
+                        None    # do not use splits since MSCOCO is larger than MAX_DATASET_INPUT, create own later
                         ], dtype=object)
                     if df_tmp.shape[0] >= MAX_DATASET_INPUT:    # stop (do not process all)
                         print("\nReached the max. amount: " + str(MAX_DATASET_INPUT))
@@ -606,15 +842,13 @@ def parse_datasets():
             filtered_str = filtered_str + "after filtering: " + str(df_tmp.shape[0]) + "\n"
             filtered_str = filtered_str + "filtered pairs: " + str(filtered_amount) + "\n\n"
 
-
-
-        df = pd.concat([df, df_tmp], ignore_index = True)   # concat the lastly processed dataset to the combined dataset
+        df = pd.concat([df, df_tmp], ignore_index=True)   # concat the lastly processed dataset to the combined dataset
 
         print("Current Stats: \n\n")
         print(filtered_str)
 
     #Output data to json format
-    df.to_json(os.path.join(OUT_DIR, "small_data.json"), orient = "index", index = True, indent = 4)
+    df.to_json(os.path.join(OUT_DIR, "small_data.json"), orient="index", index=True, indent=4)
     print("Done.")
 
     return filtered_str
