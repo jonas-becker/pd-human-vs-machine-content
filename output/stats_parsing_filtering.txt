@@ -6,7 +6,7 @@ filtered pairs: 0
 
 SAv2: 167689
 after filtering: 100000
-filtered pairs: 42237
+filtered pairs: 42028
 
 TURL: 56787
 after filtering: 25976
@@ -14,7 +14,7 @@ filtered pairs: 5253
 
 MPC: 163715
 after filtering: 100000
-filtered pairs: 351
+filtered pairs: 329
 
 QQP: 404351
 after filtering: 99998
@@ -22,7 +22,7 @@ filtered pairs: 0
 
 ParaNMT: 51409584
 after filtering: 100000
-filtered pairs: 1481
+filtered pairs: 1561
 
 APH: 5007
 after filtering: 3486
@@ -33,7 +33,7 @@ after filtering: 50000
 filtered pairs: 2
 
 APT (ppdb split): 75011
-after filtering: 43570
+after filtering: 43482
 filtered pairs: 3
 
 PAWSWiki: 65401
@@ -46,9 +46,9 @@ filtered pairs: 11
 
 ParaSCI (arXiv split): 316063
 after filtering: 66030
-filtered pairs: 42
+filtered pairs: 63
 
 MSCOCO (unique image ids): 118287
 after filtering: 100000
-filtered pairs: 12
+filtered pairs: 19
 

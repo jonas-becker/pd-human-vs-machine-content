@@ -14,7 +14,7 @@ import random
 from sklearn.utils import shuffle
 
 pd.set_option("display.max_colwidth", None)
-filter_strings = ["\n", "", " "]    # the strings we want to filter out
+filter_strings = ["\n", "", " ", None]    # the strings we want to filter out
 
 # For debugging or selecting specific datasets to parse:
 # DATASETS = ["ETPC"]
@@ -842,13 +842,14 @@ def parse_datasets():
             filtered_str = filtered_str + "after filtering: " + str(df_tmp.shape[0]) + "\n"
             filtered_str = filtered_str + "filtered pairs: " + str(filtered_amount) + "\n\n"
 
+        print(df_tmp[PARAPHRASE].value_counts())
         df = pd.concat([df, df_tmp], ignore_index=True)   # concat the lastly processed dataset to the combined dataset
 
         print("Current Stats: \n\n")
         print(filtered_str)
 
     #Output data to json format
-    df.to_json(os.path.join(OUT_DIR, "small_data.json"), orient="index", index=True, indent=4)
+    df.to_json(os.path.join(OUT_DIR, "true_data.json"), orient="index", index=True, indent=4)
     print("Done.")
 
     return filtered_str

@@ -57,6 +57,7 @@ TEXTEMBED1 = "text_embedding_1"
 TEXTEMBED2 = "text_embedding_2"
 COSINE_DISTANCE = "cosine_distance"
 ORIGIN = "origin"
+SUPPLEMENT_PAIR = "supplement_pair"
 
 PARAPHRASE_TYPE = "paraphrase_type"
 TYPE_ID = "type_id"

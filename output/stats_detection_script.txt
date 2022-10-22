@@ -1,8 +1,0 @@
-STATISTICS OF DETECTION SCRIPT
-
-Dataset: APH_embedded.json
-Balanced dataset with the following paraphrased-statistics: 
-True     1743
-False    1743
-Name: is_paraphrase, dtype: int64
-
