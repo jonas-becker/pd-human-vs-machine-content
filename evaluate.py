@@ -10,8 +10,19 @@ import sys
 from setup import *
 from sklearn.metrics import f1_score, precision_recall_curve, confusion_matrix
 import matplotlib.pyplot as plt
+from sklearn.metrics import PrecisionRecallDisplay
 import seaborn as sns
 from sklearn.metrics import classification_report
+
+def plot_pr_curve(title, y_pred, y_test):
+    display = PrecisionRecallDisplay.from_predictions(y_test, y_pred, name="LinearSVC")
+    _ = display.ax_.set_title(title)
+    _ = display.ax_.plot()
+    _ = display.ax_.set_xlabel('Recall')
+    _ = display.ax_.set_ylabel('Precision')
+    plt.xlim(0, 1)
+    plt.ylim(0, 1)
+    plt.savefig(os.path.join(OUT_DIR, EVALUATION_FOLDER, title+".pdf"), bbox_inches='tight')
 
 def eval(df, dataset, method, eval_df, eval_string):
     actual = pd.Series(df[PARAPHRASE], name='Actual')
@@ -89,10 +100,11 @@ for dataset in DATASETS:
     print("Data size of the " + str(dataset) + " test split: " + str(len(df)))
 
     #evaluate classification
-    eval_df, eval_string = eval(df, dataset, SEM_BERT, eval_df, eval_string)
+    #val_df, eval_string = eval(df, dataset, SEM_BERT, eval_df, eval_string)
 
     print("Calculating precision-recall curves...")
-    precision_sem_bert, recall_sem_bert, thresholds_sem_bert = precision_recall_curve(df[PARAPHRASE], df[SEM_BERT])
+    plot_pr_curve("BERT_"+dataset+"_pr", df[SEM_BERT].tolist(), df[PARAPHRASE].tolist())
+    #precision_sem_bert, recall_sem_bert, thresholds_sem_bert = precision_recall_curve(df[PARAPHRASE], df[SEM_BERT])
     #precision_sem_t5, recall_sem_t5, thresholds_sem_t5 = precision_recall_curve(df["is_paraphrase"], df[SEM_T5])
     #precision_fuzzy, recall_fuzzy, thresholds_fuzzy = precision_recall_curve(df["is_paraphrase"], df[FUZZY])
     #precision_tfidf, recall_tfidf, thresholds_tfidf = precision_recall_curve(df["is_paraphrase"], df[TFIDF_COSINE])
@@ -102,8 +114,8 @@ for dataset in DATASETS:
     #    precision_gpt3, recall_gpt3, thresholds_gpt3 = precision_recall_curve(df_gpt3["is_paraphrase"], df_gpt3[SEM_GPT3])
 
     print("Plotting curves...")
-    fig, ax = plt.subplots()
-    ax.plot(recall_sem_bert, precision_sem_bert, color=c_pal[0], label='BERT')
+    #fig, ax = plt.subplots()
+    #ax.plot(recall_sem_bert, precision_sem_bert, color=c_pal[0], label='BERT')
     #ax.plot(recall_sem_t5, precision_sem_t5, color=c_pal[1], label='T5')
     #ax.plot(recall_fuzzy, precision_fuzzy, color=c_pal[2], label='Fuzzy')
     #ax.plot(recall_tfidf, precision_tfidf, color=c_pal[3], label='TF-IDF')
@@ -111,11 +123,11 @@ for dataset in DATASETS:
     #if df_gpt3.shape[0] != 0:
     #    ax.plot(recall_gpt3, precision_gpt3, color=c_pal[5], label='GPT-3')
 
-    ax.set_xlabel('Recall')
-    ax.set_ylabel('Precision')
-    plt.xlim(0, 1)
-    plt.ylim(0, 1)
-    plt.savefig(os.path.join(OUT_DIR, EVALUATION_FOLDER, dataset+"_pr.pdf"), bbox_inches='tight')
+    #ax.set_xlabel('Recall')
+    #ax.set_ylabel('Precision')
+    #plt.xlim(0, 1)
+    #plt.ylim(0, 1)
+    #plt.savefig(os.path.join(OUT_DIR, EVALUATION_FOLDER, dataset+"_pr.pdf"), bbox_inches='tight')
 
 #if df_gpt3.shape[0] != 0:
 #    legend = plt.legend(loc = 3, framealpha=1, ncol=len(ax.lines))
