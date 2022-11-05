@@ -22,3 +22,5 @@ output/examples.zip
 output/stats_detection_script.txt
 output/small_data.json
 output/backup_data.json
+*.h5
+error.log

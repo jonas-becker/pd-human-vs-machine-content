@@ -10,16 +10,28 @@ import sys
 from setup import *
 from sklearn.metrics import f1_score, precision_recall_curve, confusion_matrix
 import matplotlib.pyplot as plt
-from sklearn.metrics import PrecisionRecallDisplay
+from sklearn.metrics import PrecisionRecallDisplay, RocCurveDisplay
 import seaborn as sns
 from sklearn.metrics import classification_report
 
 def plot_pr_curve(title, y_pred, y_test):
-    display = PrecisionRecallDisplay.from_predictions(y_test, y_pred, name="LinearSVC")
+    print(y_test)
+    print(y_pred)
+    display = PrecisionRecallDisplay.from_predictions(y_test, y_pred, name="LinearSVC", pos_label=True)
     _ = display.ax_.set_title(title)
     _ = display.ax_.plot()
     _ = display.ax_.set_xlabel('Recall')
     _ = display.ax_.set_ylabel('Precision')
+    plt.xlim(0, 1)
+    plt.ylim(0, 1)
+    plt.savefig(os.path.join(OUT_DIR, EVALUATION_FOLDER, title+".pdf"), bbox_inches='tight')
+
+def plot_roc_curve(title, y_pred, y_test):
+    display = RocCurveDisplay.from_predictions(y_test, y_pred, name="LinearSVC")
+    _ = display.ax_.set_title(title)
+    _ = display.ax_.plot()
+    _ = display.ax_.set_xlabel('FP Rate')
+    _ = display.ax_.set_ylabel('TP Rate')
     plt.xlim(0, 1)
     plt.ylim(0, 1)
     plt.savefig(os.path.join(OUT_DIR, EVALUATION_FOLDER, title+".pdf"), bbox_inches='tight')
@@ -96,6 +108,8 @@ df_test = pd.read_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_r
 
 for dataset in DATASETS:
     df = df_test[df_test[DATASET] == dataset]
+    if df.shape[0] == 0:
+        continue
     print(f"---> Evaluating {dataset}...")
     print("Data size of the " + str(dataset) + " test split: " + str(len(df)))
 
@@ -104,6 +118,7 @@ for dataset in DATASETS:
 
     print("Calculating precision-recall curves...")
     plot_pr_curve("BERT_"+dataset+"_pr", df[SEM_BERT].tolist(), df[PARAPHRASE].tolist())
+    plot_roc_curve("BERT_"+dataset+"_roc", df[SEM_BERT].tolist(), df[PARAPHRASE].tolist())
     #precision_sem_bert, recall_sem_bert, thresholds_sem_bert = precision_recall_curve(df[PARAPHRASE], df[SEM_BERT])
     #precision_sem_t5, recall_sem_t5, thresholds_sem_t5 = precision_recall_curve(df["is_paraphrase"], df[SEM_T5])
     #precision_fuzzy, recall_fuzzy, thresholds_fuzzy = precision_recall_curve(df["is_paraphrase"], df[FUZZY])
