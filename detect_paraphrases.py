@@ -223,14 +223,11 @@ def semantic_sim_bert_new(pair_ids_train, pair_ids_test, text1_train, text1_test
     logf = open("error.log", "w")
 
     print("Transfer training the BERT model...")
-    try:
-        train_history = model.fit(
-            train_input, y_train,
-            epochs=1,
-            batch_size=16
-        )
-    except Exception as e:  # most generic exception you can catch
-        logf.write(str(e))
+    train_history = model.fit(
+        train_input, y_train,
+        epochs=1,
+        batch_size=16
+    )
 
     print("Saving model...")
     model.save('models/bert.h5')
@@ -240,7 +237,7 @@ def semantic_sim_bert_new(pair_ids_train, pair_ids_test, text1_train, text1_test
     print("Initializing SVM Model...")
     cls_layer_model = Model(model.input, outputs=model.get_layer('tf.__operators__.getitem').output)
 
-    print("Get BERT predictions...")
+    print("Get BERT embeddings...")
     print(train_input.keys())
     X_train = cls_layer_model.predict({"input_word_ids": np.array(train_input["input_ids"]), "input_mask": np.array(train_input["attention_mask"]), "segment_ids": np.array(train_input["token_type_ids"])})
     X_test = cls_layer_model.predict({"input_word_ids": np.array(test_input["input_ids"]), "input_mask": np.array(test_input["attention_mask"]), "segment_ids": np.array(test_input["token_type_ids"])})
@@ -249,13 +246,20 @@ def semantic_sim_bert_new(pair_ids_train, pair_ids_test, text1_train, text1_test
 
     print("Training the SVM...")
     model_svm = SVC(C=15, kernel='rbf', gamma=0.001, probability=True)
-    model_svm.fit(X_train, y_train)
+    #model_svm.fit(X_train, y_train)
+
+    gs_params = {
+        'C': range(5, 20),
+        'kernel': ('rbf')
+    }
+    gs = GridSearchCV(model_svm, gs_params, cv=5, verbose=10)
+    gs.fit(X_train, y_train)
+
+    GridSearch_table_plot(gs, "C", negative=False)
 
     print("Predicting test split...")
-    prediction_result = model_svm.predict_proba(X_test)
-    print(prediction_result)
-    print(len(prediction_result))
-    print(prediction_result.shape)
+    prediction_result = gs.predict_proba(X_test)
+
     return [p[1] for p in prediction_result]    # only get probability for one of two classes (true/false)
 
 
@@ -487,8 +491,8 @@ print(None in df[TEXT1].tolist())
 
 pred_result_df = pd.DataFrame()
 
-df = df.reset_index(drop=True)
-df = df.truncate(before=0, after=10000)     # for testing
+# df = df.reset_index(drop=True)
+# df = df.truncate(before=0, after=10000)     # for testing
 # df = df[(df[DATASET] == "MPC") | (df[DATASET] == "ETPC")]   # for testing
 
 # get_splits(df)
@@ -545,16 +549,15 @@ for dataset in datasets_in_df:
     print(sum(map(lambda x: x == True, test_data[3])))
     print(sum(map(lambda x: x == False, test_data[3])))
 
-    # add only to df if pair is not included already, this does not include results yet
     print(type(X_pairID_test))
     print(X_pairID_test.shape)
     print(X_pairID_test)
     print(X_text1_train)
-    pred_result_df = pd.concat([pred_result_df, df_dataset[df_dataset[PAIR_ID].isin(X_pairID_test)]], ignore_index=True)
 
-    if None in train_data[2]:
-        print("NOIKFIOSJFIUJHSAIUJDHAIUHDIUOSA")
-        break
+    # add to pred result df in the correct order
+    print("Appending to result dataframe...")
+    for pair_id in tqdm(X_pairID_test):
+        pred_result_df = pd.concat([pred_result_df, df_dataset[df_dataset[PAIR_ID] == pair_id]], ignore_index=True)
 
 # use classifiers
 print(f"Finished assembling data. Continue with classification of {str(pred_result_df.shape[0])} examples (train- & test-split)...")
