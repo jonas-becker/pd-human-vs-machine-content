@@ -117,8 +117,13 @@ for dataset in DATASETS:
     #val_df, eval_string = eval(df, dataset, SEM_BERT, eval_df, eval_string)
 
     print("Calculating precision-recall curves...")
-    plot_pr_curve("BERT_"+dataset+"_pr", df[SEM_BERT].tolist(), df[PARAPHRASE].tolist())
-    plot_roc_curve("BERT_"+dataset+"_roc", df[SEM_BERT].tolist(), df[PARAPHRASE].tolist())
+    #plot_pr_curve("BERT_"+dataset+"_pr", df[SEM_BERT].tolist(), df[PARAPHRASE].tolist())
+    #plot_roc_curve("BERT_"+dataset+"_roc", df[SEM_BERT].tolist(), df[PARAPHRASE].tolist())
+    plot_pr_curve("T5_" + dataset + "_pr", df[SEM_T5].tolist(), df[PARAPHRASE].tolist())
+    plot_roc_curve("T5_"+dataset+"_roc", df[SEM_T5].tolist(), df[PARAPHRASE].tolist())
+    plot_pr_curve("NGram_" + dataset + "_pr", df[NGRAM3].tolist(), df[PARAPHRASE].tolist())
+    plot_roc_curve("NGram_" + dataset + "_roc", df[NGRAM3].tolist(), df[PARAPHRASE].tolist())
+
     #precision_sem_bert, recall_sem_bert, thresholds_sem_bert = precision_recall_curve(df[PARAPHRASE], df[SEM_BERT])
     #precision_sem_t5, recall_sem_t5, thresholds_sem_t5 = precision_recall_curve(df["is_paraphrase"], df[SEM_T5])
     #precision_fuzzy, recall_fuzzy, thresholds_fuzzy = precision_recall_curve(df["is_paraphrase"], df[FUZZY])

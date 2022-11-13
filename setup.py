@@ -36,7 +36,7 @@ NGRAM_BIN = "ngram_binary"
 TFIDF_COSINE_BIN = "tfidf_cosine_binary"
 
 FIGURE_SIZE = 2000  
-MAX_DATASET_INPUT = 100000
+MAX_DATASET_INPUT = 10000
 EXAMPLE_AMOUNT = 500    # how many examples to extract (top sim, low sim & random sim)
 STUDY_EXAMPLE_AMOUNT = 10
 PARAGRAM_PHRASE_SCORE = [0.4, 0.9]  # the span in which dataset entries will be taken into parsing (throw out other entries), only for ParaNMT
@@ -66,6 +66,7 @@ TEXT2_SCOPE = "text2_scope"
 SENSE_PRESERVING = "sense_preserving"
 
 TRAIN_LABELS = [True, False]
+TRAIN_SPLIT_MAX = 4000
 DEFAULT_THRESHOLDS = [0.5, 0.7, 0.9]
 
 # Variables for Embeddings
