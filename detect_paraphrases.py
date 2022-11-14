@@ -89,22 +89,6 @@ def build_bert_model(layer, max_len=512):
     return model
 
 
-def build_t5_model(layer, max_len=512):
-    input_word_ids = Input(shape=(max_len,), dtype=tf.int32, name="input_ids")
-    input_mask = Input(shape=(max_len,), dtype=tf.int32, name="attention_mask")
-    segment_ids = Input(shape=(max_len,), dtype=tf.int32, name="segment_ids")
-
-    print(layer)
-    sequence_output = layer({"input_ids": input_word_ids, "attention_mask": input_mask})["sequence_output"]
-    print(sequence_output)
-    clf_output = sequence_output[:, 0, :]
-    out = Dense(1, activation='sigmoid')(clf_output)
-
-    model = Model(inputs=[input_word_ids, input_mask], outputs=out)
-    model.compile(Adam(lr=1e-5), loss='binary_crossentropy', metrics=['accuracy'])
-
-    return model
-
 def GridSearch_table_plot(grid_clf, param_name, method_name,
                           num_results=15,
                           negative=True,
@@ -205,22 +189,9 @@ def sigmoid(x):
     return 1 / (1 + math.exp(-x))
 
 
-def preprocess_function_text1(df):
-    return bert_tokenizer(df[TEXT1], truncation=True)
-
-
-def preprocess_function_text2(df):
-    return bert_tokenizer(df[TEXT2], truncation=True)
-
-
-def append_result(df, test_result_df, test_pair_ids, test_pred_result):
-    test_result_df = pd.concat(test_result_df)
-
-    return test_result_df
-
-
 def semantic_sim_bert_new(text1_train, text1_test, text2_train, text2_test, y_train, y_test, gs_params, verb, cv, n_jobs):
     print("Semantic Similarity (BERT) \n------------")
+    '''
     print("Loading module from tensorflow...")
     module_url = "https://tfhub.dev/tensorflow/bert_en_uncased_L-24_H-1024_A-16/4"
     print("Creating layer...")
@@ -248,7 +219,40 @@ def semantic_sim_bert_new(text1_train, text1_test, text2_train, text2_test, y_tr
     #)
     #print("Saving model...")
     #model.save('models/bert.h5')
+    '''
 
+    print("Loading model...")
+    model = SentenceTransformer('bert-base-uncased')
+
+    # text_test = []
+    # for i, t1 in enumerate(text1_test):
+    #    text_test.append(t1 + " " + text2_test[i])
+    # text_train = []
+    # for i, t1 in enumerate(text1_train):
+    #    text_train.append(t1 + " " + text2_train[i])
+
+    print("Creating embeddings (test split).")
+    X1_test = model.encode(text1_test)
+    X2_test = model.encode(text2_test)
+    X_test = np.column_stack((X1_test, X2_test))
+    print("Creating embeddings (train split).")
+    X1_train = model.encode(text1_train)
+    X2_train = model.encode(text2_train)
+    X_train = np.column_stack((X1_train, X2_train))
+
+    print("Training the SVM...")
+    model_svm = SVC(C=15, kernel='rbf', gamma=0.001, probability=True)
+    # Grid Search
+    gs = GridSearchCV(model_svm, gs_params, cv=cv, verbose=verb, n_jobs=n_jobs)
+    gs.fit(X_train, y_train)
+    GridSearch_table_plot(gs, "C", "T5", negative=False)
+
+    print("Predicting test split...")
+    prediction_result = gs.predict_proba(X_test)
+
+    return [p[1] for p in prediction_result]  # only get probability for one of two classes (true/false)
+
+    '''
     # get output of slice layer from model above
     print("Initializing SVM Model...")
     cls_layer_model = Model(model.input, outputs=model.get_layer('tf.__operators__.getitem').output)
@@ -271,10 +275,12 @@ def semantic_sim_bert_new(text1_train, text1_test, text2_train, text2_test, y_tr
     prediction_result = gs.predict_proba(X_test)
 
     return [p[1] for p in prediction_result]    # only get probability for one of two classes (true/false)
+    '''
 
 
 def semantic_sim_bert(pair_ids_train, pair_ids_test, text1_train, text1_test, text2_train, text2_test, y_train, y_test):
     print("Calculating semantic similarity with BERT.")
+
     print("Train examples: " + str(len(pair_ids_train)))
     print("Test examples: " + str(len(pair_ids_test)))
     model = SentenceTransformer('all-distilroberta-v1')
@@ -329,17 +335,21 @@ def semantic_sim_t5_new(text1_train, text1_test, text2_train, text2_test, y_trai
     print("Loading model...")
     model = SentenceTransformer('sentence-t5-base')
 
-    text_test = []
-    for i, t1 in enumerate(text1_test):
-        text_test.append(t1 + " " + text2_test[i])
-    text_train = []
-    for i, t1 in enumerate(text1_train):
-        text_train.append(t1 + " " + text2_train[i])
+    #text_test = []
+    #for i, t1 in enumerate(text1_test):
+    #    text_test.append(t1 + " " + text2_test[i])
+    #text_train = []
+    #for i, t1 in enumerate(text1_train):
+    #    text_train.append(t1 + " " + text2_train[i])
 
-    print("Creating embeddings (train split).")
-    X_train = model.encode(text_train)
     print("Creating embeddings (test split).")
-    X_test = model.encode(text_test)
+    X1_test = model.encode(text1_test)
+    X2_test = model.encode(text2_test)
+    X_test = np.column_stack((X1_test, X2_test))
+    print("Creating embeddings (train split).")
+    X1_train = model.encode(text1_train)
+    X2_train = model.encode(text2_train)
+    X_train = np.column_stack((X1_train, X2_train))
 
     print("Training the SVM...")
     model_svm = SVC(C=15, kernel='rbf', gamma=0.001, probability=True)
@@ -412,7 +422,7 @@ def semantic_sim_gpt3(df):
     return semantic_results
 
 
-def ngram_sim_new(n, text1_train, text1_test, text2_train, text2_test, y_train, y_test, gs_params, verb, cv, n_jobs):
+def ngram_sim(n, text1_train, text1_test, text2_train, text2_test, y_train, y_test, gs_params, verb, cv, n_jobs):
     # done after http://webdocs.cs.ualberta.ca/~kondrak/papers/spire05.pdf
     print(f"Calculating similarity with {n}-Grams.")
 
@@ -446,32 +456,75 @@ def ngram_sim_new(n, text1_train, text1_test, text2_train, text2_test, y_train, 
 
     return [p[1] for p in prediction_result]
 
-def ngram_sim(df, n):
-    # done after http://webdocs.cs.ualberta.ca/~kondrak/papers/spire05.pdf
-    print(f"Calculating similarity with {n}-Grams.")
-    corpus1 = list(df[TEXT1])
-    corpus2 = list(df[TEXT2])
+
+def fuzzy_sim(text1_train, text1_test, text2_train, text2_test, y_train, y_test, gs_params, verb, cv, n_jobs):
+    print(f"Calculating similarity with Fuzzy.")
 
     print("Processing texts...")
-    results = []
-    ngram = NGram(n)
-    for i, row in tqdm(df.iterrows(), total=df.shape[0]):
-        sim = ngram.distance(corpus1[i], corpus2[i])  # calculate sim between text1 and text2 pairwise
-        results.append(sim)
-    return results
+    sims_train = []
+    sims_test = []
+    for i, row in tqdm(enumerate(text1_train), total=len(text1_train)):
+        sim = float(fuzz.ratio(text1_train[i], text2_train[i]) / 100)  # calculate sim between text1 and text2 pairwise
+        sims_train.append(sim)
+    for i, row in tqdm(enumerate(text1_test), total=len(text1_test)):
+        sim = float(fuzz.ratio(text1_test[i], text2_test[i]) / 100)  # calculate sim between text1 and text2 pairwise
+        sims_test.append(sim)
+    sims_train = np.array(sims_train).reshape(-1, 1)
+    sims_test = np.array(sims_test).reshape(-1, 1)
+
+    # Grid Search
+    model_svm = SVC(C=15, kernel='rbf', gamma=0.001, probability=True)
+    gs = GridSearchCV(model_svm, gs_params, cv=cv, verbose=verb, n_jobs=n_jobs)
+
+    # train the model
+    print("Training the SVM...")
+    gs.fit(sims_train, y_train)
+    print("Output grid search stats...")
+    GridSearch_table_plot(gs, "C", "NGram", negative=False)
+
+    # use the model to predict the testing instances
+    print("Testing the SVM...")
+    prediction_result = gs.predict_proba(sims_test)
+
+    return [p[1] for p in prediction_result]
 
 
-def fuzzy_sim(df):
-    # Check for paraphrase with fuzzy based
-    fuzzy_results = []
-    print("Checking for paraphrases with the fuzzy-based method.")
-    for i, row in tqdm(df.iterrows(), total=df.shape[0]):
-        fuzzy_results.append(float(fuzz.ratio(row[TEXT1], row[TEXT2]) / 100))
-    return fuzzy_results
-
-
-def tfidf_cosine_sim(df):
+def tfidf_cosine_sim(text1_train, text1_test, text2_train, text2_test, y_train, y_test, gs_params, verb, cv, n_jobs):
     print("Calculating TF-IDF cosine similarities.")
+
+    print("Processing texts...")
+
+    vectorizer = TfidfVectorizer()
+    tf_idf_matrix_train = vectorizer.fit_transform(text1_train + text2_train)  # combine text1 and text2 to one corpus
+    tf_idf_matrix_test = vectorizer.fit_transform(text1_test + text2_test)  # combine text1 and text2 to one corpus
+
+    sims_train = []
+    sims_test = []
+    for i, row in tqdm(enumerate(text1_train), total=len(text1_train)):
+        sim = cosine_similarity(tf_idf_matrix_train[i], tf_idf_matrix_train[len(text1_train) + i])
+        sims_train.append(sim)
+    for i, row in tqdm(enumerate(text1_test), total=len(text1_test)):
+        sim = cosine_similarity(tf_idf_matrix_test[i], tf_idf_matrix_test[len(text1_test) + i])
+        sims_test.append(sim)
+    sims_train = np.array(sims_train).reshape(-1, 1)
+    sims_test = np.array(sims_test).reshape(-1, 1)
+
+    # Grid Search
+    model_svm = SVC(C=15, kernel='rbf', gamma=0.001, probability=True)
+    gs = GridSearchCV(model_svm, gs_params, cv=cv, verbose=verb, n_jobs=n_jobs)
+
+    # train the model
+    print("Training the SVM...")
+    gs.fit(sims_train, y_train)
+    print("Output grid search stats...")
+    GridSearch_table_plot(gs, "C", "NGram", negative=False)
+
+    # use the model to predict the testing instances
+    print("Testing the SVM...")
+    prediction_result = gs.predict_proba(sims_test)
+
+    return [p[1] for p in prediction_result]
+
     corpus1 = list(df[TEXT1])
     corpus2 = list(df[TEXT2])
 
@@ -513,8 +566,8 @@ print(None in df[TEXT1].tolist())
 
 pred_result_df = pd.DataFrame()
 
-#df = df.reset_index(drop=True)
-#df = df.truncate(before=0, after=10000)     # for testing
+df = df.reset_index(drop=True)
+df = df.truncate(before=0, after=10000)     # for testing
 # df = df[(df[DATASET] == "MPC") | (df[DATASET] == "ETPC")]   # for testing
 
 # get_splits(df)
@@ -598,10 +651,9 @@ gs_params = {
         'kernel': ('sigmoid', 'rbf')
 }
 
-
 verb, cv, n_jobs = 50, 3, 6
 
-pred_result_df[NGRAM3] = ngram_sim_new(3,train_data[1], test_data[1],
+pred_result_df[SEM_BERT] = semantic_sim_bert_new(train_data[1], test_data[1],
                                              train_data[2], test_data[2], train_data[3], test_data[3],
                                              gs_params, verb, cv, n_jobs)
 pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
@@ -611,20 +663,25 @@ pred_result_df[SEM_T5] = semantic_sim_t5_new(train_data[1], test_data[1],
                                              gs_params, verb, cv, n_jobs)
 pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
                        index=True, indent=4)
-pred_result_df[SEM_BERT] = semantic_sim_bert_new(train_data[1], test_data[1],
+pred_result_df[TFIDF_COSINE] = tfidf_cosine_sim(train_data[1], test_data[1],
+                                             train_data[2], test_data[2], train_data[3], test_data[3],
+                                             gs_params, verb, cv, n_jobs)
+pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
+                       index=True, indent=4)
+pred_result_df[FUZZY] = fuzzy_sim(train_data[1], test_data[1],
+                                             train_data[2], test_data[2], train_data[3], test_data[3],
+                                             gs_params, verb, cv, n_jobs)
+pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
+                       index=True, indent=4)
+pred_result_df[NGRAM3] = ngram_sim(3,train_data[1], test_data[1],
                                              train_data[2], test_data[2], train_data[3], test_data[3],
                                              gs_params, verb, cv, n_jobs)
 pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
                        index=True, indent=4)
 
-# df[TFIDF_COSINE] = tfidf_cosine_sim(df)
-# df[NGRAM3] = ngram_sim(df, 3)
-# df[FUZZY] = fuzzy_sim(df)
-# df[SEM_GPT3] = semantic_sim_gpt3(df)
-# df[SEM_T5] = semantic_sim_t5(df)
+
 
 # Output data to json format
-# df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_result.json"), orient = "index", index = True, indent = 4)
 print(len(pred_result_df))
 pred_result_df = pred_result_df.reset_index(drop=True)
 print(len(pred_result_df))

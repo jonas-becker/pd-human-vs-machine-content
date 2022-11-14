@@ -6,15 +6,15 @@ filtered pairs: 0
 
 SAv2: 167689
 after filtering: 10000
-filtered pairs: 4124
+filtered pairs: 4276
 
 TURL: 56787
 after filtering: 9998
-filtered pairs: 2019
+filtered pairs: 2106
 
 MPC: 163715
 after filtering: 10000
-filtered pairs: 33
+filtered pairs: 41
 
 QQP: 404351
 after filtering: 9998
@@ -22,7 +22,7 @@ filtered pairs: 0
 
 ParaNMT: 51409584
 after filtering: 10000
-filtered pairs: 148
+filtered pairs: 150
 
 APH: 5007
 after filtering: 3486
@@ -38,11 +38,11 @@ filtered pairs: 0
 
 PAWSWiki: 65401
 after filtering: 10000
-filtered pairs: 0
+filtered pairs: 10
 
 ParaSCI (ACL split): 5001
 after filtering: 5001
-filtered pairs: 4
+filtered pairs: 5
 
 ParaSCI (arXiv split): 316063
 after filtering: 4999
@@ -50,5 +50,13 @@ filtered pairs: 4
 
 MSCOCO (unique image ids): 118287
 after filtering: 10000
-filtered pairs: 3
+filtered pairs: 0
+
+SaR (contract split): 659
+after filtering: 659
+filtered pairs: 0
+
+SaR (wiki split): 1379
+after filtering: 1379
+filtered pairs: 0
 

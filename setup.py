@@ -4,9 +4,9 @@ import xml.etree.ElementTree as ET
 DATASETS_FOLDER = "datasets"    #the folder that contains the dataset directories to read in
 FORMATTED_DATA_FILENAME = "true_data.json"  #the name of the file that contains the data to read in
 EVALUATION_RESULTS_FILENAME = "evaluation.json"
-DATASETS = ["ETPC", "SAv2", "TURL", "MPC", "QQP", "ParaNMT", "APH", "APT", "PAWSWiki", "ParaSCI", "MSCOCO"]     #the folders in the DATASETS_FOLDER should be named like the datasets here
+DATASETS = ["ETPC", "SAv2", "TURL", "MPC", "QQP", "ParaNMT", "APH", "APT", "PAWSWiki", "ParaSCI", "MSCOCO", "SaR"]     #the folders in the DATASETS_FOLDER should be named like the datasets here
 MACHINE_PARAPHRASED_DATASETS = ["SAv2", "MPC", "ParaNMT", "APT", "PAWSWiki"]
-HUMAN_PARAPHRASED_DATASETS = ["ETPC", "TURL", "QQP", "APH", "ParaSCI", "MSCOCO"]
+HUMAN_PARAPHRASED_DATASETS = ["ETPC", "TURL", "QQP", "APH", "ParaSCI", "MSCOCO", "SaR"]
 FILLER_DATASETS = ["ETPC", "TURL"]      # datasets that provide original samples to add to other datasets for balancing (make sure these contain mixed types of paraphrases)
 OUT_DIR = "output"      #the directory to output the formatted json in
 FIGURES_FOLDER = "figures"
