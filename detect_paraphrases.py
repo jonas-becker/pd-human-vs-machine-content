@@ -13,80 +13,33 @@ from sklearn.metrics import roc_auc_score
 import io
 import matplotlib.pyplot as plt
 import pprint
-from sklearn.utils import shuffle
+from transformers import BertModel, T5Model
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn import svm
 from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.metrics import PrecisionRecallDisplay
 from IPython.display import display
-import gensim.downloader as api
 from sentence_transformers import SentenceTransformer
 import zipfile
 import tensorflow as tf
 from keras.layers import Dense, Input
 from keras.optimizers import Adam
 from keras.models import Model
-from keras.callbacks import ModelCheckpoint
-import tensorflow_hub as hub
-import tokenization
-from sklearn.model_selection import train_test_split
 from sklearn.model_selection import GridSearchCV
 from transformers import AutoTokenizer
 from sklearn.model_selection import train_test_split
-from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.utils.class_weight import compute_class_weight
 from sklearn.metrics import classification_report
-from sklearn.linear_model import LogisticRegression
 import torch
 import math
 from tensorflow.python.ops.numpy_ops import np_config
+import gc
+gc.collect()
 
 np_config.enable_numpy_behavior()
 
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
 print("Using device " + str(device))
-
-bert_tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
-
-
-def bert_encode(texts, tokenizer, max_len=512):
-    all_tokens = []
-    all_masks = []
-    all_segments = []
-
-    for text in texts:
-        text = tokenizer.tokenize(text)
-
-        text = text[:max_len - 2]
-        input_sequence = ["[CLS]"] + text + ["[SEP]"]
-        pad_len = max_len - len(input_sequence)
-
-        tokens = tokenizer.convert_tokens_to_ids(input_sequence)
-        tokens += [0] * pad_len
-        pad_masks = [1] * len(input_sequence) + [0] * pad_len
-        segment_ids = [0] * max_len
-
-        all_tokens.append(tokens)
-        all_masks.append(pad_masks)
-        all_segments.append(segment_ids)
-
-    return np.array(all_tokens), np.array(all_masks), np.array(all_segments)
-
-
-def build_bert_model(layer, max_len=512):
-    input_word_ids = Input(shape=(max_len,), dtype=tf.int32, name="input_word_ids")
-    input_mask = Input(shape=(max_len,), dtype=tf.int32, name="input_mask")
-    segment_ids = Input(shape=(max_len,), dtype=tf.int32, name="segment_ids")
-
-    sequence_output = layer({"input_word_ids": input_word_ids, "input_mask": input_mask, "input_type_ids": segment_ids})["sequence_output"]
-    print(sequence_output)
-    clf_output = sequence_output[:, 0, :]
-    out = Dense(1, activation='sigmoid')(clf_output)
-
-    model = Model(inputs=[input_word_ids, input_mask, segment_ids], outputs=out)
-    model.compile(Adam(lr=1e-5), loss='binary_crossentropy', metrics=['accuracy'])
-
-    return model
+torch.cuda.empty_cache()
 
 
 def GridSearch_table_plot(grid_clf, param_name, method_name,
@@ -191,53 +144,45 @@ def sigmoid(x):
 
 def semantic_sim_bert_new(text1_train, text1_test, text2_train, text2_test, y_train, y_test, gs_params, verb, cv, n_jobs):
     print("Semantic Similarity (BERT) \n------------")
-    '''
-    print("Loading module from tensorflow...")
-    module_url = "https://tfhub.dev/tensorflow/bert_en_uncased_L-24_H-1024_A-16/4"
-    print("Creating layer...")
-    bert_layer = hub.KerasLayer(module_url, trainable=True)
-
-    print("Initialize layer settings...")
-    vocab_file = bert_layer.resolved_object.vocab_file.asset_path.numpy()
-    do_lower_case = bert_layer.resolved_object.do_lower_case.numpy()
-    tokenizer = bert_tokenizer
-
-    print("Create BERT embeddings (train)...")
-    train_input = tokenizer(text1_train, text2_train, padding="max_length", truncation=True).data
-    print("Create BERT embeddings (test)...")
-    test_input = tokenizer(text1_test, text2_test, padding="max_length", truncation=True).data
-
-    print("Building BERT model...")
-    model = build_bert_model(bert_layer, max_len=512)
-    model.summary()
-
-    #print("Transfer training the BERT model...")
-    #train_history = model.fit(
-    #    train_input, y_train,
-    #    epochs=1,
-    #    batch_size=16
-    #)
-    #print("Saving model...")
-    #model.save('models/bert.h5')
-    '''
-
     print("Loading model...")
-    model = SentenceTransformer('bert-base-uncased')
-
-    # text_test = []
-    # for i, t1 in enumerate(text1_test):
-    #    text_test.append(t1 + " " + text2_test[i])
-    # text_train = []
-    # for i, t1 in enumerate(text1_train):
-    #    text_train.append(t1 + " " + text2_train[i])
+    model = BertModel.from_pretrained("bert-large-uncased").to(device)
+    tokenizer = AutoTokenizer.from_pretrained('bert-large-uncased')
 
     print("Creating embeddings (test split).")
-    X1_test = model.encode(text1_test)
-    X2_test = model.encode(text2_test)
+
+    '''
+    # Code using large amounts of GPU memory:
+    texts_test = [list(tuple) for tuple in zip(text1_test, text2_test)]
+    t_encoded = tokenizer(texts_test, padding=True, truncation=True, return_tensors="pt").to(device)
+    print(t_encoded)
+    X_test = model(**t_encoded)
+    print(X_test)
+    '''
+
+    print("Create embeddings (test split)...")
+    X1_test = []
+    for t in tqdm(text1_test):
+        t_encoded = tokenizer(t, padding=True, truncation=True, return_tensors="pt").to(device)
+        embedding = model(**t_encoded)["pooler_output"].detach().cpu()
+        X1_test.append(embedding[0].tolist())
+    X2_test = []
+    for t in tqdm(text2_test):
+        t_encoded = tokenizer(t, padding=True, truncation=True, return_tensors="pt").to(device)
+        embedding = model(**t_encoded)["pooler_output"].detach().cpu()
+        X2_test.append(embedding[0].tolist())
     X_test = np.column_stack((X1_test, X2_test))
-    print("Creating embeddings (train split).")
-    X1_train = model.encode(text1_train)
-    X2_train = model.encode(text2_train)
+
+    print("Create embeddings (train split)...")
+    X1_train = []
+    for t in tqdm(text1_train):
+        t_encoded = tokenizer(t, padding=True, truncation=True, return_tensors="pt").to(device)
+        embedding = model(**t_encoded)["pooler_output"].detach().cpu()
+        X1_train.append(embedding[0].tolist())
+    X2_train = []
+    for t in tqdm(text2_train):
+        t_encoded = tokenizer(t, padding=True, truncation=True, return_tensors="pt").to(device)
+        embedding = model(**t_encoded)["pooler_output"].detach().cpu()
+        X2_train.append(embedding[0].tolist())
     X_train = np.column_stack((X1_train, X2_train))
 
     print("Training the SVM...")
@@ -333,22 +278,34 @@ def semantic_sim_bert(pair_ids_train, pair_ids_test, text1_train, text1_test, te
 def semantic_sim_t5_new(text1_train, text1_test, text2_train, text2_test, y_train, y_test, gs_params, verb, cv, n_jobs):
     print("Semantic Similarity (T5) \n------------")
     print("Loading model...")
-    model = SentenceTransformer('sentence-t5-base')
 
-    #text_test = []
-    #for i, t1 in enumerate(text1_test):
-    #    text_test.append(t1 + " " + text2_test[i])
-    #text_train = []
-    #for i, t1 in enumerate(text1_train):
-    #    text_train.append(t1 + " " + text2_train[i])
+    model = T5Model.from_pretrained("t5-large").to(device)
+    tokenizer = AutoTokenizer.from_pretrained('t5-large')
 
-    print("Creating embeddings (test split).")
-    X1_test = model.encode(text1_test)
-    X2_test = model.encode(text2_test)
+    print("Create embeddings (test split)...")
+    X1_test = []
+    for t in tqdm(text1_test):
+        t_encoded = tokenizer(t, padding=True, truncation=True, return_tensors="pt").to(device)
+        embedding = model.encoder(input_ids=t_encoded["input_ids"], attention_mask=t_encoded["attention_mask"]).last_hidden_state.detach().cpu()
+        X1_test.append(torch.mean(embedding, 0)[0].tolist())    # mean all word embeddings to get 1 sentence embedding
+    X2_test = []
+    for t in tqdm(text2_test):
+        t_encoded = tokenizer(t, padding=True, truncation=True, return_tensors="pt").to(device)
+        embedding = model.encoder(input_ids=t_encoded["input_ids"], attention_mask=t_encoded["attention_mask"]).last_hidden_state.detach().cpu()
+        X2_test.append(torch.mean(embedding, 0)[0].tolist())
     X_test = np.column_stack((X1_test, X2_test))
-    print("Creating embeddings (train split).")
-    X1_train = model.encode(text1_train)
-    X2_train = model.encode(text2_train)
+
+    print("Create embeddings (train split)...")
+    X1_train = []
+    for t in tqdm(text1_train):
+        t_encoded = tokenizer(t, padding=True, truncation=True, return_tensors="pt").to(device)
+        embedding = model.encoder(input_ids=t_encoded["input_ids"], attention_mask=t_encoded["attention_mask"]).last_hidden_state.detach().cpu()
+        X1_train.append(torch.mean(embedding, 0)[0].tolist())
+    X2_train = []
+    for t in tqdm(text2_train):
+        t_encoded = tokenizer(t, padding=True, truncation=True, return_tensors="pt").to(device)
+        embedding = model.encoder(input_ids=t_encoded["input_ids"], attention_mask=t_encoded["attention_mask"]).last_hidden_state.detach().cpu()
+        X2_train.append(torch.mean(embedding, 0)[0].tolist())
     X_train = np.column_stack((X1_train, X2_train))
 
     print("Training the SVM...")
@@ -653,12 +610,12 @@ gs_params = {
 
 verb, cv, n_jobs = 50, 3, 6
 
-pred_result_df[SEM_BERT] = semantic_sim_bert_new(train_data[1], test_data[1],
+pred_result_df[SEM_T5] = semantic_sim_t5_new(train_data[1], test_data[1],
                                              train_data[2], test_data[2], train_data[3], test_data[3],
                                              gs_params, verb, cv, n_jobs)
 pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
                        index=True, indent=4)
-pred_result_df[SEM_T5] = semantic_sim_t5_new(train_data[1], test_data[1],
+pred_result_df[SEM_BERT] = semantic_sim_bert_new(train_data[1], test_data[1],
                                              train_data[2], test_data[2], train_data[3], test_data[3],
                                              gs_params, verb, cv, n_jobs)
 pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
