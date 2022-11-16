@@ -15,6 +15,7 @@ EXAMPLES_FOLDER = "examples"
 DETECTION_FOLDER = "detection"
 EVALUATION_FOLDER = "evaluation"
 CORRELATIONS_FOLDER = "correlations"
+MODELS_FOLDER = "models"
 
 FUZZY = "fuzzy"
 SEM_GLOVE = "semantic_glove"
@@ -24,6 +25,7 @@ SEM_GPT3 = "semantic_gpt3"
 NGRAM3 = "3gram"
 NGRAM4 = "4gram"
 NGRAM5 = "5gram"
+FASTTEXT = "fasttext"
 TFIDF_COSINE = "tfidf_cosine"
 
 DETECTION_METHODS = [FUZZY, NGRAM3, SEM_BERT, SEM_T5, TFIDF_COSINE, SEM_GPT3]

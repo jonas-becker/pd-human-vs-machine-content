@@ -8,9 +8,12 @@ from thefuzz import fuzz
 from setup import *
 from sklearn.model_selection import GridSearchCV
 from strsimpy.ngram import NGram
+from gensim.models import fasttext
 import numpy
 from sklearn.metrics import roc_auc_score
+from torch import nn
 import io
+from gensim.scripts.glove2word2vec import glove2word2vec
 import matplotlib.pyplot as plt
 import pprint
 from transformers import BertModel, T5Model
@@ -20,6 +23,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from IPython.display import display
 from sentence_transformers import SentenceTransformer
 import zipfile
+import fasttext
 import tensorflow as tf
 from keras.layers import Dense, Input
 from keras.optimizers import Adam
@@ -142,7 +146,7 @@ def sigmoid(x):
     return 1 / (1 + math.exp(-x))
 
 
-def semantic_sim_bert_new(text1_train, text1_test, text2_train, text2_test, y_train, y_test, gs_params, verb, cv, n_jobs):
+def semantic_sim_bert(text1_train, text1_test, text2_train, text2_test, y_train, y_test, gs_params, verb, cv, n_jobs):
     print("Semantic Similarity (BERT) \n------------")
     print("Loading model...")
     model = BertModel.from_pretrained("bert-large-uncased").to(device)
@@ -163,26 +167,26 @@ def semantic_sim_bert_new(text1_train, text1_test, text2_train, text2_test, y_tr
     X1_test = []
     for t in tqdm(text1_test):
         t_encoded = tokenizer(t, padding=True, truncation=True, return_tensors="pt").to(device)
-        embedding = model(**t_encoded)["pooler_output"].detach().cpu()
-        X1_test.append(embedding[0].tolist())
+        embedding = model(**t_encoded).last_hidden_state.detach().cpu()
+        X1_test.append(torch.mean(embedding, 0)[0].tolist())
     X2_test = []
     for t in tqdm(text2_test):
         t_encoded = tokenizer(t, padding=True, truncation=True, return_tensors="pt").to(device)
-        embedding = model(**t_encoded)["pooler_output"].detach().cpu()
-        X2_test.append(embedding[0].tolist())
+        embedding = model(**t_encoded).last_hidden_state.detach().cpu()
+        X2_test.append(torch.mean(embedding, 0)[0].tolist())
     X_test = np.column_stack((X1_test, X2_test))
 
     print("Create embeddings (train split)...")
     X1_train = []
     for t in tqdm(text1_train):
         t_encoded = tokenizer(t, padding=True, truncation=True, return_tensors="pt").to(device)
-        embedding = model(**t_encoded)["pooler_output"].detach().cpu()
-        X1_train.append(embedding[0].tolist())
+        embedding = model(**t_encoded).last_hidden_state.detach().cpu()
+        X1_train.append(torch.mean(embedding, 0)[0].tolist())
     X2_train = []
     for t in tqdm(text2_train):
         t_encoded = tokenizer(t, padding=True, truncation=True, return_tensors="pt").to(device)
-        embedding = model(**t_encoded)["pooler_output"].detach().cpu()
-        X2_train.append(embedding[0].tolist())
+        embedding = model(**t_encoded).last_hidden_state.detach().cpu()
+        X2_train.append(torch.mean(embedding, 0)[0].tolist())
     X_train = np.column_stack((X1_train, X2_train))
 
     print("Training the SVM...")
@@ -223,59 +227,7 @@ def semantic_sim_bert_new(text1_train, text1_test, text2_train, text2_test, y_tr
     '''
 
 
-def semantic_sim_bert(pair_ids_train, pair_ids_test, text1_train, text1_test, text2_train, text2_test, y_train, y_test):
-    print("Calculating semantic similarity with BERT.")
-
-    print("Train examples: " + str(len(pair_ids_train)))
-    print("Test examples: " + str(len(pair_ids_test)))
-    model = SentenceTransformer('all-distilroberta-v1')
-    print("Created model.")
-
-    print(sum(map(lambda x: x is True, y_test)))
-    print(sum(map(lambda x: x is False, y_test)))
-
-    print("Creating embeddings (test split).")
-    X1_test = model.encode(text1_test)
-    X2_test = model.encode(text2_test)
-    X_test = np.column_stack((X1_test, X2_test))
-    print("Creating embeddings (train split).")
-    X1_train = model.encode(text1_train)
-    X2_train = model.encode(text2_train)
-    X_train = np.column_stack((X1_train, X2_train))
-
-
-    print("Processing texts...")
-    # take care, maybe train data has to be processed in batches
-    class_weight = compute_class_weight(
-        class_weight='balanced', classes=[False, True], y=y_train
-    )
-    print("Weighting classes: " + str(class_weight))
-
-    # Grid Search
-    clf = svm.SVC(kernel="rbf")
-    gs_params = {
-        'C': range(9, 10)
-    }
-    gs = GridSearchCV(clf, gs_params, cv=2, verbose=10)
-
-    # train the model
-    print("Training the SVM for the test split...")
-    gs.fit(X_train, y_train)
-
-    # use the model to predict the testing instances
-    print("Testing the SVM...")
-    y_pred = gs.predict(X_test)
-
-    # generate the classification report
-    print(classification_report(y_test, y_pred))
-    y_score = gs.decision_function(X_test)
-    prediction_result = [sigmoid(y_item) for y_item in y_score.tolist()]  # normalize with sigmoid
-    GridSearch_table_plot(gs, "C", "BERT", negative=False)
-
-    return prediction_result
-
-
-def semantic_sim_t5_new(text1_train, text1_test, text2_train, text2_test, y_train, y_test, gs_params, verb, cv, n_jobs):
+def semantic_sim_t5(text1_train, text1_test, text2_train, text2_test, y_train, y_test, gs_params, verb, cv, n_jobs):
     print("Semantic Similarity (T5) \n------------")
     print("Loading model...")
 
@@ -319,40 +271,6 @@ def semantic_sim_t5_new(text1_train, text1_test, text2_train, text2_test, y_trai
     prediction_result = gs.predict_proba(X_test)
 
     return [p[1] for p in prediction_result]    # only get probability for one of two classes (true/false)
-
-def semantic_sim_t5(df):
-    print("Calculating semantic similarity with T5.")
-    corpus1 = list(df[TEXT1])
-    corpus2 = list(df[TEXT2])
-    # use bert to embed
-    model = SentenceTransformer('sentence-t5-base')
-    print("Encoding text_1's...")
-    text1_embeddings = model.encode(corpus1)
-    print("Encoding text_2's...")
-    text2_embeddings = model.encode(corpus2)
-
-    with zipfile.ZipFile(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER, 'embeddings-T5.zip'), 'a') as archive:
-        print("Exporting embeddings (text 1)...")
-        for i, text1_embedding in tqdm(enumerate(text1_embeddings)):
-            with open("tmp.txt", "w") as f1:
-                f1.write(np.array2string(numpy.array(text1_embedding), separator='\n'))
-                archive.write("tmp.txt", os.path.basename(df.iloc[i][PAIR_ID] + "_text_1.txt"))
-        print("Exporting embeddings (text 2)...")
-        for i, text2_embedding in tqdm(enumerate(text2_embeddings)):
-            with open("tmp.txt", "w") as f2:
-                f2.write(np.array2string(numpy.array(text2_embedding), separator='\n'))
-                archive.write("tmp.txt", os.path.basename(df.iloc[i][PAIR_ID] + "_text_2.txt"))
-
-    print("Processing texts...")
-    semantic_results = []
-    for i, row in tqdm(df.iterrows(), total=df.shape[0]):
-        sim = cosine_similarity([text1_embeddings[i]], [text2_embeddings[i]])[0][0]
-        try:
-            semantic_results.append(sim)
-        except Exception as e:
-            semantic_results.append(float(sim.item()))
-            continue
-    return semantic_results
 
 
 def semantic_sim_gpt3(df):
@@ -446,6 +364,119 @@ def fuzzy_sim(text1_train, text1_test, text2_train, text2_test, y_train, y_test,
     return [p[1] for p in prediction_result]
 
 
+def create_embedding_matrix(word_index, embedding_dict, dimension):
+    embedding_matrix = np.zeros((len(word_index) + 1, dimension))
+
+    for word, index in word_index.items():
+        if word in embedding_dict:
+            embedding_matrix[index] = embedding_dict[word]
+    return embedding_matrix
+
+
+def semantic_sim_glove(text1_train, text1_test, text2_train, text2_test, y_train, y_test, gs_params, verb, cv, n_jobs):
+    print("GloVe Similarity \n------------")
+    print("Loading model...")
+
+    glove = pd.read_csv(os.path.join(MODELS_FOLDER, 'glove.6B.100d.txt'), sep=" ", quoting=3, header=None, index_col=0)
+    glove_embedding = {key: val.values for key, val in glove.T.items()}
+
+    print("Tokenize (fit)...")
+    tokenizer = tf.keras.preprocessing.text.Tokenizer(split=" ")
+    tokenizer.fit_on_texts(text1_test + text1_train + text2_train + text2_test)
+
+    print("Tokenize test split..")
+    text1_test_token = tokenizer.texts_to_sequences(text1_test)
+    text2_test_token = tokenizer.texts_to_sequences(text2_test)
+    print("Tokenize train split...")
+    text1_train_token = tokenizer.texts_to_sequences(text1_train)
+    text2_train_token = tokenizer.texts_to_sequences(text2_train)
+
+    print("Creating embedding matrix...")
+    embedding_matrix = create_embedding_matrix(tokenizer.word_index, embedding_dict=glove_embedding, dimension=100)
+
+    vocab_size = embedding_matrix.shape[0]
+    vector_size = embedding_matrix.shape[1]
+
+    embedding_layer = nn.Embedding(num_embeddings=vocab_size, embedding_dim=vector_size)
+
+    embedding_layer.weight = nn.Parameter(torch.tensor(embedding_matrix, dtype=torch.float32))
+    embedding_layer.weight.requires_grad = False  # not trainable weights, use pretrained glove
+
+    X1_test = []
+    for t in tqdm(text1_test_token):
+        embedding = embedding_layer(torch.LongTensor(t))
+        X1_test.append(torch.mean(embedding, 0).tolist())
+    X2_test = []
+    for t in tqdm(text2_test_token):
+        embedding = embedding_layer(torch.LongTensor(t))
+        X2_test.append(torch.mean(embedding, 0).tolist())
+    X_test = np.column_stack((X1_test, X2_test))
+    X_test = np.nan_to_num(X_test)  # fill NaN with zeros
+
+    X1_train = []
+    for t in tqdm(text1_train_token):
+        embedding = embedding_layer(torch.LongTensor(t))
+        X1_train.append(torch.mean(embedding, 0).tolist())
+    X2_train = []
+    for t in tqdm(text2_train_token):
+        embedding = embedding_layer(torch.LongTensor(t))
+        X2_train.append(torch.mean(embedding, 0).tolist())
+    X_train = np.column_stack((X1_train, X2_train))
+    X_train = np.nan_to_num(X_train)  # fill NaN with zeros
+
+    print("Training the SVM...")
+    model_svm = SVC(C=15, kernel='rbf', gamma=0.001, probability=True)
+    # Grid Search
+    gs = GridSearchCV(model_svm, gs_params, cv=cv, verbose=verb, n_jobs=n_jobs)
+    gs.fit(X_train, y_train)
+    GridSearch_table_plot(gs, "C", "GloVe", negative=False)
+
+    print("Predicting test split...")
+    prediction_result = gs.predict_proba(X_test)
+
+    return [p[1] for p in prediction_result]    # only get probability for one of two classes (true/false)
+
+def fasttext_sim(text1_train, text1_test, text2_train, text2_test, y_train, y_test, gs_params, verb, cv, n_jobs):
+    print("GloVe Similarity \n------------")
+    print("Loading model...")
+
+    #model = fasttext.load_facebook_vectors(os.path.join(MODELS_FOLDER, "model_filename.bin"))
+
+    model = fasttext.load_model(os.path.join(MODELS_FOLDER, 'cc.en.300.bin'))
+
+    X1_test = []
+    for t in tqdm(text1_test):
+        vector = model.get_sentence_vector(t.replace("\n", " "))
+        X1_test.append(vector)
+    X2_test = []
+    for t in tqdm(text2_test):
+        vector = model.get_sentence_vector(t.replace("\n", " "))
+        X2_test.append(vector)
+    X_test = np.column_stack((X1_test, X2_test))
+
+    X1_train = []
+    for t in tqdm(text1_train):
+        vector = model.get_sentence_vector(t.replace("\n", " "))
+        X1_train.append(vector)
+    X2_train = []
+    for t in tqdm(text2_train):
+        vector = model.get_sentence_vector(t.replace("\n", " "))
+        X2_train.append(vector)
+    X_train = np.column_stack((X1_train, X2_train))
+
+    print("Training the SVM...")
+    model_svm = SVC(C=15, kernel='rbf', gamma=0.001, probability=True)
+    # Grid Search
+    gs = GridSearchCV(model_svm, gs_params, cv=cv, verbose=verb, n_jobs=n_jobs)
+    gs.fit(X_train, y_train)
+    GridSearch_table_plot(gs, "C", "fasttext", negative=False)
+
+    print("Predicting test split...")
+    prediction_result = gs.predict_proba(X_test)
+
+    return [p[1] for p in prediction_result]    # only get probability for one of two classes (true/false)
+
+
 def tfidf_cosine_sim(text1_train, text1_test, text2_train, text2_test, y_train, y_test, gs_params, verb, cv, n_jobs):
     print("Calculating TF-IDF cosine similarities.")
 
@@ -524,13 +555,10 @@ print(None in df[TEXT1].tolist())
 pred_result_df = pd.DataFrame()
 
 df = df.reset_index(drop=True)
-df = df.truncate(before=0, after=10000)     # for testing
+df = df.truncate(before=0, after=50000)     # for testing
 # df = df[(df[DATASET] == "MPC") | (df[DATASET] == "ETPC")]   # for testing
 
-# get_splits(df)
-
 print(f"{df.shape[0]} pairs found in the file.")
-# df = df.truncate(after=200)  #cut part of dataframe for testing
 
 # Calculate the similarities with each method
 datasets_in_df = df[DATASET].unique().tolist()
@@ -608,14 +636,24 @@ gs_params = {
         'kernel': ('sigmoid', 'rbf')
 }
 
-verb, cv, n_jobs = 50, 3, 6
+verb, cv, n_jobs = 50, 2, 6
 
-pred_result_df[SEM_T5] = semantic_sim_t5_new(train_data[1], test_data[1],
+pred_result_df[FASTTEXT] = fasttext_sim(train_data[1], test_data[1],
                                              train_data[2], test_data[2], train_data[3], test_data[3],
                                              gs_params, verb, cv, n_jobs)
 pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
                        index=True, indent=4)
-pred_result_df[SEM_BERT] = semantic_sim_bert_new(train_data[1], test_data[1],
+pred_result_df[SEM_GLOVE] = semantic_sim_glove(train_data[1], test_data[1],
+                                             train_data[2], test_data[2], train_data[3], test_data[3],
+                                             gs_params, verb, cv, n_jobs)
+pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
+                       index=True, indent=4)
+pred_result_df[SEM_BERT] = semantic_sim_bert(train_data[1], test_data[1],
+                                             train_data[2], test_data[2], train_data[3], test_data[3],
+                                             gs_params, verb, cv, n_jobs)
+pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
+                       index=True, indent=4)
+pred_result_df[SEM_T5] = semantic_sim_t5(train_data[1], test_data[1],
                                              train_data[2], test_data[2], train_data[3], test_data[3],
                                              gs_params, verb, cv, n_jobs)
 pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",

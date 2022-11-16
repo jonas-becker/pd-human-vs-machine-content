@@ -117,10 +117,14 @@ for dataset in DATASETS:
     #val_df, eval_string = eval(df, dataset, SEM_BERT, eval_df, eval_string)
 
     print("Calculating precision-recall curves...")
-    plot_pr_curve("BERT_"+dataset+"_pr", df[SEM_BERT].tolist(), df[PARAPHRASE].tolist())
-    plot_roc_curve("BERT_"+dataset+"_roc", df[SEM_BERT].tolist(), df[PARAPHRASE].tolist())
-    plot_pr_curve("T5_" + dataset + "_pr", df[SEM_T5].tolist(), df[PARAPHRASE].tolist())
-    plot_roc_curve("T5_"+dataset+"_roc", df[SEM_T5].tolist(), df[PARAPHRASE].tolist())
+    plot_pr_curve("FastText_" + dataset + "_pr", df[FASTTEXT].tolist(), df[PARAPHRASE].tolist())
+    plot_roc_curve("FastText_" + dataset + "_roc", df[FASTTEXT].tolist(), df[PARAPHRASE].tolist())
+    plot_pr_curve("GloVe_" + dataset + "_pr", df[SEM_GLOVE].tolist(), df[PARAPHRASE].tolist())
+    plot_roc_curve("GloVe_" + dataset + "_roc", df[SEM_GLOVE].tolist(), df[PARAPHRASE].tolist())
+    #plot_pr_curve("BERT_"+dataset+"_pr", df[SEM_BERT].tolist(), df[PARAPHRASE].tolist())
+    #plot_roc_curve("BERT_"+dataset+"_roc", df[SEM_BERT].tolist(), df[PARAPHRASE].tolist())
+    #plot_pr_curve("T5_" + dataset + "_pr", df[SEM_T5].tolist(), df[PARAPHRASE].tolist())
+    #plot_roc_curve("T5_"+dataset+"_roc", df[SEM_T5].tolist(), df[PARAPHRASE].tolist())
     #plot_pr_curve("NGram_" + dataset + "_pr", df[NGRAM3].tolist(), df[PARAPHRASE].tolist())
     #plot_roc_curve("NGram_" + dataset + "_roc", df[NGRAM3].tolist(), df[PARAPHRASE].tolist())
 
@@ -133,7 +137,7 @@ for dataset in DATASETS:
     #if df_gpt3.shape[0] != 0:
     #    precision_gpt3, recall_gpt3, thresholds_gpt3 = precision_recall_curve(df_gpt3["is_paraphrase"], df_gpt3[SEM_GPT3])
 
-    print("Plotting curves...")
+    #print("Plotting curves...")
     #fig, ax = plt.subplots()
     #ax.plot(recall_sem_bert, precision_sem_bert, color=c_pal[0], label='BERT')
     #ax.plot(recall_sem_t5, precision_sem_t5, color=c_pal[1], label='T5')
