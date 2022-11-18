@@ -7,8 +7,7 @@ EVALUATION_RESULTS_FILENAME = "evaluation.json"
 DATASETS = ["ETPC", "SAv2", "TURL", "MPC", "QQP", "ParaNMT", "APH", "APT", "PAWSWiki", "ParaSCI", "MSCOCO", "SaR"]     #the folders in the DATASETS_FOLDER should be named like the datasets here
 MACHINE_PARAPHRASED_DATASETS = ["SAv2", "MPC", "ParaNMT", "APT", "PAWSWiki"]
 HUMAN_PARAPHRASED_DATASETS = ["ETPC", "TURL", "QQP", "APH", "ParaSCI", "MSCOCO", "SaR"]
-FILLER_DATASETS = ["ETPC", "TURL"]      # datasets that provide original samples to add to other datasets for balancing (make sure these contain mixed types of paraphrases)
-OUT_DIR = "output"      #the directory to output the formatted json in
+OUT_DIR = "output"      #the directory to output the formatted files in
 FIGURES_FOLDER = "figures"
 EMBEDDINGS_FOLDER = "embeddings"
 EXAMPLES_FOLDER = "examples"
@@ -100,8 +99,6 @@ THRESHOLD = "threshold"
 
 CORR_GRAPH_SIZE = 3000
 
-STOPWORDS = ['the', 'and', 'are', 'a', 'of', 'an', 'is', 'in', 'for', 'where', 'when', 'to', 'at']
-
 # Paraphrase Types (EPT Annotation)
 PARAPHRASE_TYPES = {}
 TYPE_NAME = "type_name"
@@ -114,7 +111,8 @@ TYPE_CATEGORY = "type_category"
 #        PARAPHRASE_TYPES[int(elem[0].text)] = { TYPE_NAME: elem[1].text, TYPE_CATEGORY: elem[2].text }
 #    PARAPHRASE_TYPES[0] = { TYPE_NAME: "Unknown", TYPE_CATEGORY: "Unknown" }  # Add the "Unknown" type (needed for other unclassified datasets)
 
-# Paraphrase Types explained (numbers different from ETPC Paper as they skipped some numbers in EPT dev code):
+# Paraphrase Types explained
+# (numbers different from ETPC Paper as they seem to have skipped some numbers in EPT dev code)
 '''
 
 Morphology-based changes

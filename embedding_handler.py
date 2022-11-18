@@ -288,7 +288,7 @@ if __name__ == "__main__":
         #Extract Embeddings
         tensor = torch.tensor([indexed]).to(device)
         segments_tensors = torch.tensor([segments_ids]).to(device)
-        # collect all of the hidden states produced from all layers
+        # collect all the hidden states produced from all layers
         with torch.no_grad():
             hidden_states = model(tensor, segments_tensors)[2]
         # Concatenate the tensors for all layers (create a new dimension in the tensor)
@@ -296,7 +296,7 @@ if __name__ == "__main__":
         # Remove dimension 1, the "batches".
         embeds = torch.squeeze(embeds, dim=1).to(device)
         #Switch dimensions
-        embeds = embeds.permute(1,0,2)
+        embeds = embeds.permute(1, 0, 2)
         # Create Sentence Vector Representations (average of all token vectors)
         embedding_1 = torch.mean(hidden_states[-2][0], dim=0).to(device)
 

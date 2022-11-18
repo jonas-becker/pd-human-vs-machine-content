@@ -632,10 +632,20 @@ print(f"Finished assembling data. Continue with classification of {str(pred_resu
 print(f"Train data size: {str(len(train_data[0]))}")
 print(f"Test data size: {str(len(test_data[0]))}")
 
+# Grid Search Testing Range
 gs_params = {
-        'C': range(9, 11),
-        'kernel': ('sigmoid', 'rbf')
+        'C': [10, 100]
 }
+
+# Grid Search Range (https://arxiv.org/abs/2101.09023)
+'''
+gs_params = {
+    'kernel': ('linear', 'rbf', 'poly'),
+    'gamma': [0.01, 0.001, 0.0001, 0.00001],
+    'degree': [1, 2, 3, 4, 5, 6, 7, 8, 9],
+    'C': [1, 10, 100],
+}
+'''
 
 verb, cv, n_jobs = 50, 2, 6
 
