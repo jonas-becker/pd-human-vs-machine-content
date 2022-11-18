@@ -1,12 +1,8 @@
-import os
-import pandas as pd
 from tqdm import tqdm
 import numpy as np
-import sys
 from setup import *
 import torch
 from transformers import BertTokenizer, BertModel
-import matplotlib.pyplot as plt
 from scipy.spatial.distance import cosine
 from sklearn.manifold import TSNE
 from sklearn.utils import shuffle
@@ -16,6 +12,11 @@ import json
 import gc
 
 def create_tsne_figure(embed_data, out_filename):
+    '''
+    Creates a plot figure with t-SNE. Outputs the figure in different formats to the specified output folder.
+    :param embed_data: The data representing each embedding position in 2d vector space
+    :param out_filename: The name of the output file (not directory)
+    '''
     dataset_embeddings = [d[EMBED] for d in embed_data]
     dataset_embeddings = torch.tensor(dataset_embeddings, device = "cpu")   # move tensors to cpu
     text_ids = [d[TEXT_ID] for d in embed_data]
@@ -50,14 +51,17 @@ def create_tsne_figure(embed_data, out_filename):
             hover_data=["text_id", "pair_id", "text", "paraphrase"], title = 'Embedding Visualization: ' + out_filename
             )
         fig.update_layout(showlegend=False)
-    #fig.show()
     fig.write_html(os.path.join(OUT_DIR, FIGURES_FOLDER, out_filename + ".html"))
     fig.write_image(os.path.join(OUT_DIR, FIGURES_FOLDER, out_filename + ".pdf"))
     fig.write_image(os.path.join(OUT_DIR, FIGURES_FOLDER, out_filename + ".png"))
     fig.write_image(os.path.join(OUT_DIR, FIGURES_FOLDER, out_filename + ".svg"))
 
 def visualize_embeddings(embed_dict, dataset):
-
+    '''
+    Visualizes the BERT embeddings in two dimensional vector space with t-SNE.
+    :param embed_dict: The dictionary containing all embeddings
+    :param dataset: The dataset name that should be visualized
+    '''
     if dataset == "total":
         # Create visualization for all datasets (paraphrase & non-paraphrase pairs combined)
         print("Creating visualizations for dataset...")
@@ -92,10 +96,14 @@ def visualize_embeddings(embed_dict, dataset):
             #stats_dict[dataset]["paraphrase_pairs"] = stats_dict[dataset]["paraphrase_pairs"] + int(len(embed_data)/2)
             create_tsne_figure(embed_data, dataset+"_paraphrasedOnly")
 
-    #return stats_dict
-
 def calculate_cosine_dists(df, embed_dict, dataset):
-    # Calculate cosine distance of embeddings between each pair
+    '''
+    Calculates the cosine distance for each pairs BERT embeddings.
+    :param df: The dataframe containing the text pairs
+    :param embed_dict: The dictionary containing all embeddings for each sentence pair
+    :param dataset: The name of the dataset that should get processed
+    :return: The updated df with the cosine distances for each pair
+    '''
     print("\nCalculating cosine distances between pairs embeddings...")
     embed_data = embed_dict[dataset][EMBEDDINGS]
     dataset_embeddings = {}
@@ -124,6 +132,14 @@ def calculate_cosine_dists(df, embed_dict, dataset):
     return df
 
 def track_stats(embed_dict, dataset, stats_dict):
+    '''
+    Tracks statistics about the embedded data.
+    Gives information about the total amount of pairs paraphrased/original
+    :param embed_dict: The dictionary containing all embeddings to track stats for
+    :param dataset: The dataset name that stats should be tracked for
+    :param stats_dict: The dictionary containing the statistics information (gets expanded)
+    :return: the stats_dict
+    '''
     embed_data = embed_dict[dataset][EMBEDDINGS]
     stats_dict[dataset]["total_pairs"] = stats_dict[dataset]["total_pairs"] + int(len(embed_data)/2)
 
@@ -134,6 +150,12 @@ def track_stats(embed_dict, dataset, stats_dict):
     return stats_dict
 
 def mean_cos_distance(df, stats_dict):
+    '''
+    Calculates the mean cosine distance for the BERT embeddings. Averages over each dataset separately.
+    :param df: The dataframe containing pairs and cosine distances for each pair.
+    :param stats_dict: The dictionary containing the statistics information (gets expanded)
+    :return: the stats_dict
+    '''
     for dataset in DATASETS:
         # Calculate the mean distances per dataset (non-paraphrases and paraphrases seperately)
         df_filtered = df[(df[DATASET] == dataset) & (df[PARAPHRASE] == True)]
@@ -186,7 +208,7 @@ if __name__ == "__main__":
     print("Shuffled.")
     print("Total pairs found: " + str(df.shape[0]))
 
-    #DATASETS = ["APT"]
+    # Optional Menu (can be commented out which leads to all datasets being processed)
     '''
     print("Welcome! Do you want to embed all datasets or a specific one?")
     print('1 - all datasets \n2 - a specific dataset')
@@ -203,10 +225,10 @@ if __name__ == "__main__":
                 print("This is not a valid dataset. Please use the correct casing. Example: \"ETPC\" or \"SAv2\" or \"ETPC,SAv2\".")
     '''
 
-    embed_dict = { }
-    embed_dict_total = { }
-    tokenized_texts = { }
-    tokenized_pairs = { }
+    embed_dict = {}
+    embed_dict_total = {}
+    tokenized_texts = {}
+    tokenized_pairs = {}
     visualized_datasets = []
 
     print("Tokenize texts and prepare data for embedding generation...")
@@ -243,7 +265,7 @@ if __name__ == "__main__":
 
         dataset = tokenized_pairs[pair_id][DATASET]
 
-        # handle visualization & output if neccessary (many processed or all of dataset processed)
+        # handle visualization & output if necessary (many processed or whole dataset processed)
         if dataset != last_dataset_viewed:
             if last_dataset_viewed not in visualized_datasets:
                 visualize_embeddings(embed_dict, last_dataset_viewed)
@@ -291,13 +313,11 @@ if __name__ == "__main__":
         # collect all the hidden states produced from all layers
         with torch.no_grad():
             hidden_states = model(tensor, segments_tensors)[2]
-        # Concatenate the tensors for all layers (create a new dimension in the tensor)
+        # concat the tensors for all layers (create a new dimension in the tensor)
         embeds = torch.stack(hidden_states, dim=0).to(device)
-        # Remove dimension 1, the "batches".
-        embeds = torch.squeeze(embeds, dim=1).to(device)
-        #Switch dimensions
-        embeds = embeds.permute(1, 0, 2)
-        # Create Sentence Vector Representations (average of all token vectors)
+        embeds = torch.squeeze(embeds, dim=1).to(device)    # remove dimension 1, the "batches".
+        embeds = embeds.permute(1, 0, 2)    # switch dims
+        # create Sentence Vector Representations (average of all token vectors)
         embedding_1 = torch.mean(hidden_states[-2][0], dim=0).to(device)
 
         # DO FOR SECOND TEXT
@@ -331,9 +351,9 @@ if __name__ == "__main__":
     df[df[DATASET] == dataset].to_json(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER, dataset+"_embedded.json"), orient = "index", index = True, indent = 4)
 
     # pop out unnecessary embeds (for final total tsne-figure)
-    for d in DATASETS:
-        if d in embed_dict:
-            embed_dict[d][EMBEDDINGS] = embed_dict[d][EMBEDDINGS][:2*int(FIGURE_SIZE/len(DATASETS))]    # only leave a certain amount of pairs for this dataset in total figure
+    #for d in DATASETS:
+    #    if d in embed_dict:
+    #        embed_dict[d][EMBEDDINGS] = embed_dict[d][EMBEDDINGS][:2*int(FIGURE_SIZE/len(DATASETS))]    # only leave a certain amount of pairs for this dataset in total figure
     embed_dict_total = dict(embed_dict_total, **embed_dict) # update total dict
 
     # visualize all datasets in one tsne-figure
@@ -342,6 +362,6 @@ if __name__ == "__main__":
     # get mean cos distance per dataset
     stats_dict = mean_cos_distance(df, stats_dict)
 
-    # Output Stats
+    # output stats
     with open(os.path.join(OUT_DIR, 'stats_embedding_handler.json'), 'w') as f:
         json.dump(stats_dict, f, indent=4)
