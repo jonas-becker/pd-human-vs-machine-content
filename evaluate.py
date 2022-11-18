@@ -15,15 +15,13 @@ import seaborn as sns
 from sklearn.metrics import classification_report
 
 def plot_pr_curve(title, y_pred, y_test):
-    print(y_test)
-    print(y_pred)
-    display = PrecisionRecallDisplay.from_predictions(y_test, y_pred, name="LinearSVC", pos_label=True)
-    _ = display.ax_.set_title(title)
-    _ = display.ax_.plot()
-    _ = display.ax_.set_xlabel('Recall')
-    _ = display.ax_.set_ylabel('Precision')
-    plt.xlim(0, 1)
-    plt.ylim(0, 1)
+    #_, ax = plt.subplots(figsize=(7, 8))
+
+    precision, recall, thresholds = precision_recall_curve(np.array(y_test), np.array(y_pred))
+
+    display = PrecisionRecallDisplay(recall = recall, precision = precision)
+    display.plot(name=f"Precision-recall")
+
     plt.savefig(os.path.join(OUT_DIR, EVALUATION_FOLDER, title+".pdf"), bbox_inches='tight')
 
 def plot_roc_curve(title, y_pred, y_test):

@@ -194,7 +194,7 @@ def semantic_sim_bert(text1_train, text1_test, text2_train, text2_test, y_train,
     # Grid Search
     gs = GridSearchCV(model_svm, gs_params, cv=cv, verbose=verb, n_jobs=n_jobs)
     gs.fit(X_train, y_train)
-    GridSearch_table_plot(gs, "C", "T5", negative=False)
+    GridSearch_table_plot(gs, "C", "BERT", negative=False)
 
     print("Predicting test split...")
     prediction_result = gs.predict_proba(X_test)
@@ -435,6 +435,7 @@ def semantic_sim_glove(text1_train, text1_test, text2_train, text2_test, y_train
     prediction_result = gs.predict_proba(X_test)
 
     return [p[1] for p in prediction_result]    # only get probability for one of two classes (true/false)
+
 
 def fasttext_sim(text1_train, text1_test, text2_train, text2_test, y_train, y_test, gs_params, verb, cv, n_jobs):
     print("GloVe Similarity \n------------")

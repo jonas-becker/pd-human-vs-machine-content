@@ -1,66 +1,98 @@
 {
     "ETPC": {
-        "total_pairs": 5801,
-        "paraphrase_pairs": 3327,
+        "total_pairs": 4948,
+        "paraphrase_pairs": 2474,
         "original_pairs": 2474,
-        "mean_cos_paraphrased": 0.9330957632076285,
-        "mean_cos_original": 0.9018790261728107,
-        "mean_cos_mixed": 0.9197825055927105
+        "mean_cos_paraphrased": 0.933387396961041,
+        "mean_cos_original": 0.9018790577579721,
+        "mean_cos_mixed": 0.9176332273595065
     },
     "SAv2": {
-        "total_pairs": 99998,
-        "paraphrase_pairs": 99998,
+        "total_pairs": 10000,
+        "paraphrase_pairs": 10000,
         "original_pairs": 0,
-        "mean_cos_paraphrased": 0.9486061422623964,
+        "mean_cos_paraphrased": 0.9269001642465592,
         "mean_cos_original": NaN,
-        "mean_cos_mixed": 0.9486061422623964
+        "mean_cos_mixed": 0.9269001642465592
     },
     "TURL": {
-        "total_pairs": 51534,
-        "paraphrase_pairs": 12988,
-        "original_pairs": 38546,
-        "mean_cos_paraphrased": 0.8601628862181406,
-        "mean_cos_original": 0.7397142834874434,
-        "mean_cos_mixed": 0.7700706783387318
+        "total_pairs": 9998,
+        "paraphrase_pairs": 4999,
+        "original_pairs": 4999,
+        "mean_cos_paraphrased": 0.8616460381471818,
+        "mean_cos_original": 0.7448832846970814,
+        "mean_cos_mixed": 0.8032646614221316
     },
-    "MPCBert": {
-        "total_pairs": 98673,
-        "paraphrase_pairs": 98673,
+    "MPC": {
+        "total_pairs": 9825,
+        "paraphrase_pairs": 9825,
         "original_pairs": 0,
-        "mean_cos_paraphrased": 0.9756005072514436,
+        "mean_cos_paraphrased": 0.9931769223947258,
         "mean_cos_original": NaN,
-        "mean_cos_mixed": 0.9756005072514436
+        "mean_cos_mixed": 0.9931769223947258
     },
     "QQP": {
-        "total_pairs": 100000,
-        "paraphrase_pairs": 37261,
-        "original_pairs": 62739,
-        "mean_cos_paraphrased": 0.9169943284490591,
-        "mean_cos_original": 0.8541219446496783,
-        "mean_cos_mixed": 0.8775488235771656
+        "total_pairs": 9998,
+        "paraphrase_pairs": 4999,
+        "original_pairs": 4999,
+        "mean_cos_paraphrased": 0.9185258174901201,
+        "mean_cos_original": 0.8549730676511546,
+        "mean_cos_mixed": 0.8867494425706373
     },
     "ParaNMT": {
-        "total_pairs": 99979,
-        "paraphrase_pairs": 99979,
+        "total_pairs": 9998,
+        "paraphrase_pairs": 9998,
         "original_pairs": 0,
-        "mean_cos_paraphrased": 0.8551340572715067,
+        "mean_cos_paraphrased": 0.8420171914344597,
         "mean_cos_original": NaN,
-        "mean_cos_mixed": 0.8551340572715067
+        "mean_cos_mixed": 0.8420171914344597
     },
     "APH": {
-        "total_pairs": 4975,
-        "paraphrase_pairs": 3232,
+        "total_pairs": 3486,
+        "paraphrase_pairs": 1743,
         "original_pairs": 1743,
-        "mean_cos_paraphrased": 0.8732161481707993,
-        "mean_cos_original": 0.8042939138255172,
-        "mean_cos_mixed": 0.8490691221479195
+        "mean_cos_paraphrased": 0.8725918447978184,
+        "mean_cos_original": 0.8042970956808113,
+        "mean_cos_mixed": 0.8384444702393148
     },
     "APT": {
-        "total_pairs": 99999,
-        "paraphrase_pairs": 44215,
-        "original_pairs": 55784,
-        "mean_cos_paraphrased": 0.9730981285992918,
-        "mean_cos_original": 0.8884398344240118,
-        "mean_cos_mixed": 0.9258718735140027
+        "total_pairs": 9998,
+        "paraphrase_pairs": 4999,
+        "original_pairs": 4999,
+        "mean_cos_paraphrased": 0.9702459945514647,
+        "mean_cos_original": 0.8971219284399959,
+        "mean_cos_mixed": 0.9336839614957303
+    },
+    "PAWSWiki": {
+        "total_pairs": 10000,
+        "paraphrase_pairs": 5000,
+        "original_pairs": 5000,
+        "mean_cos_paraphrased": 0.9800227783441544,
+        "mean_cos_original": 0.9759630547165871,
+        "mean_cos_mixed": 0.9779929165303707
+    },
+    "ParaSCI": {
+        "total_pairs": 10000,
+        "paraphrase_pairs": 10000,
+        "original_pairs": 0,
+        "mean_cos_paraphrased": 0.9284736010253429,
+        "mean_cos_original": NaN,
+        "mean_cos_mixed": 0.9284736010253429
+    },
+    "MSCOCO": {
+        "total_pairs": 10000,
+        "paraphrase_pairs": 10000,
+        "original_pairs": 0,
+        "mean_cos_paraphrased": 0.837970505219698,
+        "mean_cos_original": NaN,
+        "mean_cos_mixed": 0.837970505219698
+    },
+    "SaR": {
+        "total_pairs": 1379,
+        "paraphrase_pairs": 1379,
+        "original_pairs": 0,
+        "mean_cos_paraphrased": 0.9666935742722637,
+        "mean_cos_original": NaN,
+        "mean_cos_mixed": 0.9666935742722637
     }
 }

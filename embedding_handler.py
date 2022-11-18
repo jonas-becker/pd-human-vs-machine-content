@@ -154,192 +154,194 @@ def mean_cos_distance(df, stats_dict):
     return stats_dict
 
 
-# MAIN -----------------------------------------------------------------------------------------------------
+if __name__ == "__main__":
 
-df = pd.read_json(os.path.join(OUT_DIR, FORMATTED_DATA_FILENAME), orient = "index")
-df[COSINE_DISTANCE] = None
+    df = pd.read_json(os.path.join(OUT_DIR, FORMATTED_DATA_FILENAME), orient = "index")
+    df[COSINE_DISTANCE] = None
 
-# Create stats dict
-stats_dict = {}
-for dataset in DATASETS:
-    stats_dict[dataset] = { "total_pairs": 0, "paraphrase_pairs": 0, "original_pairs": 0, "mean_cos_paraphrased": 0, "mean_cos_original": 0, "mean_cos_mixed": 0 }
+    # Create stats dict
+    stats_dict = {}
+    for dataset in DATASETS:
+        stats_dict[dataset] = { "total_pairs": 0, "paraphrase_pairs": 0, "original_pairs": 0, "mean_cos_paraphrased": 0, "mean_cos_original": 0, "mean_cos_mixed": 0 }
 
-device = "cuda:0" if torch.cuda.is_available() else "cpu"
+    device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
-# Load pre-trained model (weights)
-model = BertModel.from_pretrained('bert-base-uncased', output_hidden_states = True ).to(device)
-# feed-forward
-model.eval()
+    # Load pre-trained model (weights)
+    model = BertModel.from_pretrained('bert-base-uncased', output_hidden_states = True ).to(device)
+    # feed-forward only
+    model.eval()
 
-print("GPU available: " +  str(torch.cuda.is_available()))
-print("Model running on " + device)
+    print("GPU available: " +  str(torch.cuda.is_available()))
+    print("Model running on " + device)
 
-print("Shuffle the dataframe...")
-new_df = pd.DataFrame()
-for dataset in DATASETS:
-    d_df = df[df[DATASET] == dataset]   # shuffle while keeping the order of datasets in the df
-    d_df = shuffle(d_df)
-    new_df = pd.concat([new_df, d_df])
-df = new_df.reset_index(drop=True)
-print("Shuffled.")
+    print("Shuffle the dataframe...")
+    new_df = pd.DataFrame()
+    for dataset in DATASETS:
+        d_df = df[df[DATASET] == dataset]   # shuffle while keeping the order of datasets in the df
+        d_df = shuffle(d_df)
+        new_df = pd.concat([new_df, d_df])
+    df = new_df.reset_index(drop=True)
+    print("Shuffled.")
+    print("Total pairs found: " + str(df.shape[0]))
 
-DATASETS = ["APT"]
-'''
-print("Welcome! Do you want to embed all datasets or a specific one?")
-print('1 - all datasets \n2 - a specific dataset')
-x = int(input("Enter a number: "))
-if x == 2:
-    while True:
-        print('Please enter the dataset you want to process (folder name). You can enter multiple datasets by seperating them by \",\" (no spaces).')
-        x = input("Dataset: ").split(",")
-        if all(x_item in DATASETS for x_item in x):
-            print("Okay.")
-            DATASETS = x
-            break
+    #DATASETS = ["APT"]
+    '''
+    print("Welcome! Do you want to embed all datasets or a specific one?")
+    print('1 - all datasets \n2 - a specific dataset')
+    x = int(input("Enter a number: "))
+    if x == 2:
+        while True:
+            print('Please enter the dataset you want to process (folder name). You can enter multiple datasets by seperating them by \",\" (no spaces).')
+            x = input("Dataset: ").split(",")
+            if all(x_item in DATASETS for x_item in x):
+                print("Okay.")
+                DATASETS = x
+                break
+            else:
+                print("This is not a valid dataset. Please use the correct casing. Example: \"ETPC\" or \"SAv2\" or \"ETPC,SAv2\".")
+    '''
+
+    embed_dict = { }
+    embed_dict_total = { }
+    tokenized_texts = { }
+    tokenized_pairs = { }
+    visualized_datasets = []
+
+    print("Tokenize texts and prepare data for embedding generation...")
+    for i, row in tqdm(df[df[DATASET].isin(DATASETS)].iterrows(), total=df[df[DATASET].isin(DATASETS)].shape[0]):
+        # skip invalid entries in the datasets
+        if not row[TEXT1] or not row[TEXT2]:
+            print("\nPair " + str(row[PAIR_ID]) + " contains empty text. Excluding pair from embeddings.")
+            continue
+
+        # mark the text with BERTs special characters
+        t_1 = "[CLS] " + row[TEXT1].replace(".", ". [SEP][CLS]")
+        t_2 = "[CLS] " + row[TEXT2].replace(".", ". [SEP][CLS]")
+        if t_1.endswith("[CLS]"):
+            t_1 = t_1[:-5]
+        if not t_1.endswith("[SEP]"):
+            t_1 = t_1 + " [SEP]"
+        if t_2.endswith("[CLS]"):
+            t_2 = t_2[:-5]
+        if not t_2.endswith("[SEP]"):
+            t_2 = t_2 + " [SEP]"
+
+        # tokenize with BERT tokenizer
+        t1_tokenized = tokenizer.tokenize(t_1)
+        t2_tokenized = tokenizer.tokenize(t_2)
+
+        tokenized_pairs[row[PAIR_ID]] = {ID1: row[ID1], TOKENS1: t1_tokenized, ID2: row[ID2], TOKENS2: t2_tokenized, PARAPHRASE: row[PARAPHRASE], TEXT_PREVIEW1: row[TEXT1][:90]+"...", TEXT_PREVIEW2: row[TEXT2][:90]+"...", DATASET: row[DATASET]}
+
+    last_dataset_viewed = tokenized_pairs[list(tokenized_pairs.keys())[0]][DATASET]
+    last_index = 0
+    skipped_counter = 0
+
+    print("Creating embeddings for each sentence (text1 & text2) ...")
+    for i, pair_id in tqdm(enumerate(list(tokenized_pairs.keys()))):
+
+        dataset = tokenized_pairs[pair_id][DATASET]
+
+        # handle visualization & output if neccessary (many processed or all of dataset processed)
+        if dataset != last_dataset_viewed:
+            if last_dataset_viewed not in visualized_datasets:
+                visualize_embeddings(embed_dict, last_dataset_viewed)
+                visualized_datasets.append(last_dataset_viewed)
+
+            df = calculate_cosine_dists(df, embed_dict, last_dataset_viewed)
+            stats_dict = track_stats(embed_dict, last_dataset_viewed, stats_dict)
+
+            df[df[DATASET] == last_dataset_viewed].to_json(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER, last_dataset_viewed+"_embedded.json"), orient = "index", index = True, indent = 4)
+            last_dataset_viewed = dataset
+            last_index = i
+
+           # pop out unneccessary embeds (for final total tsne-figure)
+            for d in DATASETS:
+                if d in embed_dict:
+                    embed_dict[d][EMBEDDINGS] = embed_dict[d][EMBEDDINGS][:2*int(FIGURE_SIZE/len(DATASETS))]    # only leave a certain amount of pairs for this dataset in total figure
+            embed_dict_total = dict(embed_dict_total, **embed_dict) # update total dict
+
+            embed_dict = { }
+            skipped_counter = 0
+            gc.collect()
+
+        elif i - skipped_counter - last_index >= FIGURE_SIZE and dataset == last_dataset_viewed:     # specified figure size (max) to avoid high memory usage
+            if last_dataset_viewed not in visualized_datasets:
+                visualize_embeddings(embed_dict, dataset)
+                visualized_datasets.append(last_dataset_viewed)
+
+            last_index = i
+            skipped_counter = 0
+            gc.collect()
+
+        # throw out longer that 512 token texts because BERT model struggels to process them
+        if len(tokenized_pairs[pair_id][TOKENS1]) > 512 or len(tokenized_pairs[pair_id][TOKENS2]) > 512:
+            del tokenized_pairs[pair_id]
+            skipped_counter = skipped_counter + 1
+            continue
+
+        # DO FOR FIRST TEXT
+        # map tokens to vocab indices
+        indexed = tokenizer.convert_tokens_to_ids(tokenized_pairs[pair_id][TOKENS1])
+        segments_ids = [1] * len(tokenized_pairs[pair_id][TOKENS1])
+        #Extract Embeddings
+        tensor = torch.tensor([indexed]).to(device)
+        segments_tensors = torch.tensor([segments_ids]).to(device)
+        # collect all of the hidden states produced from all layers
+        with torch.no_grad():
+            hidden_states = model(tensor, segments_tensors)[2]
+        # Concatenate the tensors for all layers (create a new dimension in the tensor)
+        embeds = torch.stack(hidden_states, dim=0).to(device)
+        # Remove dimension 1, the "batches".
+        embeds = torch.squeeze(embeds, dim=1).to(device)
+        #Switch dimensions
+        embeds = embeds.permute(1,0,2)
+        # Create Sentence Vector Representations (average of all token vectors)
+        embedding_1 = torch.mean(hidden_states[-2][0], dim=0).to(device)
+
+        # DO FOR SECOND TEXT
+        indexed = tokenizer.convert_tokens_to_ids(tokenized_pairs[pair_id][TOKENS2])
+        segments_ids = [1] * len(tokenized_pairs[pair_id][TOKENS2])
+        tensor = torch.tensor([indexed]).to(device)
+        segments_tensors = torch.tensor([segments_ids]).to(device)
+        with torch.no_grad():
+            hidden_states = model(tensor, segments_tensors)[2]
+        embeds = torch.stack(hidden_states, dim=0).to(device)
+        embeds = torch.squeeze(embeds, dim=1).to(device)
+        embeds = embeds.permute(1,0,2)
+        embedding_2 = torch.mean(hidden_states[-2][0], dim=0).to(device)
+
+        # Add embeddings to dataset-specific lists:
+        if dataset in embed_dict:
+            embed_dict[dataset][EMBEDDINGS].append({ DATASET: dataset, PAIR_ID: pair_id, TEXT_ID: tokenized_pairs[pair_id][ID1], TEXT_PREVIEW: tokenized_pairs[pair_id][TEXT_PREVIEW1], EMBED: list(embedding_1), PARAPHRASE: tokenized_pairs[pair_id][PARAPHRASE], TUPLE_ID: False })
+            embed_dict[dataset][EMBEDDINGS].append({ DATASET: dataset, PAIR_ID: pair_id, TEXT_ID: tokenized_pairs[pair_id][ID2], TEXT_PREVIEW: tokenized_pairs[pair_id][TEXT_PREVIEW2], EMBED: list(embedding_2), PARAPHRASE: tokenized_pairs[pair_id][PARAPHRASE], TUPLE_ID: True })
         else:
-            print("This is not a valid dataset. Please use the correct casing. Example: \"ETPC\" or \"SAv2\" or \"ETPC,SAv2\".")
-'''
+            embed_dict[dataset] = { EMBEDDINGS: [{ DATASET: dataset, PAIR_ID: pair_id, TEXT_ID: tokenized_pairs[pair_id][ID1], TEXT_PREVIEW: tokenized_pairs[pair_id][TEXT_PREVIEW1], EMBED: list(embedding_1), PARAPHRASE: tokenized_pairs[pair_id][PARAPHRASE], TUPLE_ID: False }] }
+            embed_dict[dataset][EMBEDDINGS].append({ DATASET: dataset, PAIR_ID: pair_id, TEXT_ID: tokenized_pairs[pair_id][ID2], TEXT_PREVIEW: tokenized_pairs[pair_id][TEXT_PREVIEW2], EMBED: list(embedding_2), PARAPHRASE: tokenized_pairs[pair_id][PARAPHRASE], TUPLE_ID: True })
 
-embed_dict = { }
-embed_dict_total = { }
-tokenized_texts = { }
-tokenized_pairs = { }
-visualized_datasets = []
+    # Also do after the for loop completed (for the last dataset)
+    if dataset not in visualized_datasets:
+        visualize_embeddings(embed_dict, dataset)
+        visualized_datasets.append(dataset)
 
-print("Creating embeddings for each sentence (text1 & text2) ...")
-for i, row in tqdm(df[df[DATASET].isin(DATASETS)].iterrows(), total=df[df[DATASET].isin(DATASETS)].shape[0]):
-    # skip invalid entries in the datasets
-    if not row[TEXT1] or not row[TEXT2]:
-        print("\nPair " + str(row[PAIR_ID]) + " contains empty text. Excluding pair from embeddings.")
-        continue
+    df = calculate_cosine_dists(df, embed_dict, dataset)
+    stats_dict = track_stats(embed_dict, dataset, stats_dict)
 
-    # mark the text with BERTs special characters
-    t_1 = "[CLS] " + row[TEXT1].replace(".", ". [SEP][CLS]") 
-    t_2 = "[CLS] " + row[TEXT2].replace(".", ". [SEP][CLS]") 
-    if t_1.endswith("[CLS]"):
-        t_1 = t_1[:-5]
-    if not t_1.endswith("[SEP]"):
-        t_1 = t_1 + " [SEP]"
-    if t_2.endswith("[CLS]"):
-        t_2 = t_2[:-5]
-    if not t_2.endswith("[SEP]"):
-        t_2 = t_2 + " [SEP]"
+    df[df[DATASET] == dataset].to_json(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER, dataset+"_embedded.json"), orient = "index", index = True, indent = 4)
 
-    # tokenize with BERT tokenizer
-    t1_tokenized = tokenizer.tokenize(t_1)
-    t2_tokenized = tokenizer.tokenize(t_2)
+    # pop out unnecessary embeds (for final total tsne-figure)
+    for d in DATASETS:
+        if d in embed_dict:
+            embed_dict[d][EMBEDDINGS] = embed_dict[d][EMBEDDINGS][:2*int(FIGURE_SIZE/len(DATASETS))]    # only leave a certain amount of pairs for this dataset in total figure
+    embed_dict_total = dict(embed_dict_total, **embed_dict) # update total dict
 
-    tokenized_pairs[row[PAIR_ID]] = {ID1: row[ID1], TOKENS1: t1_tokenized, ID2: row[ID2], TOKENS2: t2_tokenized, PARAPHRASE: row[PARAPHRASE], TEXT_PREVIEW1: row[TEXT1][:90]+"...", TEXT_PREVIEW2: row[TEXT2][:90]+"...", DATASET: row[DATASET]}
+    # visualize all datasets in one tsne-figure
+    visualize_embeddings(embed_dict_total, "total")
 
-last_dataset_viewed = tokenized_pairs[list(tokenized_pairs.keys())[0]][DATASET]
-last_index = 0
-skipped_counter = 0
+    # get mean cos distance per dataset
+    stats_dict = mean_cos_distance(df, stats_dict)
 
-for i, pair_id in enumerate(tqdm(list(tokenized_pairs.keys()))):
-
-    dataset = tokenized_pairs[pair_id][DATASET]
-    
-    # handle visualization & output if neccessary (many processed or all of dataset processed)
-    if dataset != last_dataset_viewed:
-        if last_dataset_viewed not in visualized_datasets:
-            visualize_embeddings(embed_dict, last_dataset_viewed)
-            visualized_datasets.append(last_dataset_viewed)
-        
-        df = calculate_cosine_dists(df, embed_dict, last_dataset_viewed)
-        stats_dict = track_stats(embed_dict, last_dataset_viewed, stats_dict)
-
-        df[df[DATASET] == last_dataset_viewed].to_json(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER, last_dataset_viewed+"_embedded.json"), orient = "index", index = True, indent = 4)
-        last_dataset_viewed = dataset
-        last_index = i
-
-       # pop out unneccessary embeds (for final total tsne-figure)
-        for d in DATASETS:
-            if d in embed_dict:
-                embed_dict[d][EMBEDDINGS] = embed_dict[d][EMBEDDINGS][:2*int(FIGURE_SIZE/len(DATASETS))]    # only leave a certain amount of pairs for this dataset in total figure
-        embed_dict_total = dict(embed_dict_total, **embed_dict) # update total dict
-
-        embed_dict = { }  
-        skipped_counter = 0
-        gc.collect()  
-
-    elif i - skipped_counter - last_index >= FIGURE_SIZE and dataset == last_dataset_viewed:     # specified figure size (max) to avoid high memory usage
-        if last_dataset_viewed not in visualized_datasets:
-            visualize_embeddings(embed_dict, dataset)
-            visualized_datasets.append(last_dataset_viewed)
-
-        last_index = i
-        skipped_counter = 0
-        gc.collect()
-
-    # throw out longer that 512 token texts because BERT model struggels to process them
-    if len(tokenized_pairs[pair_id][TOKENS1]) > 512 or len(tokenized_pairs[pair_id][TOKENS2]) > 512:
-        del tokenized_pairs[pair_id]
-        skipped_counter = skipped_counter + 1
-        continue
-    
-    # DO FOR FIRST TEXT
-    # map tokens to vocab indices
-    indexed = tokenizer.convert_tokens_to_ids(tokenized_pairs[pair_id][TOKENS1])
-    segments_ids = [1] * len(tokenized_pairs[pair_id][TOKENS1])
-    #Extract Embeddings
-    tensor = torch.tensor([indexed]).to(device)
-    segments_tensors = torch.tensor([segments_ids]).to(device)
-    # collect all of the hidden states produced from all layers 
-    with torch.no_grad():
-        hidden_states = model(tensor, segments_tensors)[2]
-    # Concatenate the tensors for all layers (create a new dimension in the tensor)
-    embeds = torch.stack(hidden_states, dim=0).to(device)
-    # Remove dimension 1, the "batches".
-    embeds = torch.squeeze(embeds, dim=1).to(device)
-    #Switch dimensions
-    embeds = embeds.permute(1,0,2)
-    # Create Sentence Vector Representations (average of all token vectors)
-    embedding_1 = torch.mean(hidden_states[-2][0], dim=0).to(device)
-
-    # DO FOR SECOND TEXT
-    indexed = tokenizer.convert_tokens_to_ids(tokenized_pairs[pair_id][TOKENS2])
-    segments_ids = [1] * len(tokenized_pairs[pair_id][TOKENS2])
-    tensor = torch.tensor([indexed]).to(device)
-    segments_tensors = torch.tensor([segments_ids]).to(device)
-    with torch.no_grad():
-        hidden_states = model(tensor, segments_tensors)[2]
-    embeds = torch.stack(hidden_states, dim=0).to(device)
-    embeds = torch.squeeze(embeds, dim=1).to(device)
-    embeds = embeds.permute(1,0,2)
-    embedding_2 = torch.mean(hidden_states[-2][0], dim=0).to(device)
-
-    # Add embeddings to dataset-specific lists:
-    if dataset in embed_dict:
-        embed_dict[dataset][EMBEDDINGS].append({ DATASET: dataset, PAIR_ID: pair_id, TEXT_ID: tokenized_pairs[pair_id][ID1], TEXT_PREVIEW: tokenized_pairs[pair_id][TEXT_PREVIEW1], EMBED: list(embedding_1), PARAPHRASE: tokenized_pairs[pair_id][PARAPHRASE], TUPLE_ID: False }) 
-        embed_dict[dataset][EMBEDDINGS].append({ DATASET: dataset, PAIR_ID: pair_id, TEXT_ID: tokenized_pairs[pair_id][ID2], TEXT_PREVIEW: tokenized_pairs[pair_id][TEXT_PREVIEW2], EMBED: list(embedding_2), PARAPHRASE: tokenized_pairs[pair_id][PARAPHRASE], TUPLE_ID: True }) 
-    else:
-        embed_dict[dataset] = { EMBEDDINGS: [{ DATASET: dataset, PAIR_ID: pair_id, TEXT_ID: tokenized_pairs[pair_id][ID1], TEXT_PREVIEW: tokenized_pairs[pair_id][TEXT_PREVIEW1], EMBED: list(embedding_1), PARAPHRASE: tokenized_pairs[pair_id][PARAPHRASE], TUPLE_ID: False }] }
-        embed_dict[dataset][EMBEDDINGS].append({ DATASET: dataset, PAIR_ID: pair_id, TEXT_ID: tokenized_pairs[pair_id][ID2], TEXT_PREVIEW: tokenized_pairs[pair_id][TEXT_PREVIEW2], EMBED: list(embedding_2), PARAPHRASE: tokenized_pairs[pair_id][PARAPHRASE], TUPLE_ID: True }) 
-
-# Also do after the for loop completed (for the last dataset)
-if dataset not in visualized_datasets:
-    visualize_embeddings(embed_dict, dataset)
-    visualized_datasets.append(dataset)
-
-df = calculate_cosine_dists(df, embed_dict, dataset)
-stats_dict = track_stats(embed_dict, dataset, stats_dict)
-
-df[df[DATASET] == dataset].to_json(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER, dataset+"_embedded.json"), orient = "index", index = True, indent = 4)
-
-# pop out unneccessary embeds (for final total tsne-figure)
-for d in DATASETS:
-    if d in embed_dict:
-        embed_dict[d][EMBEDDINGS] = embed_dict[d][EMBEDDINGS][:2*int(FIGURE_SIZE/len(DATASETS))]    # only leave a certain amount of pairs for this dataset in total figure
-embed_dict_total = dict(embed_dict_total, **embed_dict) # update total dict
-
-# visualize all datasets in one tsne-figure
-visualize_embeddings(embed_dict_total, "total")
-
-# get mean cos distance per dataset
-stats_dict = mean_cos_distance(df, stats_dict)
-
-# Output Stats
-with open(os.path.join(OUT_DIR, 'stats_embedding_handler.json'), 'w') as f:
-    json.dump(stats_dict, f, indent=4)
+    # Output Stats
+    with open(os.path.join(OUT_DIR, 'stats_embedding_handler.json'), 'w') as f:
+        json.dump(stats_dict, f, indent=4)
