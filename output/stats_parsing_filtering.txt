@@ -1,62 +1,89 @@
 FILTERING STATS 
 
+Explanation:
+first number: theoretical dataset size
+after filtering: what we are using
+duplicates: NOT text1 == text2, but rather text1=text1 OR text2=text2
+filtered pairs: pairs that have either empty text fields like "", "\n", ... our where text1 == text2. Only counted up until the max 10k pairs per dataset were reached.
+
+
 ETPC: 5801
-after filtering: 4948
+after filtering: 5801
+filtered duplicates (counted separately): 0
 filtered pairs: 0
 
 SAv2: 167689
 after filtering: 10000
-filtered pairs: 4276
+filtered duplicates (counted separately): 5
+filtered pairs: 4082
 
 TURL: 56787
-after filtering: 9998
-filtered pairs: 2106
+after filtering: 10000
+filtered duplicates (counted separately): 1061
+filtered pairs: 2260
 
 MPC: 163715
 after filtering: 10000
-filtered pairs: 41
+filtered duplicates (counted separately): 0
+filtered pairs: 35
 
 QQP: 404351
-after filtering: 9998
+after filtering: 10000
+filtered duplicates (counted separately): 52
 filtered pairs: 0
 
 ParaNMT: 51409584
 after filtering: 10000
-filtered pairs: 150
+filtered duplicates (counted separately): 10
+filtered pairs: 176
 
 APH: 5007
-after filtering: 3486
+after filtering: 4572
+filtered duplicates (counted separately): 403
 filtered pairs: 32
 
 APT (msrp split): 62993
 after filtering: 5000
+filtered duplicates (counted separately): 1
 filtered pairs: 0
 
 APT (ppdb split): 75011
-after filtering: 4998
+after filtering: 5000
+filtered duplicates (counted separately): 2
 filtered pairs: 0
 
 PAWSWiki: 65401
 after filtering: 10000
-filtered pairs: 10
+filtered duplicates (counted separately): 1813
+filtered pairs: 69
 
-ParaSCI (ACL split): 5001
-after filtering: 5001
-filtered pairs: 5
+ParaSCI (ACL split): 33981
+after filtering: 5000
+filtered duplicates (counted separately): 818
+filtered pairs: 2
 
 ParaSCI (arXiv split): 316063
-after filtering: 4999
-filtered pairs: 4
+after filtering: 5000
+filtered duplicates (counted separately): 123
+filtered pairs: 6
 
-MSCOCO (unique image ids): 118287
-after filtering: 10000
+MSCOCO (unique image ids) (train split): 118287
+after filtering: 5000
+filtered duplicates (counted separately): 0
+filtered pairs: 2
+
+MSCOCO (unique image ids) (val split): 5000
+after filtering: 0
+filtered duplicates (counted separately): 1
 filtered pairs: 0
 
 SaR (contract split): 659
 after filtering: 659
+filtered duplicates (counted separately): 0
 filtered pairs: 0
 
 SaR (wiki split): 1379
 after filtering: 1379
+filtered duplicates (counted separately): 0
 filtered pairs: 0
 

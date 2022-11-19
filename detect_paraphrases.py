@@ -52,36 +52,22 @@ def GridSearch_table_plot(grid_clf, param_name, method_name,
                           graph=True,
                           display_all_params=True):
 
-    '''Display grid search results
-
-    Arguments
-    ---------
-
-    grid_clf           the estimator resulting from a grid search
+    '''
+    Display grid search results in a figure
+    :param grid_clf: the estimator resulting from a grid search
                        for example: grid_clf = GridSearchCV( ...
-
-    param_name         a string with the name of the parameter being tested
-
-    num_results        an integer indicating the number of results to display
+    :param param_name: a string with the name of the parameter being tested
+    :param num_results: an integer indicating the number of results to display
                        Default: 15
-
-    negative           boolean: should the sign of the score be reversed?
+    :param negative: boolean: should the sign of the score be reversed?
                        scoring = 'neg_log_loss', for instance
                        Default: True
-
-    graph              boolean: should a graph be produced?
+    :param graph: boolean: should a graph be produced?
                        non-numeric parameters (True/False, None) don't graph well
                        Default: True
-
-    display_all_params boolean: should we print out all of the parameters, not just the ones searched for?
+    :param display_all_params: boolean: should we print out all of the parameters, not just the ones searched for?
                        Default: True
-
-    Usage
-    -----
-
-    GridSearch_table_plot(grid_clf, "min_samples_leaf")
-
-                          '''
+    '''
 
     clf = grid_clf.best_estimator_
     clf_params = grid_clf.best_params_
@@ -142,11 +128,7 @@ def GridSearch_table_plot(grid_clf, param_name, method_name,
         plt.savefig(os.path.join(OUT_DIR, DETECTION_FOLDER, 'grid_search_' + method_name + '.png'))
 
 
-def sigmoid(x):
-    return 1 / (1 + math.exp(-x))
-
-
-def semantic_sim_bert(text1_train, text1_test, text2_train, text2_test, y_train, y_test, gs_params, verb, cv, n_jobs):
+def semantic_sim_bert(text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs):
     print("Semantic Similarity (BERT) \n------------")
     print("Loading model...")
     model = BertModel.from_pretrained("bert-large-uncased").to(device)
@@ -227,7 +209,7 @@ def semantic_sim_bert(text1_train, text1_test, text2_train, text2_test, y_train,
     '''
 
 
-def semantic_sim_t5(text1_train, text1_test, text2_train, text2_test, y_train, y_test, gs_params, verb, cv, n_jobs):
+def semantic_sim_t5(text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs):
     print("Semantic Similarity (T5) \n------------")
     print("Loading model...")
 
@@ -297,7 +279,7 @@ def semantic_sim_gpt3(df):
     return semantic_results
 
 
-def ngram_sim(n, text1_train, text1_test, text2_train, text2_test, y_train, y_test, gs_params, verb, cv, n_jobs):
+def ngram_sim(n, text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs):
     # done after http://webdocs.cs.ualberta.ca/~kondrak/papers/spire05.pdf
     print(f"Calculating similarity with {n}-Grams.")
 
@@ -332,7 +314,7 @@ def ngram_sim(n, text1_train, text1_test, text2_train, text2_test, y_train, y_te
     return [p[1] for p in prediction_result]
 
 
-def fuzzy_sim(text1_train, text1_test, text2_train, text2_test, y_train, y_test, gs_params, verb, cv, n_jobs):
+def fuzzy_sim(text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs):
     print(f"Calculating similarity with Fuzzy.")
 
     print("Processing texts...")
@@ -373,7 +355,7 @@ def create_embedding_matrix(word_index, embedding_dict, dimension):
     return embedding_matrix
 
 
-def semantic_sim_glove(text1_train, text1_test, text2_train, text2_test, y_train, y_test, gs_params, verb, cv, n_jobs):
+def semantic_sim_glove(text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs):
     print("GloVe Similarity \n------------")
     print("Loading model...")
 
@@ -437,7 +419,7 @@ def semantic_sim_glove(text1_train, text1_test, text2_train, text2_test, y_train
     return [p[1] for p in prediction_result]    # only get probability for one of two classes (true/false)
 
 
-def fasttext_sim(text1_train, text1_test, text2_train, text2_test, y_train, y_test, gs_params, verb, cv, n_jobs):
+def fasttext_sim(text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs):
     print("GloVe Similarity \n------------")
     print("Loading model...")
 
@@ -478,7 +460,7 @@ def fasttext_sim(text1_train, text1_test, text2_train, text2_test, y_train, y_te
     return [p[1] for p in prediction_result]    # only get probability for one of two classes (true/false)
 
 
-def tfidf_cosine_sim(text1_train, text1_test, text2_train, text2_test, y_train, y_test, gs_params, verb, cv, n_jobs):
+def tfidf_cosine_sim(text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs):
     print("Calculating TF-IDF cosine similarities.")
 
     print("Processing texts...")
@@ -539,159 +521,160 @@ def get_splits(df):
         print("---")
 
 
-#################################################################################
+if __name__ == "__main__":
 
-if not os.path.isdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):
-    os.makedirs(os.path.join(OUT_DIR, DETECTION_FOLDER))
+    # create output folder
+    if not os.path.isdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):
+        os.makedirs(os.path.join(OUT_DIR, DETECTION_FOLDER))
 
-stats_str = "STATISTICS OF DETECTION SCRIPT\n\n"
+    stats_str = "STATISTICS OF DETECTION SCRIPT\n\n"
 
-print("Reading " + FORMATTED_DATA_FILENAME + " ...")
-df = pd.read_json(os.path.join(OUT_DIR, FORMATTED_DATA_FILENAME), orient="index")
-df = df.sort_values(by=[DATASET])  # sort to have datasets processed sequentially
+    print("Reading " + FORMATTED_DATA_FILENAME + " ...")
+    df = pd.read_json(os.path.join(OUT_DIR, FORMATTED_DATA_FILENAME), orient="index")
+    df = df.sort_values(by=[DATASET])  # sort to have datasets processed sequentially
 
-print(None in df[TEXT2].tolist())
-print(None in df[TEXT1].tolist())
+    print(None in df[TEXT2].tolist())
+    print(None in df[TEXT1].tolist())
 
-pred_result_df = pd.DataFrame()
+    pred_result_df = pd.DataFrame()
 
-df = df.reset_index(drop=True)
-df = df.truncate(before=0, after=50000)     # for testing
-# df = df[(df[DATASET] == "MPC") | (df[DATASET] == "ETPC")]   # for testing
+    df = df.reset_index(drop=True)
+    df = df.truncate(before=0, after=50000)     # for testing
+    # df = df[(df[DATASET] == "MPC") | (df[DATASET] == "ETPC")]   # for testing
 
-print(f"{df.shape[0]} pairs found in the file.")
+    print(f"{df.shape[0]} pairs found in the file.")
 
-# Calculate the similarities with each method
-datasets_in_df = df[DATASET].unique().tolist()
-total_pred_result = []
-print("Found the following datasets in the data: " + str(datasets_in_df))
+    # Calculate the similarities with each method
+    datasets_in_df = df[DATASET].unique().tolist()
+    total_pred_result = []
+    print("Found the following datasets in the data: " + str(datasets_in_df))
 
-test_data = [[], [], [], []]
-train_data = [[], [], [], []]
+    test_data = [[], [], [], []]
+    train_data = [[], [], [], []]
 
-for dataset in datasets_in_df:
-    print("Processing " + str(dataset) + "...")
+    for dataset in datasets_in_df:
+        print("Processing " + str(dataset) + "...")
 
-    df_dataset = df[df[DATASET] == dataset]
-    df_dataset[SUPPLEMENT_FROM] = None
+        df_dataset = df[df[DATASET] == dataset]
+        df_dataset[SUPPLEMENT_FROM] = None
 
-    # For datasets with only positive pairs, supplement the data with random pairs from other datasets
-    if False not in df_dataset[PARAPHRASE].unique():
-        supplement_df = df[~(df[DATASET] == dataset)].sample(frac=1).reset_index(drop=True)
-        supplement_df = supplement_df[~supplement_df[PARAPHRASE]].head(df_dataset.shape[0])
-        supplement_df[SUPPLEMENT_FROM] = supplement_df[DATASET]
-        supplement_df[DATASET] = dataset
-        df_dataset = pd.concat([df_dataset, supplement_df])
-        print("Supplemented dataset. It does now contain " + str(df_dataset.shape[0]) + " pairs.")
-    df_dataset.reset_index(drop=True, inplace=True)
-    print(df_dataset[PARAPHRASE].value_counts())
+        # For datasets with only positive pairs, supplement the data with random pairs from other datasets
+        if False not in df_dataset[PARAPHRASE].unique():
+            supplement_df = df[~(df[DATASET] == dataset)].sample(frac=1).reset_index(drop=True)
+            supplement_df = supplement_df[~supplement_df[PARAPHRASE]].head(df_dataset.shape[0])
+            supplement_df[SUPPLEMENT_FROM] = supplement_df[DATASET]
+            supplement_df[DATASET] = dataset
+            df_dataset = pd.concat([df_dataset, supplement_df])
+            print("Supplemented dataset. It does now contain " + str(df_dataset.shape[0]) + " pairs.")
+        df_dataset.reset_index(drop=True, inplace=True)
+        print(df_dataset[PARAPHRASE].value_counts())
 
-    print("Managing pair ids...")
+        print("Managing pair ids...")
 
-    y = np.array(df_dataset[PARAPHRASE])
+        y = np.array(df_dataset[PARAPHRASE])
 
-    # max amount of train split to make data comparable
-    # (rest is used as test split)
-    if len(df_dataset) > TRAIN_SPLIT_MAX:
-        train_split_size = TRAIN_SPLIT_MAX / len(df_dataset)
-    else:
-        train_split_size = 0.8
-    print("Determined train split size for " + str(dataset) + ": " + str(train_split_size))
+        # max amount of train split to make data comparable
+        # (rest is used as test split)
+        if len(df_dataset) > TRAIN_SPLIT_MAX:
+            train_split_size = TRAIN_SPLIT_MAX / len(df_dataset)
+        else:
+            train_split_size = 0.8
+        print("Determined train split size for " + str(dataset) + ": " + str(train_split_size))
 
-    print("Creating splits...")
-    df_dataset_train, df_dataset_test, X_pairID_train, X_pairID_test, X_text1_train, X_text1_test, X_text2_train, X_text2_test, y_train, y_test = train_test_split(df_dataset, df_dataset[PAIR_ID], df_dataset[TEXT1], df_dataset[TEXT2], y, train_size=train_split_size, random_state=0, stratify=y)
+        print("Creating splits...")
+        df_dataset_train, df_dataset_test, X_pairID_train, X_pairID_test, X_text1_train, X_text1_test, X_text2_train, X_text2_test, y_train, y_test = train_test_split(df_dataset, df_dataset[PAIR_ID], df_dataset[TEXT1], df_dataset[TEXT2], y, train_size=train_split_size, random_state=0, stratify=y)
 
-    print("Assembling data...")
-    test_data[0] = test_data[0] + X_pairID_test.tolist()  # pair ids
-    test_data[1] = test_data[1] + X_text1_test.tolist()  # text 1
-    test_data[2] = test_data[2] + X_text2_test.tolist()  # text 2
-    test_data[3] = test_data[3] + y_test.tolist()  # labels
+        print("Assembling data...")
+        test_data[0] = test_data[0] + X_pairID_test.tolist()  # pair ids
+        test_data[1] = test_data[1] + X_text1_test.tolist()  # text 1
+        test_data[2] = test_data[2] + X_text2_test.tolist()  # text 2
+        test_data[3] = test_data[3] + y_test.tolist()  # labels
 
-    train_data[0] = train_data[0] + X_pairID_train.tolist()  # pair ids
-    train_data[1] = train_data[1] + X_text1_train.tolist()  # text 1
-    train_data[2] = train_data[2] + X_text2_train.tolist()  # text 2
-    train_data[3] = train_data[3] + y_train.tolist()  # labels
+        train_data[0] = train_data[0] + X_pairID_train.tolist()  # pair ids
+        train_data[1] = train_data[1] + X_text1_train.tolist()  # text 1
+        train_data[2] = train_data[2] + X_text2_train.tolist()  # text 2
+        train_data[3] = train_data[3] + y_train.tolist()  # labels
 
-    print(sum(map(lambda x: x == True, train_data[3])))
-    print(sum(map(lambda x: x == False, train_data[3])))
-    print("---")
-    print(sum(map(lambda x: x == True, test_data[3])))
-    print(sum(map(lambda x: x == False, test_data[3])))
+        print(sum(map(lambda x: x == True, train_data[3])))
+        print(sum(map(lambda x: x == False, train_data[3])))
+        print("---")
+        print(sum(map(lambda x: x == True, test_data[3])))
+        print(sum(map(lambda x: x == False, test_data[3])))
 
-    print(type(X_pairID_test))
-    print(X_pairID_test.shape)
-    print(X_pairID_test)
-    print(X_text1_train)
+        print(type(X_pairID_test))
+        print(X_pairID_test.shape)
+        print(X_pairID_test)
+        print(X_text1_train)
 
-    # add to pred result df in the correct order
-    print("Appending test split to result dataframe...")
-    pred_result_df = pd.concat([pred_result_df, df_dataset_test], ignore_index=True)
+        # add to pred result df in the correct order
+        print("Appending test split to result dataframe...")
+        pred_result_df = pd.concat([pred_result_df, df_dataset_test], ignore_index=True)
 
-# use classifiers
-print(f"Finished assembling data. Continue with classification of {str(pred_result_df.shape[0])} examples (train- & test-split)...")
-print(f"Train data size: {str(len(train_data[0]))}")
-print(f"Test data size: {str(len(test_data[0]))}")
+    # use classifiers
+    print(f"Finished assembling data. Continue with classification of {str(pred_result_df.shape[0])} examples (train- & test-split)...")
+    print(f"Train data size: {str(len(train_data[0]))}")
+    print(f"Test data size: {str(len(test_data[0]))}")
 
-# Grid Search Testing Range
-gs_params = {
-        'C': [10, 100]
-}
+    # Grid Search Testing Range
+    gs_params = {
+            'C': [10, 100]
+    }
 
-# Grid Search Range (https://arxiv.org/abs/2101.09023)
-'''
-gs_params = {
-    'kernel': ('linear', 'rbf', 'poly'),
-    'gamma': [0.01, 0.001, 0.0001, 0.00001],
-    'degree': [1, 2, 3, 4, 5, 6, 7, 8, 9],
-    'C': [1, 10, 100],
-}
-'''
+    # Grid Search Range (https://arxiv.org/abs/2101.09023)
+    '''
+    gs_params = {
+        'kernel': ('linear', 'rbf', 'poly'),
+        'gamma': [0.01, 0.001, 0.0001, 0.00001],
+        'degree': [1, 2, 3, 4, 5, 6, 7, 8, 9],
+        'C': [1, 10, 100],
+    }
+    '''
 
-verb, cv, n_jobs = 50, 2, 6
+    verb, cv, n_jobs = 50, 2, 6
 
-pred_result_df[FASTTEXT] = fasttext_sim(train_data[1], test_data[1],
-                                             train_data[2], test_data[2], train_data[3], test_data[3],
-                                             gs_params, verb, cv, n_jobs)
-pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
-                       index=True, indent=4)
-pred_result_df[SEM_GLOVE] = semantic_sim_glove(train_data[1], test_data[1],
-                                             train_data[2], test_data[2], train_data[3], test_data[3],
-                                             gs_params, verb, cv, n_jobs)
-pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
-                       index=True, indent=4)
-pred_result_df[SEM_BERT] = semantic_sim_bert(train_data[1], test_data[1],
-                                             train_data[2], test_data[2], train_data[3], test_data[3],
-                                             gs_params, verb, cv, n_jobs)
-pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
-                       index=True, indent=4)
-pred_result_df[SEM_T5] = semantic_sim_t5(train_data[1], test_data[1],
-                                             train_data[2], test_data[2], train_data[3], test_data[3],
-                                             gs_params, verb, cv, n_jobs)
-pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
-                       index=True, indent=4)
-pred_result_df[TFIDF_COSINE] = tfidf_cosine_sim(train_data[1], test_data[1],
-                                             train_data[2], test_data[2], train_data[3], test_data[3],
-                                             gs_params, verb, cv, n_jobs)
-pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
-                       index=True, indent=4)
-pred_result_df[FUZZY] = fuzzy_sim(train_data[1], test_data[1],
-                                             train_data[2], test_data[2], train_data[3], test_data[3],
-                                             gs_params, verb, cv, n_jobs)
-pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
-                       index=True, indent=4)
-pred_result_df[NGRAM3] = ngram_sim(3,train_data[1], test_data[1],
-                                             train_data[2], test_data[2], train_data[3], test_data[3],
-                                             gs_params, verb, cv, n_jobs)
-pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
-                       index=True, indent=4)
+    pred_result_df[FASTTEXT] = fasttext_sim(train_data[1], test_data[1],
+                                                 train_data[2], test_data[2], train_data[3], test_data[3],
+                                                 gs_params, verb, cv, n_jobs)
+    pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
+                           index=True, indent=4)
+    pred_result_df[SEM_GLOVE] = semantic_sim_glove(train_data[1], test_data[1],
+                                                 train_data[2], test_data[2], train_data[3], test_data[3],
+                                                 gs_params, verb, cv, n_jobs)
+    pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
+                           index=True, indent=4)
+    pred_result_df[SEM_BERT] = semantic_sim_bert(train_data[1], test_data[1],
+                                                 train_data[2], test_data[2], train_data[3], test_data[3],
+                                                 gs_params, verb, cv, n_jobs)
+    pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
+                           index=True, indent=4)
+    pred_result_df[SEM_T5] = semantic_sim_t5(train_data[1], test_data[1],
+                                                 train_data[2], test_data[2], train_data[3], test_data[3],
+                                                 gs_params, verb, cv, n_jobs)
+    pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
+                           index=True, indent=4)
+    pred_result_df[TFIDF_COSINE] = tfidf_cosine_sim(train_data[1], test_data[1],
+                                                 train_data[2], test_data[2], train_data[3], test_data[3],
+                                                 gs_params, verb, cv, n_jobs)
+    pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
+                           index=True, indent=4)
+    pred_result_df[FUZZY] = fuzzy_sim(train_data[1], test_data[1],
+                                                 train_data[2], test_data[2], train_data[3], test_data[3],
+                                                 gs_params, verb, cv, n_jobs)
+    pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
+                           index=True, indent=4)
+    pred_result_df[NGRAM3] = ngram_sim(3,train_data[1], test_data[1],
+                                                 train_data[2], test_data[2], train_data[3], test_data[3],
+                                                 gs_params, verb, cv, n_jobs)
+    pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
+                           index=True, indent=4)
 
 
 
-# Output data to json format
-print(len(pred_result_df))
-pred_result_df = pred_result_df.reset_index(drop=True)
-print(len(pred_result_df))
-pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
-                       index=True, indent=4)
+    # Output data to json format
+    print(len(pred_result_df))
+    pred_result_df = pred_result_df.reset_index(drop=True)
+    print(len(pred_result_df))
+    pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
+                           index=True, indent=4)
 
-print("Done.")
+    print("Done.")

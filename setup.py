@@ -7,6 +7,7 @@ EVALUATION_RESULTS_FILENAME = "evaluation.json"
 DATASETS = ["ETPC", "SAv2", "TURL", "MPC", "QQP", "ParaNMT", "APH", "APT", "PAWSWiki", "ParaSCI", "MSCOCO", "SaR"]     #the folders in the DATASETS_FOLDER should be named like the datasets here
 MACHINE_PARAPHRASED_DATASETS = ["SAv2", "MPC", "ParaNMT", "APT", "PAWSWiki"]
 HUMAN_PARAPHRASED_DATASETS = ["ETPC", "TURL", "QQP", "APH", "ParaSCI", "MSCOCO", "SaR"]
+
 OUT_DIR = "output"      #the directory to output the formatted files in
 FIGURES_FOLDER = "figures"
 EMBEDDINGS_FOLDER = "embeddings"
@@ -16,6 +17,7 @@ EVALUATION_FOLDER = "evaluation"
 CORRELATIONS_FOLDER = "correlations"
 MODELS_FOLDER = "models"
 
+# Methods:
 FUZZY = "fuzzy"
 SEM_GLOVE = "semantic_glove"
 SEM_BERT = "semantic_bert"
@@ -26,52 +28,36 @@ NGRAM4 = "4gram"
 NGRAM5 = "5gram"
 FASTTEXT = "fasttext"
 TFIDF_COSINE = "tfidf_cosine"
-
 DETECTION_METHODS = [FUZZY, NGRAM3, SEM_BERT, SEM_T5, TFIDF_COSINE, SEM_GPT3, FASTTEXT, SEM_GLOVE]
 
-FUZZY_BIN = "fuzzy_binary"
-SEM_BERT_BIN = "sem_bert_binary"
-SEM_T5_BIN = "sem_t5_binary"
-SEM_GPT3_BIN = "sem_gpt3_binary"
-NGRAM_BIN = "ngram_binary"
-TFIDF_COSINE_BIN = "tfidf_cosine_binary"
-
 FIGURE_SIZE = 2000  
-MAX_DATASET_INPUT = 10000
+MAX_DATASET_INPUT = 10000   # how many pairs to parse per dataset (sampled randomly from bigger datasets)
 EXAMPLE_AMOUNT = 500    # how many examples to extract (top sim, low sim & random sim)
-STUDY_EXAMPLE_AMOUNT = 10
-PARAGRAM_PHRASE_SCORE = [0.4, 0.9]  # the span in which dataset entries will be taken into parsing (throw out other entries), only for ParaNMT
+STUDY_EXAMPLE_AMOUNT = 10   # amount of extracted examples for human study
 
 # Variable Names for the outputs:
 TEXT1 = "text_1"
 TEXT2 = "text_2"
 DATASET = "dataset"
 PAIR_ID = "pair_id"
-SPLIT = "split"     # should be either "test", "train", "dev", "val" or None
+SPLIT = "split_original"     # should be either "test", "train", "dev", "val" or None, NOT the splits from this study, but from the original datasets if provided
 TUPLE_ID = "tuple_id" 
 ID1 = "id_1"
 ID2 = "id_2"
-PARAPHRASE = "is_paraphrase" 
-WORDVECS1 = "word_vectors_1" 
-WORDVECS2 = "word_vectors_2"
-TEXTEMBED1 = "text_embedding_1" 
-TEXTEMBED2 = "text_embedding_2"
+PARAPHRASE = "is_paraphrase"
 COSINE_DISTANCE = "cosine_distance"
 ORIGIN = "origin"
 SUPPLEMENT_FROM = "supplement_from"
-
 PARAPHRASE_TYPE = "paraphrase_type"
-TYPE_ID = "type_id"
+# ETPC-relevant attributes:
+TYPE_ID = "type_id"     # the ETP annotation for the paraphrase type
 TEXT1_SCOPE = "text1_scope"     # the token id scope x,y that marks the part of sentence which has been modified
 TEXT2_SCOPE = "text2_scope"
 SENSE_PRESERVING = "sense_preserving"
 
-TRAIN_LABELS = [True, False]
-TRAIN_SPLIT_MAX = 4000
-DEFAULT_THRESHOLDS = [0.5, 0.7, 0.9]
+TRAIN_SPLIT_MAX = 4000      # max amount of train split pairs used for grid search SVM training
 
-# Variables for Embeddings
-TOKENS = "tokens"
+# Variables for embeddings and their visualization
 TOKENS1 = "tokens_1"
 TOKENS2 = "tokens_2"
 TEXT_PREVIEW = "text_preview"
@@ -81,8 +67,8 @@ EMBEDDINGS = "embeddings"
 TEXT_ID = "text_id"
 EMBED = "embed"
 
-#Eval Variables
-DATASET_NAME = "dataset"
+# Eval Variables
+DATASET_COLUMN_NAME = "dataset"
 METHOD = "detection_method"
 PAIRS = "pairs"
 TP = "TP"
@@ -92,17 +78,10 @@ FN = "FN"
 ACCURACY = "accuracy"
 PRECISION = "precision"
 SPECIFICITY = "specificity"
-TRUE_NEG_RATE = "true_negative_rate"
 RECALL = "recall"
 F1 = "f1"
-THRESHOLD = "threshold"
 
 CORR_GRAPH_SIZE = 3000
-
-# Paraphrase Types (EPT Annotation)
-PARAPHRASE_TYPES = {}
-TYPE_NAME = "type_name"
-TYPE_CATEGORY = "type_category"
 
 #with open(os.path.join(os.path.join(DATASETS_FOLDER, "ETPC"), "paraphrase_types.xml"), encoding='utf-8', mode = "r") as file:
 #    tree = ET.parse(file)

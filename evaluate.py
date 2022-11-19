@@ -89,7 +89,7 @@ def eval(df, dataset, method, eval_df, eval_string):
 c_pal = sns.color_palette("colorblind")
 plt.rcParams.update({'font.size': 30})
 
-eval_df = pd.DataFrame(columns=[DATASET_NAME, METHOD, PAIRS, TP, TN, FP, FN, ACCURACY, PRECISION, RECALL, SPECIFICITY, F1])
+eval_df = pd.DataFrame(columns=[DATASET_COLUMN_NAME, METHOD, PAIRS, TP, TN, FP, FN, ACCURACY, PRECISION, RECALL, SPECIFICITY, F1])
 
 eval_string = ""
 eval_string += "-------------------------" + "\n"
