@@ -129,6 +129,21 @@ def GridSearch_table_plot(grid_clf, param_name, method_name,
 
 
 def semantic_sim_bert(text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs):
+    '''
+        Calculates the BERT embeddings for the given text pairs and uses an SVM to output classification
+        and estimated probabilities for the provided test split. The optimal SVM parameters are determined by a grid
+        search
+        :param text1_train: first texts of train split
+        :param text1_test: first texts of test split
+        :param text2_train: second texts of train split
+        :param text2_test: second texts of test split
+        :param y_train: true label for the train split
+        :param gs_params: grid search parameters
+        :param verb: the verbose level (amount of logging)
+        :param cv: how many folds should be done during grid search
+        :param n_jobs: how many cpu cores to use for processing (-1 for max amount)
+        :return: estimated probabilities for being a paraphrase, predicted labels
+    '''
     print("Semantic Similarity (BERT) \n------------")
     print("Loading model...")
     model = BertModel.from_pretrained("bert-large-uncased").to(device)
@@ -191,6 +206,21 @@ def semantic_sim_bert(text1_train, text1_test, text2_train, text2_test, y_train,
 
 
 def semantic_sim_t5(text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs):
+    '''
+        Calculates the T5 embeddings for the given text pairs and uses an SVM to output classification
+        and estimated probabilities for the provided test split. The optimal SVM parameters are determined by a grid
+        search
+        :param text1_train: first texts of train split
+        :param text1_test: first texts of test split
+        :param text2_train: second texts of train split
+        :param text2_test: second texts of test split
+        :param y_train: true label for the train split
+        :param gs_params: grid search parameters
+        :param verb: the verbose level (amount of logging)
+        :param cv: how many folds should be done during grid search
+        :param n_jobs: how many cpu cores to use for processing (-1 for max amount)
+        :return: estimated probabilities for being a paraphrase, predicted labels
+    '''
     print("Semantic Similarity (T5) \n------------")
     print("Loading model...")
 
@@ -243,6 +273,23 @@ def semantic_sim_t5(text1_train, text1_test, text2_train, text2_test, y_train, g
 
 
 def ngram_sim(n, text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs):
+    '''
+        Calculates the N-Gram similarities for the given text pairs and uses an SVM to output classification
+        and estimated probabilities for the provided test split. The optimal SVM parameters are determined by a grid
+        search.
+        Done after http://webdocs.cs.ualberta.ca/~kondrak/papers/spire05.pdf
+        :param n: n-gram span
+        :param text1_train: first texts of train split
+        :param text1_test: first texts of test split
+        :param text2_train: second texts of train split
+        :param text2_test: second texts of test split
+        :param y_train: true label for the train split
+        :param gs_params: grid search parameters
+        :param verb: the verbose level (amount of logging)
+        :param cv: how many folds should be done during grid search
+        :param n_jobs: how many cpu cores to use for processing (-1 for max amount)
+        :return: estimated probabilities for being a paraphrase, predicted labels
+    '''
     # done after http://webdocs.cs.ualberta.ca/~kondrak/papers/spire05.pdf
     print(f"Calculating similarity with {n}-Grams.")
 
@@ -284,6 +331,21 @@ def ngram_sim(n, text1_train, text1_test, text2_train, text2_test, y_train, gs_p
 
 
 def fuzzy_sim(text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs):
+    '''
+        Calculates the fuzzy similarities for the given text pairs and uses an SVM to output classification
+        and estimated probabilities for the provided test split. The optimal SVM parameters are determined by a grid
+        search
+        :param text1_train: first texts of train split
+        :param text1_test: first texts of test split
+        :param text2_train: second texts of train split
+        :param text2_test: second texts of test split
+        :param y_train: true label for the train split
+        :param gs_params: grid search parameters
+        :param verb: the verbose level (amount of logging)
+        :param cv: how many folds should be done during grid search
+        :param n_jobs: how many cpu cores to use for processing (-1 for max amount)
+        :return: estimated probabilities for being a paraphrase, predicted labels
+    '''
     print(f"Calculating similarity with Fuzzy.")
 
     print("Processing texts...")
@@ -321,7 +383,14 @@ def fuzzy_sim(text1_train, text1_test, text2_train, text2_test, y_train, gs_para
     return [p[true_i] for p in prediction_result], prediction_classes
 
 
-def create_embedding_matrix(word_index, embedding_dict, dimension):
+def create_glove_embedding_matrix(word_index, embedding_dict, dimension):
+    '''
+    Creates the embedding matrix for GloVe
+    :param word_index: word index of the tokenizer
+    :param embedding_dict: the GloVe embedding dictionary
+    :param dimension: desired dimensionality of the embedding matrix
+    :return: the embedding matrix
+    '''
     embedding_matrix = np.zeros((len(word_index) + 1, dimension))
 
     for word, index in word_index.items():
@@ -331,6 +400,21 @@ def create_embedding_matrix(word_index, embedding_dict, dimension):
 
 
 def semantic_sim_glove(text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs):
+    '''
+        Calculates the GloVe embeddings for the given text pairs and uses an SVM to output classification
+        and estimated probabilities for the provided test split. The optimal SVM parameters are determined by a grid
+        search
+        :param text1_train: first texts of train split
+        :param text1_test: first texts of test split
+        :param text2_train: second texts of train split
+        :param text2_test: second texts of test split
+        :param y_train: true label for the train split
+        :param gs_params: grid search parameters
+        :param verb: the verbose level (amount of logging)
+        :param cv: how many folds should be done during grid search
+        :param n_jobs: how many cpu cores to use for processing (-1 for max amount)
+        :return: estimated probabilities for being a paraphrase, predicted labels
+    '''
     print("GloVe Similarity \n------------")
     print("Loading model...")
 
@@ -349,7 +433,7 @@ def semantic_sim_glove(text1_train, text1_test, text2_train, text2_test, y_train
     text2_train_token = tokenizer.texts_to_sequences(text2_train)
 
     print("Creating embedding matrix...")
-    embedding_matrix = create_embedding_matrix(tokenizer.word_index, embedding_dict=glove_embedding, dimension=100)
+    embedding_matrix = create_glove_embedding_matrix(tokenizer.word_index, embedding_dict=glove_embedding, dimension=100)
 
     vocab_size = embedding_matrix.shape[0]
     vector_size = embedding_matrix.shape[1]
@@ -401,6 +485,21 @@ def semantic_sim_glove(text1_train, text1_test, text2_train, text2_test, y_train
 
 
 def fasttext_sim(text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs):
+    '''
+        Calculates the FastText vector representations for the given text pairs and uses an SVM to output classification
+        and estimated probabilities for the provided test split. The optimal SVM parameters are determined by a grid
+        search
+        :param text1_train: first texts of train split
+        :param text1_test: first texts of test split
+        :param text2_train: second texts of train split
+        :param text2_test: second texts of test split
+        :param y_train: true label for the train split
+        :param gs_params: grid search parameters
+        :param verb: the verbose level (amount of logging)
+        :param cv: how many folds should be done during grid search
+        :param n_jobs: how many cpu cores to use for processing (-1 for max amount)
+        :return: estimated probabilities for being a paraphrase, predicted labels
+    '''
     print("FastText Similarity \n------------")
     print("Loading model...")
 
@@ -448,6 +547,22 @@ def fasttext_sim(text1_train, text1_test, text2_train, text2_test, y_train, gs_p
 
 
 def tfidf_cosine_sim(text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs):
+    '''
+        Calculates the tfidf-vector representations for the given text pairs to calculate cosine similarites of all
+        pairs.
+        It uses an SVM to output classification and estimated probabilities for the provided test split.
+        The optimal SVM parameters are determined by a grid search
+        :param text1_train: first texts of train split
+        :param text1_test: first texts of test split
+        :param text2_train: second texts of train split
+        :param text2_test: second texts of test split
+        :param y_train: true label for the train split
+        :param gs_params: grid search parameters
+        :param verb: the verbose level (amount of logging)
+        :param cv: how many folds should be done during grid search
+        :param n_jobs: how many cpu cores to use for processing (-1 for max amount)
+        :return: estimated probabilities for being a paraphrase, predicted label
+    '''
     print("Calculating TF-IDF cosine similarities.")
 
     print("Processing texts...")
