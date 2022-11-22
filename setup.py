@@ -22,13 +22,23 @@ FUZZY = "fuzzy"
 SEM_GLOVE = "semantic_glove"
 SEM_BERT = "semantic_bert"
 SEM_T5 = "semantic_t5"
-SEM_GPT3 = "semantic_gpt3"
 NGRAM3 = "3gram"
 NGRAM4 = "4gram"
 NGRAM5 = "5gram"
 FASTTEXT = "fasttext"
 TFIDF_COSINE = "tfidf_cosine"
-DETECTION_METHODS = [FUZZY, NGRAM3, SEM_BERT, SEM_T5, TFIDF_COSINE, SEM_GPT3, FASTTEXT, SEM_GLOVE]
+DETECTION_METHODS = [FUZZY, NGRAM3, SEM_BERT, SEM_T5, TFIDF_COSINE, FASTTEXT, SEM_GLOVE]
+
+# Methods (Class Prediction):
+FUZZY_PRED = FUZZY+"_pred"
+SEM_GLOVE_PRED = SEM_GLOVE+"_pred"
+SEM_BERT_PRED = SEM_BERT+"_pred"
+SEM_T5_PRED = SEM_T5+"_pred"
+NGRAM3_PRED = NGRAM3+"_pred"
+NGRAM4_PRED = NGRAM4+"_pred"
+NGRAM5_PRED = NGRAM5+"_pred"
+FASTTEXT_PRED = FASTTEXT+"_pred"
+TFIDF_COSINE_PRED = TFIDF_COSINE+"_pred"
 
 FIGURE_SIZE = 2000  
 MAX_DATASET_INPUT = 10000   # how many pairs to parse per dataset (sampled randomly from bigger datasets)

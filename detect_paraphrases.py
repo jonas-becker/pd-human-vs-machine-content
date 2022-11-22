@@ -178,35 +178,16 @@ def semantic_sim_bert(text1_train, text1_test, text2_train, text2_test, y_train,
     gs.fit(X_train, y_train)
     GridSearch_table_plot(gs, "C", "BERT", negative=False)
 
+    best_model = gs.best_estimator_
+
+    # test the model
     print("Predicting test split...")
-    prediction_result = gs.predict_proba(X_test)
+    prediction_classes = best_model.predict(X_test).tolist()
+    prediction_result = best_model.predict_proba(X_test)
+    true_i = numpy.where(gs.classes_ == True)[0][0]  # the index of the prob for being "True"
 
-    return [p[1] for p in prediction_result]  # only get probability for one of two classes (true/false)
-
-    '''
-    # get output of slice layer from model above
-    print("Initializing SVM Model...")
-    cls_layer_model = Model(model.input, outputs=model.get_layer('tf.__operators__.getitem').output)
-
-    print("Get embeddings...")
-    print(train_input.keys())
-    X_train = cls_layer_model.predict({"input_word_ids": np.array(train_input["input_ids"]), "input_mask": np.array(train_input["attention_mask"]), "segment_ids": np.array(train_input["token_type_ids"])})
-    print(X_train)
-    X_test = cls_layer_model.predict({"input_word_ids": np.array(test_input["input_ids"]), "input_mask": np.array(test_input["attention_mask"]), "segment_ids": np.array(test_input["token_type_ids"])})
-
-    print("Training the SVM...")
-    model_svm = SVC(C=15, kernel='rbf', gamma=0.001, probability=True)
-
-    # Grid Search
-    gs = GridSearchCV(model_svm, gs_params, cv=3, verbose=50)
-    gs.fit(X_train, y_train)
-    GridSearch_table_plot(gs, "C",  "BERT", negative=False)
-
-    print("Predicting test split...")
-    prediction_result = gs.predict_proba(X_test)
-
-    return [p[1] for p in prediction_result]    # only get probability for one of two classes (true/false)
-    '''
+    # only get probability for one of two classes (true/false), True/False classification
+    return [p[true_i] for p in prediction_result], prediction_classes
 
 
 def semantic_sim_t5(text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs):
@@ -249,34 +230,16 @@ def semantic_sim_t5(text1_train, text1_test, text2_train, text2_test, y_train, g
     gs.fit(X_train, y_train)
     GridSearch_table_plot(gs, "C", "T5", negative=False)
 
+    best_model = gs.best_estimator_
+
+    # test the model
     print("Predicting test split...")
-    prediction_result = gs.predict_proba(X_test)
+    prediction_classes = best_model.predict(X_test).tolist()
+    prediction_result = best_model.predict_proba(X_test)
+    true_i = numpy.where(gs.classes_ == True)[0][0]  # the index of the prob for being "True"
 
-    return [p[1] for p in prediction_result]    # only get probability for one of two classes (true/false)
-
-
-def semantic_sim_gpt3(df):
-    print("Calculating semantic similarity with GPT-3.")
-    semantic_results = []
-    with zipfile.ZipFile(os.path.join(OUT_DIR, EMBEDDINGS_FOLDER, 'embeddings-gpt-3.zip'), 'r') as archive:
-        for i, row in tqdm(df.iterrows(), total=df.shape[0]):
-            if "embeddings-gpt-3/" + str(row[PAIR_ID]) + "_text_1.txt" not in archive.namelist():
-                sim = None
-            else:
-                with io.TextIOWrapper(archive.open("embeddings-gpt-3/" + str(row[PAIR_ID]) + "_text_1.txt")) as f1:
-                    text1_embedding = f1.read()  # [2:]
-                    t1_embed = []
-                    for e in list(text1_embedding.split("\n"))[:-1]:
-                        t1_embed.append(float(e))
-                with io.TextIOWrapper(archive.open("embeddings-gpt-3/" + str(row[PAIR_ID]) + "_text_2.txt")) as f2:
-                    text2_embedding = f2.read()  # [2:]
-                    t2_embed = []
-                    for e in list(text2_embedding.split("\n"))[:-1]:
-                        t2_embed.append(float(e))
-                sim = cosine_similarity([t1_embed], [t2_embed])[0][0]
-            semantic_results.append(sim)
-
-    return semantic_results
+    # only get probability for one of two classes (true/false), True/False classification
+    return [p[true_i] for p in prediction_result], prediction_classes
 
 
 def ngram_sim(n, text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs):
@@ -308,10 +271,16 @@ def ngram_sim(n, text1_train, text1_test, text2_train, text2_test, y_train, gs_p
     GridSearch_table_plot(gs, "C", "NGram", negative=False)
 
     # use the model to predict the testing instances
-    print("Testing the SVM...")
-    prediction_result = gs.predict_proba(sims_test)
+    best_model = gs.best_estimator_
 
-    return [p[1] for p in prediction_result]
+    # test the model
+    print("Predicting test split...")
+    prediction_classes = best_model.predict(sims_test).tolist()
+    prediction_result = best_model.predict_proba(sims_test)
+    true_i = numpy.where(gs.classes_ == True)[0][0]  # the index of the prob for being "True"
+
+    # only get probability for one of two classes (true/false), True/False classification
+    return [p[true_i] for p in prediction_result], prediction_classes
 
 
 def fuzzy_sim(text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs):
@@ -340,10 +309,16 @@ def fuzzy_sim(text1_train, text1_test, text2_train, text2_test, y_train, gs_para
     GridSearch_table_plot(gs, "C", "NGram", negative=False)
 
     # use the model to predict the testing instances
-    print("Testing the SVM...")
-    prediction_result = gs.predict_proba(sims_test)
+    best_model = gs.best_estimator_
 
-    return [p[1] for p in prediction_result]
+    # test the model
+    print("Predicting test split...")
+    prediction_classes = best_model.predict(sims_test).tolist()
+    prediction_result = best_model.predict_proba(sims_test)
+    true_i = numpy.where(gs.classes_ == True)[0][0]  # the index of the prob for being "True"
+
+    # only get probability for one of two classes (true/false), True/False classification
+    return [p[true_i] for p in prediction_result], prediction_classes
 
 
 def create_embedding_matrix(word_index, embedding_dict, dimension):
@@ -413,14 +388,20 @@ def semantic_sim_glove(text1_train, text1_test, text2_train, text2_test, y_train
     gs.fit(X_train, y_train)
     GridSearch_table_plot(gs, "C", "GloVe", negative=False)
 
-    print("Predicting test split...")
-    prediction_result = gs.predict_proba(X_test)
+    best_model = gs.best_estimator_
 
-    return [p[1] for p in prediction_result]    # only get probability for one of two classes (true/false)
+    # test the model
+    print("Predicting test split...")
+    prediction_classes = best_model.predict(X_test).tolist()
+    prediction_result = best_model.predict_proba(X_test)
+    true_i = numpy.where(gs.classes_ == True)[0][0]  # the index of the prob for being "True"
+
+    # only get probability for one of two classes (true/false), True/False classification
+    return [p[true_i] for p in prediction_result], prediction_classes
 
 
 def fasttext_sim(text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs):
-    print("GloVe Similarity \n------------")
+    print("FastText Similarity \n------------")
     print("Loading model...")
 
     #model = fasttext.load_facebook_vectors(os.path.join(MODELS_FOLDER, "model_filename.bin"))
@@ -454,10 +435,16 @@ def fasttext_sim(text1_train, text1_test, text2_train, text2_test, y_train, gs_p
     gs.fit(X_train, y_train)
     GridSearch_table_plot(gs, "C", "fasttext", negative=False)
 
-    print("Predicting test split...")
-    prediction_result = gs.predict_proba(X_test)
+    best_model = gs.best_estimator_
 
-    return [p[1] for p in prediction_result]    # only get probability for one of two classes (true/false)
+    # test the model
+    print("Predicting test split...")
+    prediction_classes = best_model.predict(X_test).tolist()
+    prediction_result = best_model.predict_proba(X_test)
+    true_i = numpy.where(gs.classes_ == True)[0][0]  # the index of the prob for being "True"
+
+    # only get probability for one of two classes (true/false), True/False classification
+    return [p[true_i] for p in prediction_result], prediction_classes
 
 
 def tfidf_cosine_sim(text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs):
@@ -491,34 +478,17 @@ def tfidf_cosine_sim(text1_train, text1_test, text2_train, text2_test, y_train, 
     GridSearch_table_plot(gs, "C", "NGram", negative=False)
 
     # use the model to predict the testing instances
-    print("Testing the SVM...")
-    prediction_result = gs.predict_proba(sims_test)
+    best_model = gs.best_estimator_
 
-    return [p[1] for p in prediction_result]
+    # test the model
+    print("Predicting test split...")
+    print("Predicting test split...")
+    prediction_classes = best_model.predict(sims_test).tolist()
+    prediction_result = best_model.predict_proba(sims_test)
+    true_i = numpy.where(gs.classes_ == True)[0][0]  # the index of the prob for being "True"
 
-    corpus1 = list(df[TEXT1])
-    corpus2 = list(df[TEXT2])
-
-    print("Processing texts...")
-    vectorizer = TfidfVectorizer()
-    tf_idf_matrix = vectorizer.fit_transform(corpus1 + corpus2)  # combine text1 and text2 to one corpus
-
-    results = []
-    for i, row in tqdm(df.iterrows(), total=df.shape[0]):
-        sim = cosine_similarity(tf_idf_matrix[i],
-                                tf_idf_matrix[len(corpus1) + i])  # calculate sim between text1 and text2 pairwise
-        results.append(sim[0][0])
-    return results
-
-
-def get_splits(df):
-    splits = ["train", "test", "dev", "val", None]
-    for dataset in DATASETS:
-        print("Dataset: " + str(dataset))
-        for s_type in splits:
-            amount = df[(df[DATASET] == dataset) & (df[SPLIT] == s_type)].shape[0]
-            print(str(s_type) + ": " + str(amount))
-        print("---")
+    # only get probability for one of two classes (true/false), True/False classification
+    return [p[true_i] for p in prediction_result], prediction_classes
 
 
 if __name__ == "__main__":
@@ -539,7 +509,7 @@ if __name__ == "__main__":
     pred_result_df = pd.DataFrame()
 
     df = df.reset_index(drop=True)
-    df = df.truncate(before=0, after=50000)     # for testing
+    df = df.truncate(before=0, after=10000)     # for testing
     # df = df[(df[DATASET] == "MPC") | (df[DATASET] == "ETPC")]   # for testing
 
     print(f"{df.shape[0]} pairs found in the file.")
@@ -632,38 +602,38 @@ if __name__ == "__main__":
 
     verb, cv, n_jobs = 50, 2, 6
 
-    pred_result_df[FASTTEXT] = fasttext_sim(train_data[1], test_data[1],
-                                                 train_data[2], test_data[2], train_data[3], test_data[3],
+    pred_result_df[FASTTEXT], pred_result_df[FASTTEXT_PRED] = fasttext_sim(train_data[1], test_data[1],
+                                                 train_data[2], test_data[2], train_data[3],
                                                  gs_params, verb, cv, n_jobs)
     pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
                            index=True, indent=4)
-    pred_result_df[SEM_GLOVE] = semantic_sim_glove(train_data[1], test_data[1],
-                                                 train_data[2], test_data[2], train_data[3], test_data[3],
+    pred_result_df[SEM_GLOVE], pred_result_df[SEM_GLOVE_PRED] = semantic_sim_glove(train_data[1], test_data[1],
+                                                 train_data[2], test_data[2], train_data[3],
                                                  gs_params, verb, cv, n_jobs)
     pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
                            index=True, indent=4)
-    pred_result_df[SEM_BERT] = semantic_sim_bert(train_data[1], test_data[1],
-                                                 train_data[2], test_data[2], train_data[3], test_data[3],
+    pred_result_df[SEM_BERT], pred_result_df[SEM_BERT_PRED] = semantic_sim_bert(train_data[1], test_data[1],
+                                                 train_data[2], test_data[2], train_data[3],
                                                  gs_params, verb, cv, n_jobs)
     pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
                            index=True, indent=4)
-    pred_result_df[SEM_T5] = semantic_sim_t5(train_data[1], test_data[1],
-                                                 train_data[2], test_data[2], train_data[3], test_data[3],
+    pred_result_df[SEM_T5], pred_result_df[SEM_T5_PRED] = semantic_sim_t5(train_data[1], test_data[1],
+                                                 train_data[2], test_data[2], train_data[3],
                                                  gs_params, verb, cv, n_jobs)
     pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
                            index=True, indent=4)
-    pred_result_df[TFIDF_COSINE] = tfidf_cosine_sim(train_data[1], test_data[1],
-                                                 train_data[2], test_data[2], train_data[3], test_data[3],
+    pred_result_df[TFIDF_COSINE], pred_result_df[TFIDF_COSINE_PRED] = tfidf_cosine_sim(train_data[1], test_data[1],
+                                                 train_data[2], test_data[2], train_data[3],
                                                  gs_params, verb, cv, n_jobs)
     pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
                            index=True, indent=4)
-    pred_result_df[FUZZY] = fuzzy_sim(train_data[1], test_data[1],
-                                                 train_data[2], test_data[2], train_data[3], test_data[3],
+    pred_result_df[FUZZY], pred_result_df[FUZZY_PRED] = fuzzy_sim(train_data[1], test_data[1],
+                                                 train_data[2], test_data[2], train_data[3],
                                                  gs_params, verb, cv, n_jobs)
     pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
                            index=True, indent=4)
-    pred_result_df[NGRAM3] = ngram_sim(3,train_data[1], test_data[1],
-                                                 train_data[2], test_data[2], train_data[3], test_data[3],
+    pred_result_df[NGRAM3], pred_result_df[NGRAM3_PRED] = ngram_sim(3,train_data[1], test_data[1],
+                                                 train_data[2], test_data[2], train_data[3],
                                                  gs_params, verb, cv, n_jobs)
     pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
                            index=True, indent=4)
@@ -671,9 +641,8 @@ if __name__ == "__main__":
 
 
     # Output data to json format
-    print(len(pred_result_df))
+    print("Output results to specified directory...")
     pred_result_df = pred_result_df.reset_index(drop=True)
-    print(len(pred_result_df))
     pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
                            index=True, indent=4)
 
