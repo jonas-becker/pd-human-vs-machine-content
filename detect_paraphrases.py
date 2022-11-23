@@ -357,7 +357,6 @@ def fuzzy_sim(text1_train, text1_test, text2_train, text2_test, y_train, gs_para
     print("Output grid search stats...")
     GridSearch_table_plot(gs, "C", "fuzzy", negative=False)
 
-    # use the model to predict the testing instances
     save_gridsearch_model(gs, "fuzzy_gs")
     best_model = gs.best_estimator_
 
@@ -560,7 +559,7 @@ def tfidf_cosine_sim(text1_train, text1_test, text2_train, text2_test, y_train, 
     print("Output grid search stats...")
     GridSearch_table_plot(gs, "C", "tfidf_cosine", negative=False)
 
-    # use the model to predict the testing instances
+    save_gridsearch_model(gs, "tfidf_cosine_gs")
     best_model = gs.best_estimator_
 
     return predict_with_model(best_model, gs, sims_test)
@@ -675,8 +674,14 @@ if __name__ == "__main__":
         'C': [1, 10, 100],
     }
 
-    verb, cv, n_jobs = 50, 2, 6
+    verb, cv, n_jobs = 50, 5, -1
 
+    pred_result_df[TFIDF_COSINE], pred_result_df[TFIDF_COSINE_PRED] = tfidf_cosine_sim(train_data[1], test_data[1],
+                                                                                       train_data[2], test_data[2],
+                                                                                       train_data[3],
+                                                                                       gs_params, verb, cv, n_jobs)
+    pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
+                           index=True, indent=4)
     pred_result_df[FASTTEXT], pred_result_df[FASTTEXT_PRED] = fasttext_sim(train_data[1], test_data[1],
                                                  train_data[2], test_data[2], train_data[3],
                                                  gs_params, verb, cv, n_jobs)
@@ -694,11 +699,6 @@ if __name__ == "__main__":
     pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
                            index=True, indent=4)
     pred_result_df[SEM_T5], pred_result_df[SEM_T5_PRED] = semantic_sim_t5(train_data[1], test_data[1],
-                                                 train_data[2], test_data[2], train_data[3],
-                                                 gs_params, verb, cv, n_jobs)
-    pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
-                           index=True, indent=4)
-    pred_result_df[TFIDF_COSINE], pred_result_df[TFIDF_COSINE_PRED] = tfidf_cosine_sim(train_data[1], test_data[1],
                                                  train_data[2], test_data[2], train_data[3],
                                                  gs_params, verb, cv, n_jobs)
     pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
