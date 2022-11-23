@@ -125,7 +125,13 @@ def GridSearch_table_plot(grid_clf, param_name, method_name, num_results=15, neg
 
 
 def predict_with_model(model, gs, X_test):
-    # test the model
+    """
+        Test a provided model by providing an input
+        :param model: the model to test
+        :param gs: the gridsearch object including the model
+        :param X_test: the test features
+        :return: estimated probabilities for being a paraphrase, predicted labels
+    """
     print("Predicting...")
     prediction_classes = model.predict(X_test).tolist()
     prediction_result = model.predict_proba(X_test)
@@ -365,11 +371,11 @@ def fuzzy_sim(text1_train, text1_test, text2_train, text2_test, y_train, gs_para
 
 def create_glove_embedding_matrix(word_index, embedding_dict, dimension):
     """
-    Creates the embedding matrix for GloVe
-    :param word_index: word index of the tokenizer
-    :param embedding_dict: the GloVe embedding dictionary
-    :param dimension: desired dimensionality of the embedding matrix
-    :return: the embedding matrix
+        Creates the embedding matrix for GloVe
+        :param word_index: word index of the tokenizer
+        :param embedding_dict: the GloVe embedding dictionary
+        :param dimension: desired dimensionality of the embedding matrix
+        :return: the embedding matrix
     """
     embedding_matrix = np.zeros((len(word_index) + 1, dimension))
 
