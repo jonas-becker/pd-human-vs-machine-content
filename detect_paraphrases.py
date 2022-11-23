@@ -1,42 +1,28 @@
-import os
 import pandas as pd
 from sklearn.svm import SVC
 from tqdm import tqdm
-from re import sub
 import numpy as np
 from thefuzz import fuzz
 from setup import *
-from sklearn.model_selection import GridSearchCV
 from strsimpy.ngram import NGram
 from gensim.models import fasttext
 import numpy
-from sklearn.metrics import roc_auc_score
 from torch import nn
-import io
-from gensim.scripts.glove2word2vec import glove2word2vec
 import matplotlib.pyplot as plt
 import pprint
 from transformers import BertModel, T5Model
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn import svm
 from sklearn.metrics.pairwise import cosine_similarity
 from IPython.display import display
-from sentence_transformers import SentenceTransformer
-import zipfile
 import fasttext
 import tensorflow as tf
-from keras.layers import Dense, Input
-from keras.optimizers import Adam
-from keras.models import Model
 from sklearn.model_selection import GridSearchCV
 from transformers import AutoTokenizer
 from sklearn.model_selection import train_test_split
-from sklearn.utils.class_weight import compute_class_weight
-from sklearn.metrics import classification_report
 import torch
-import math
 from tensorflow.python.ops.numpy_ops import np_config
 import gc
+import joblib
 gc.collect()
 
 np_config.enable_numpy_behavior()
@@ -46,28 +32,35 @@ print("Using device " + str(device))
 torch.cuda.empty_cache()
 
 
-def GridSearch_table_plot(grid_clf, param_name, method_name,
-                          num_results=15,
-                          negative=True,
-                          graph=True,
-                          display_all_params=True):
+def save_gridsearch_model(gs, filename):
+    """
+        Saves a model (gridsearch model) to a file. It can later be laded using joblib.load(filename).
+        :param gs: the GridSearchCV model
+        :param filename: the desired filename
+        :return:
+    """
+    joblib.dump(gs, os.path.join(MODELS_FOLDER, GRIDSEARCH_FOLDER, filename+'.pkl'))
+    print("Saved model to: " + os.path.join(MODELS_FOLDER, GRIDSEARCH_FOLDER, filename+'.pkl'))
 
-    '''
-    Display grid search results in a figure
-    :param grid_clf: the estimator resulting from a grid search
-                       for example: grid_clf = GridSearchCV( ...
-    :param param_name: a string with the name of the parameter being tested
-    :param num_results: an integer indicating the number of results to display
-                       Default: 15
-    :param negative: boolean: should the sign of the score be reversed?
-                       scoring = 'neg_log_loss', for instance
-                       Default: True
-    :param graph: boolean: should a graph be produced?
-                       non-numeric parameters (True/False, None) don't graph well
-                       Default: True
-    :param display_all_params: boolean: should we print out all of the parameters, not just the ones searched for?
-                       Default: True
-    '''
+
+def GridSearch_table_plot(grid_clf, param_name, method_name, num_results=15, negative=True, graph=True,
+                          display_all_params=True):
+    """
+        Display grid search results in a figure
+        :param grid_clf: the estimator resulting from a grid search
+                           for example: grid_clf = GridSearchCV( ...
+        :param param_name: a string with the name of the parameter being tested
+        :param num_results: an integer indicating the number of results to display
+                           Default: 15
+        :param negative: boolean: should the sign of the score be reversed?
+                           scoring = 'neg_log_loss', for instance
+                           Default: True
+        :param graph: boolean: should a graph be produced?
+                           non-numeric parameters (True/False, None) don't graph well
+                           Default: True
+        :param display_all_params: boolean: should we print out all of the parameters, not just the ones searched for?
+                           Default: True
+    """
 
     clf = grid_clf.best_estimator_
     clf_params = grid_clf.best_params_
@@ -111,7 +104,10 @@ def GridSearch_table_plot(grid_clf, param_name, method_name,
     stds = scores_df['std_test_score']
     params = scores_df['param_' + param_name]
 
-    scores_df.to_csv(os.path.join(OUT_DIR, DETECTION_FOLDER, "grid_search_"+method_name+".csv"))
+    if not os.path.exists(os.path.join(OUT_DIR, DETECTION_FOLDER, GRIDSEARCH_FOLDER)):
+        os.makedirs(os.path.join(OUT_DIR, DETECTION_FOLDER, GRIDSEARCH_FOLDER))
+
+    scores_df.to_csv(os.path.join(OUT_DIR, DETECTION_FOLDER, GRIDSEARCH_FOLDER, "gs_"+method_name+".csv"))
 
     # plot
     if graph:
@@ -125,11 +121,22 @@ def GridSearch_table_plot(grid_clf, param_name, method_name,
         plt.title(param_name + " vs Score\nBest Score {:0.5f}".format(clf_score))
         plt.xlabel(param_name)
         plt.ylabel('Score')
-        plt.savefig(os.path.join(OUT_DIR, DETECTION_FOLDER, 'grid_search_' + method_name + '.png'))
+        plt.savefig(os.path.join(OUT_DIR, DETECTION_FOLDER, GRIDSEARCH_FOLDER, 'gs_' + method_name + '.png'))
+
+
+def predict_with_model(model, gs, X_test):
+    # test the model
+    print("Predicting...")
+    prediction_classes = model.predict(X_test).tolist()
+    prediction_result = model.predict_proba(X_test)
+    true_i = numpy.where(gs.classes_ == True)[0][0]  # the index of the prob for being "True"
+
+    # only get probability for one of two classes (true/false), True/False classification
+    return [p[true_i] for p in prediction_result], prediction_classes
 
 
 def semantic_sim_bert(text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs):
-    '''
+    """
         Calculates the BERT embeddings for the given text pairs and uses an SVM to output classification
         and estimated probabilities for the provided test split. The optimal SVM parameters are determined by a grid
         search
@@ -143,13 +150,11 @@ def semantic_sim_bert(text1_train, text1_test, text2_train, text2_test, y_train,
         :param cv: how many folds should be done during grid search
         :param n_jobs: how many cpu cores to use for processing (-1 for max amount)
         :return: estimated probabilities for being a paraphrase, predicted labels
-    '''
+    """
     print("Semantic Similarity (BERT) \n------------")
     print("Loading model...")
     model = BertModel.from_pretrained("bert-large-uncased").to(device)
     tokenizer = AutoTokenizer.from_pretrained('bert-large-uncased')
-
-    print("Creating embeddings (test split).")
 
     '''
     # Code using large amounts of GPU memory:
@@ -193,20 +198,14 @@ def semantic_sim_bert(text1_train, text1_test, text2_train, text2_test, y_train,
     gs.fit(X_train, y_train)
     GridSearch_table_plot(gs, "C", "BERT", negative=False)
 
+    save_gridsearch_model(gs, "bert_gs")
     best_model = gs.best_estimator_
 
-    # test the model
-    print("Predicting test split...")
-    prediction_classes = best_model.predict(X_test).tolist()
-    prediction_result = best_model.predict_proba(X_test)
-    true_i = numpy.where(gs.classes_ == True)[0][0]  # the index of the prob for being "True"
-
-    # only get probability for one of two classes (true/false), True/False classification
-    return [p[true_i] for p in prediction_result], prediction_classes
+    return predict_with_model(best_model, gs, X_test)
 
 
 def semantic_sim_t5(text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs):
-    '''
+    """
         Calculates the T5 embeddings for the given text pairs and uses an SVM to output classification
         and estimated probabilities for the provided test split. The optimal SVM parameters are determined by a grid
         search
@@ -220,7 +219,7 @@ def semantic_sim_t5(text1_train, text1_test, text2_train, text2_test, y_train, g
         :param cv: how many folds should be done during grid search
         :param n_jobs: how many cpu cores to use for processing (-1 for max amount)
         :return: estimated probabilities for being a paraphrase, predicted labels
-    '''
+    """
     print("Semantic Similarity (T5) \n------------")
     print("Loading model...")
 
@@ -260,20 +259,14 @@ def semantic_sim_t5(text1_train, text1_test, text2_train, text2_test, y_train, g
     gs.fit(X_train, y_train)
     GridSearch_table_plot(gs, "C", "T5", negative=False)
 
+    save_gridsearch_model(gs, "t5_gs")
     best_model = gs.best_estimator_
 
-    # test the model
-    print("Predicting test split...")
-    prediction_classes = best_model.predict(X_test).tolist()
-    prediction_result = best_model.predict_proba(X_test)
-    true_i = numpy.where(gs.classes_ == True)[0][0]  # the index of the prob for being "True"
-
-    # only get probability for one of two classes (true/false), True/False classification
-    return [p[true_i] for p in prediction_result], prediction_classes
+    return predict_with_model(best_model, gs, X_test)
 
 
 def ngram_sim(n, text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs):
-    '''
+    """
         Calculates the N-Gram similarities for the given text pairs and uses an SVM to output classification
         and estimated probabilities for the provided test split. The optimal SVM parameters are determined by a grid
         search.
@@ -289,7 +282,7 @@ def ngram_sim(n, text1_train, text1_test, text2_train, text2_test, y_train, gs_p
         :param cv: how many folds should be done during grid search
         :param n_jobs: how many cpu cores to use for processing (-1 for max amount)
         :return: estimated probabilities for being a paraphrase, predicted labels
-    '''
+    """
     # done after http://webdocs.cs.ualberta.ca/~kondrak/papers/spire05.pdf
     print(f"Calculating similarity with {n}-Grams.")
 
@@ -315,23 +308,17 @@ def ngram_sim(n, text1_train, text1_test, text2_train, text2_test, y_train, gs_p
     print("Training the SVM...")
     gs.fit(sims_train, y_train)
     print("Output grid search stats...")
-    GridSearch_table_plot(gs, "C", "NGram", negative=False)
+    GridSearch_table_plot(gs, "C", "ngram", negative=False)
 
     # use the model to predict the testing instances
+    save_gridsearch_model(gs, "ngram_gs")
     best_model = gs.best_estimator_
 
-    # test the model
-    print("Predicting test split...")
-    prediction_classes = best_model.predict(sims_test).tolist()
-    prediction_result = best_model.predict_proba(sims_test)
-    true_i = numpy.where(gs.classes_ == True)[0][0]  # the index of the prob for being "True"
-
-    # only get probability for one of two classes (true/false), True/False classification
-    return [p[true_i] for p in prediction_result], prediction_classes
+    return predict_with_model(best_model, gs, sims_test)
 
 
 def fuzzy_sim(text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs):
-    '''
+    """
         Calculates the fuzzy similarities for the given text pairs and uses an SVM to output classification
         and estimated probabilities for the provided test split. The optimal SVM parameters are determined by a grid
         search
@@ -345,7 +332,7 @@ def fuzzy_sim(text1_train, text1_test, text2_train, text2_test, y_train, gs_para
         :param cv: how many folds should be done during grid search
         :param n_jobs: how many cpu cores to use for processing (-1 for max amount)
         :return: estimated probabilities for being a paraphrase, predicted labels
-    '''
+    """
     print(f"Calculating similarity with Fuzzy.")
 
     print("Processing texts...")
@@ -368,29 +355,23 @@ def fuzzy_sim(text1_train, text1_test, text2_train, text2_test, y_train, gs_para
     print("Training the SVM...")
     gs.fit(sims_train, y_train)
     print("Output grid search stats...")
-    GridSearch_table_plot(gs, "C", "NGram", negative=False)
+    GridSearch_table_plot(gs, "C", "fuzzy", negative=False)
 
     # use the model to predict the testing instances
+    save_gridsearch_model(gs, "fuzzy_gs")
     best_model = gs.best_estimator_
 
-    # test the model
-    print("Predicting test split...")
-    prediction_classes = best_model.predict(sims_test).tolist()
-    prediction_result = best_model.predict_proba(sims_test)
-    true_i = numpy.where(gs.classes_ == True)[0][0]  # the index of the prob for being "True"
-
-    # only get probability for one of two classes (true/false), True/False classification
-    return [p[true_i] for p in prediction_result], prediction_classes
+    return predict_with_model(best_model, gs, sims_test)
 
 
 def create_glove_embedding_matrix(word_index, embedding_dict, dimension):
-    '''
+    """
     Creates the embedding matrix for GloVe
     :param word_index: word index of the tokenizer
     :param embedding_dict: the GloVe embedding dictionary
     :param dimension: desired dimensionality of the embedding matrix
     :return: the embedding matrix
-    '''
+    """
     embedding_matrix = np.zeros((len(word_index) + 1, dimension))
 
     for word, index in word_index.items():
@@ -400,7 +381,7 @@ def create_glove_embedding_matrix(word_index, embedding_dict, dimension):
 
 
 def semantic_sim_glove(text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs):
-    '''
+    """
         Calculates the GloVe embeddings for the given text pairs and uses an SVM to output classification
         and estimated probabilities for the provided test split. The optimal SVM parameters are determined by a grid
         search
@@ -414,7 +395,7 @@ def semantic_sim_glove(text1_train, text1_test, text2_train, text2_test, y_train
         :param cv: how many folds should be done during grid search
         :param n_jobs: how many cpu cores to use for processing (-1 for max amount)
         :return: estimated probabilities for being a paraphrase, predicted labels
-    '''
+    """
     print("GloVe Similarity \n------------")
     print("Loading model...")
 
@@ -472,20 +453,14 @@ def semantic_sim_glove(text1_train, text1_test, text2_train, text2_test, y_train
     gs.fit(X_train, y_train)
     GridSearch_table_plot(gs, "C", "GloVe", negative=False)
 
+    save_gridsearch_model(gs, "glove_gs")
     best_model = gs.best_estimator_
 
-    # test the model
-    print("Predicting test split...")
-    prediction_classes = best_model.predict(X_test).tolist()
-    prediction_result = best_model.predict_proba(X_test)
-    true_i = numpy.where(gs.classes_ == True)[0][0]  # the index of the prob for being "True"
-
-    # only get probability for one of two classes (true/false), True/False classification
-    return [p[true_i] for p in prediction_result], prediction_classes
+    return predict_with_model(best_model, gs, X_test)
 
 
 def fasttext_sim(text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs):
-    '''
+    """
         Calculates the FastText vector representations for the given text pairs and uses an SVM to output classification
         and estimated probabilities for the provided test split. The optimal SVM parameters are determined by a grid
         search
@@ -499,7 +474,7 @@ def fasttext_sim(text1_train, text1_test, text2_train, text2_test, y_train, gs_p
         :param cv: how many folds should be done during grid search
         :param n_jobs: how many cpu cores to use for processing (-1 for max amount)
         :return: estimated probabilities for being a paraphrase, predicted labels
-    '''
+    """
     print("FastText Similarity \n------------")
     print("Loading model...")
 
@@ -534,20 +509,14 @@ def fasttext_sim(text1_train, text1_test, text2_train, text2_test, y_train, gs_p
     gs.fit(X_train, y_train)
     GridSearch_table_plot(gs, "C", "fasttext", negative=False)
 
+    save_gridsearch_model(gs, "fasttext_gs")
     best_model = gs.best_estimator_
 
-    # test the model
-    print("Predicting test split...")
-    prediction_classes = best_model.predict(X_test).tolist()
-    prediction_result = best_model.predict_proba(X_test)
-    true_i = numpy.where(gs.classes_ == True)[0][0]  # the index of the prob for being "True"
-
-    # only get probability for one of two classes (true/false), True/False classification
-    return [p[true_i] for p in prediction_result], prediction_classes
+    return predict_with_model(best_model, gs, X_test)
 
 
 def tfidf_cosine_sim(text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs):
-    '''
+    """
         Calculates the tfidf-vector representations for the given text pairs to calculate cosine similarites of all
         pairs.
         It uses an SVM to output classification and estimated probabilities for the provided test split.
@@ -562,9 +531,8 @@ def tfidf_cosine_sim(text1_train, text1_test, text2_train, text2_test, y_train, 
         :param cv: how many folds should be done during grid search
         :param n_jobs: how many cpu cores to use for processing (-1 for max amount)
         :return: estimated probabilities for being a paraphrase, predicted label
-    '''
+    """
     print("Calculating TF-IDF cosine similarities.")
-
     print("Processing texts...")
 
     vectorizer = TfidfVectorizer()
@@ -590,20 +558,12 @@ def tfidf_cosine_sim(text1_train, text1_test, text2_train, text2_test, y_train, 
     print("Training the SVM...")
     gs.fit(sims_train, y_train)
     print("Output grid search stats...")
-    GridSearch_table_plot(gs, "C", "NGram", negative=False)
+    GridSearch_table_plot(gs, "C", "tfidf_cosine", negative=False)
 
     # use the model to predict the testing instances
     best_model = gs.best_estimator_
 
-    # test the model
-    print("Predicting test split...")
-    print("Predicting test split...")
-    prediction_classes = best_model.predict(sims_test).tolist()
-    prediction_result = best_model.predict_proba(sims_test)
-    true_i = numpy.where(gs.classes_ == True)[0][0]  # the index of the prob for being "True"
-
-    # only get probability for one of two classes (true/false), True/False classification
-    return [p[true_i] for p in prediction_result], prediction_classes
+    return predict_with_model(best_model, gs, sims_test)
 
 
 if __name__ == "__main__":
@@ -623,8 +583,8 @@ if __name__ == "__main__":
 
     pred_result_df = pd.DataFrame()
 
-    df = df.reset_index(drop=True)
-    df = df.truncate(before=0, after=10000)     # for testing
+    #df = df.reset_index(drop=True)
+    #df = df.truncate(before=0, after=1000)     # for testing
     # df = df[(df[DATASET] == "MPC") | (df[DATASET] == "ETPC")]   # for testing
 
     print(f"{df.shape[0]} pairs found in the file.")
@@ -701,19 +661,19 @@ if __name__ == "__main__":
     print(f"Test data size: {str(len(test_data[0]))}")
 
     # Grid Search Testing Range
+    '''
     gs_params = {
             'C': [10, 100]
     }
+    '''
 
     # Grid Search Range (https://arxiv.org/abs/2101.09023)
-    '''
     gs_params = {
         'kernel': ('linear', 'rbf', 'poly'),
         'gamma': [0.01, 0.001, 0.0001, 0.00001],
         'degree': [1, 2, 3, 4, 5, 6, 7, 8, 9],
         'C': [1, 10, 100],
     }
-    '''
 
     verb, cv, n_jobs = 50, 2, 6
 
@@ -728,8 +688,9 @@ if __name__ == "__main__":
     pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
                            index=True, indent=4)
     pred_result_df[SEM_BERT], pred_result_df[SEM_BERT_PRED] = semantic_sim_bert(train_data[1], test_data[1],
-                                                 train_data[2], test_data[2], train_data[3],
-                                                 gs_params, verb, cv, n_jobs)
+                                                                                train_data[2], test_data[2],
+                                                                                train_data[3],
+                                                                                gs_params, verb, cv, n_jobs)
     pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
                            index=True, indent=4)
     pred_result_df[SEM_T5], pred_result_df[SEM_T5_PRED] = semantic_sim_t5(train_data[1], test_data[1],

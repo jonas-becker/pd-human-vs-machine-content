@@ -117,14 +117,17 @@ for dataset in DATASETS:
     print("Calculating precision-recall curves...")
     plot_pr_curve("FastText_" + dataset + "_pr", y_pred= df[FASTTEXT].tolist(), y_test= df[PARAPHRASE].tolist())
     plot_roc_curve("FastText_" + dataset + "_roc", y_pred= df[FASTTEXT].tolist(), y_test= df[PARAPHRASE].tolist())
+    print(f1_score(y_true=df[PARAPHRASE].tolist(), y_pred=df[FASTTEXT_PRED].tolist()))
+
     plot_pr_curve("GloVe_" + dataset + "_pr", y_pred= df[SEM_GLOVE].tolist(), y_test= df[PARAPHRASE].tolist())
     plot_roc_curve("GloVe_" + dataset + "_roc", y_pred= df[SEM_GLOVE].tolist(), y_test= df[PARAPHRASE].tolist())
-    plot_pr_curve("BERT_"+dataset+"_pr", y_pred= df[SEM_BERT].tolist(), y_test= df[PARAPHRASE].tolist())
-    plot_roc_curve("BERT_"+dataset+"_roc", y_pred= df[SEM_BERT].tolist(), y_test= df[PARAPHRASE].tolist())
-    plot_pr_curve("T5_" + dataset + "_pr", y_pred= df[SEM_T5].tolist(), y_test= df[PARAPHRASE].tolist())
-    plot_roc_curve("T5_"+dataset+"_roc", y_pred= df[SEM_T5].tolist(), y_test= df[PARAPHRASE].tolist())
-    plot_pr_curve("NGram_" + dataset + "_pr", y_pred= df[NGRAM3].tolist(), y_test= df[PARAPHRASE].tolist())
-    plot_roc_curve("NGram_" + dataset + "_roc", y_pred= df[NGRAM3].tolist(), y_test= df[PARAPHRASE].tolist())
+    print(f1_score(y_true=df[PARAPHRASE].tolist(), y_pred=df[SEM_GLOVE_PRED].tolist()))
+    #plot_pr_curve("BERT_"+dataset+"_pr", y_pred= df[SEM_BERT].tolist(), y_test= df[PARAPHRASE].tolist())
+    #plot_roc_curve("BERT_"+dataset+"_roc", y_pred= df[SEM_BERT].tolist(), y_test= df[PARAPHRASE].tolist())
+    #plot_pr_curve("T5_" + dataset + "_pr", y_pred= df[SEM_T5].tolist(), y_test= df[PARAPHRASE].tolist())
+    ##plot_roc_curve("T5_"+dataset+"_roc", y_pred= df[SEM_T5].tolist(), y_test= df[PARAPHRASE].tolist())
+    #plot_pr_curve("NGram_" + dataset + "_pr", y_pred= df[NGRAM3].tolist(), y_test= df[PARAPHRASE].tolist())
+    #plot_roc_curve("NGram_" + dataset + "_roc", y_pred= df[NGRAM3].tolist(), y_test= df[PARAPHRASE].tolist())
 
     #precision_sem_bert, recall_sem_bert, thresholds_sem_bert = precision_recall_curve(df[PARAPHRASE], df[SEM_BERT])
     #precision_sem_t5, recall_sem_t5, thresholds_sem_t5 = precision_recall_curve(df["is_paraphrase"], df[SEM_T5])
@@ -168,7 +171,7 @@ with open(os.path.join(OUT_DIR, EVALUATION_FOLDER, "eval_stats.txt"), 'w') as f:
 
 # Make correlation graphs (mixed)
 plt.rcParams.update({'font.size': 16})
-methods_to_correlate = [TFIDF_COSINE, NGRAM3, FUZZY, SEM_BERT, SEM_T5, SEM_GPT3]
+methods_to_correlate = [TFIDF_COSINE, NGRAM3, FUZZY, SEM_BERT, SEM_T5]
 
 # machine-paraphrases & human-paraphrases
 df = pd.DataFrame()
@@ -200,8 +203,6 @@ for method1 in tqdm(methods_to_correlate):
         if method1 != method2:
             if method1 == SEM_BERT:
                 xlabel = "BERT Cosine Distance"
-            elif method1 == SEM_GPT3:
-                xlabel = "GPT-3 Cosine Distance"
             elif method1 == SEM_T5:
                 xlabel = "T5 Cosine Distance"
             elif method1 == FUZZY:
@@ -212,8 +213,6 @@ for method1 in tqdm(methods_to_correlate):
                 xlabel = "3-Gram Similarity"
             if method2 == SEM_BERT:
                 ylabel = "BERT Cosine Distance"
-            elif method2 == SEM_GPT3:
-                ylabel = "GPT-3 Cosine Distance"
             elif method2 == SEM_T5:
                 ylabel = "T5 Cosine Distance"
             elif method2 == FUZZY:
@@ -274,8 +273,6 @@ for method1 in tqdm(methods_to_correlate):
         if method1 != method2:
             if method1 == SEM_BERT:
                 xlabel = "BERT Cosine Distance"
-            elif method1 == SEM_GPT3:
-                xlabel = "GPT-3 Cosine Distance"
             elif method1 == SEM_T5:
                 xlabel = "T5 Cosine Distance"
             elif method1 == FUZZY:
@@ -286,8 +283,6 @@ for method1 in tqdm(methods_to_correlate):
                 xlabel = "3-Gram Similarity"
             if method2 == SEM_BERT:
                 ylabel = "BERT Cosine Distance"
-            elif method2 == SEM_GPT3:
-                ylabel = "GPT-3 Cosine Distance"
             elif method2 == SEM_T5:
                 ylabel = "T5 Cosine Distance"
             elif method2 == FUZZY:
