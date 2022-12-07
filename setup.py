@@ -29,17 +29,17 @@ NGRAM5 = "5gram"
 FASTTEXT = "fasttext"
 TFIDF_COSINE = "tfidf_cosine"
 DETECTION_METHODS = [FUZZY, NGRAM3, SEM_BERT, SEM_T5, TFIDF_COSINE, FASTTEXT, SEM_GLOVE]
+PRED_SUF = "_pred"     # the suffix to append to each method name to get the prediction probability
 
 # Methods (Class Prediction):
-FUZZY_PRED = FUZZY+"_pred"
-SEM_GLOVE_PRED = SEM_GLOVE+"_pred"
-SEM_BERT_PRED = SEM_BERT+"_pred"
-SEM_T5_PRED = SEM_T5+"_pred"
-NGRAM3_PRED = NGRAM3+"_pred"
-NGRAM4_PRED = NGRAM4+"_pred"
-NGRAM5_PRED = NGRAM5+"_pred"
-FASTTEXT_PRED = FASTTEXT+"_pred"
-TFIDF_COSINE_PRED = TFIDF_COSINE+"_pred"
+FUZZY_PRED = FUZZY+PRED_SUF
+SEM_GLOVE_PRED = SEM_GLOVE+PRED_SUF
+SEM_BERT_PRED = SEM_BERT+PRED_SUF
+SEM_T5_PRED = SEM_T5+PRED_SUF
+NGRAM3_PRED = NGRAM3+PRED_SUF
+FASTTEXT_PRED = FASTTEXT+PRED_SUF
+TFIDF_COSINE_PRED = TFIDF_COSINE+PRED_SUF
+METHOD_PRED_CLASSES = [FUZZY_PRED, SEM_GLOVE_PRED, SEM_BERT_PRED, SEM_T5_PRED, NGRAM3_PRED, FASTTEXT_PRED, TFIDF_COSINE_PRED]
 
 FIGURE_SIZE = 2000  
 MAX_DATASET_INPUT = 10000   # how many pairs to parse per dataset (sampled randomly from bigger datasets)
@@ -82,6 +82,8 @@ EMBED = "embed"
 DATASET_COLUMN_NAME = "dataset"
 METHOD = "detection_method"
 PAIRS = "pairs"
+PARA_PAIRS = "paraphrases"
+ORIG_PAIRS = "originals"
 TP = "TP"
 TN = "TN"
 FP = "FP"
