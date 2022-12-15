@@ -39,6 +39,9 @@ def save_gridsearch_model(gs, filename):
         :param filename: the desired filename
         :return:
     """
+    if not os.path.exists(os.path.join(MODELS_FOLDER, GRIDSEARCH_FOLDER)):
+        os.makedirs(os.path.join(MODELS_FOLDER, GRIDSEARCH_FOLDER))
+        
     joblib.dump(gs, os.path.join(MODELS_FOLDER, GRIDSEARCH_FOLDER, filename+'.pkl'))
     print("Saved model to: " + os.path.join(MODELS_FOLDER, GRIDSEARCH_FOLDER, filename+'.pkl'))
 
