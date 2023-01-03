@@ -1,7 +1,12 @@
+import numpy as np
+
+# patch for intel speedup:
+from sklearnex import patch_sklearn
+patch_sklearn()
+
 import pandas as pd
 from sklearn.svm import SVC
 from tqdm import tqdm
-import numpy as np
 from thefuzz import fuzz
 from setup import *
 from strsimpy.ngram import NGram
@@ -200,6 +205,8 @@ def semantic_sim_bert(text1_train, text1_test, text2_train, text2_test, y_train,
         X2_train.append(torch.mean(embedding, 0)[0].tolist())
     X_train = np.column_stack((X1_train, X2_train))
 
+    print(f'Amount of features per pair: {X_train.shape[1]}')
+
     print("Training the SVM...")
     model_svm = SVC(C=15, kernel='rbf', gamma=0.001, probability=True)
     # Grid Search
@@ -261,6 +268,8 @@ def semantic_sim_t5(text1_train, text1_test, text2_train, text2_test, y_train, g
         X2_train.append(torch.mean(embedding, 0)[0].tolist())
     X_train = np.column_stack((X1_train, X2_train))
 
+    print(f'Amount of features per pair: {X_train.shape[1]}')
+
     print("Training the SVM...")
     model_svm = SVC(C=15, kernel='rbf', gamma=0.001, probability=True)
     # Grid Search
@@ -308,6 +317,7 @@ def ngram_sim(n, text1_train, text1_test, text2_train, text2_test, y_train, gs_p
     sims_train = np.array(sims_train).reshape(-1, 1)
     sims_test = np.array(sims_test).reshape(-1, 1)
 
+    print(f'Amount of features per pair: {len(sims_train[0])}')
 
     # Grid Search
     model_svm = SVC(C=15, kernel='rbf', gamma=0.001, probability=True)
@@ -355,6 +365,8 @@ def fuzzy_sim(text1_train, text1_test, text2_train, text2_test, y_train, gs_para
         sims_test.append(sim)
     sims_train = np.array(sims_train).reshape(-1, 1)
     sims_test = np.array(sims_test).reshape(-1, 1)
+
+    print(f'Amount of features per pair: {len(sims_train[0])}')
 
     # Grid Search
     model_svm = SVC(C=15, kernel='rbf', gamma=0.001, probability=True)
@@ -454,6 +466,8 @@ def semantic_sim_glove(text1_train, text1_test, text2_train, text2_test, y_train
     X_train = np.column_stack((X1_train, X2_train))
     X_train = np.nan_to_num(X_train)  # fill NaN with zeros
 
+    print(f'Amount of features per pair: {X_train.shape[1]}')
+
     print("Training the SVM...")
     model_svm = SVC(C=15, kernel='rbf', gamma=0.001, probability=True)
     # Grid Search
@@ -510,6 +524,8 @@ def fasttext_sim(text1_train, text1_test, text2_train, text2_test, y_train, gs_p
         X2_train.append(vector)
     X_train = np.column_stack((X1_train, X2_train))
 
+    print(f'Amount of features per pair: {X_train.shape[1]}')
+
     print("Training the SVM...")
     model_svm = SVC(C=15, kernel='rbf', gamma=0.001, probability=True)
     # Grid Search
@@ -557,6 +573,8 @@ def tfidf_cosine_sim(text1_train, text1_test, text2_train, text2_test, y_train, 
         sims_test.append(sim)
     sims_train = np.array(sims_train).reshape(-1, 1)
     sims_test = np.array(sims_test).reshape(-1, 1)
+
+    print(f'Amount of features per pair: {len(sims_train[0])}')
 
     # Grid Search
     model_svm = SVC(C=15, kernel='rbf', gamma=0.001, probability=True)
@@ -675,7 +693,7 @@ if __name__ == "__main__":
     }
     '''
 
-    # Grid Search Range (https://arxiv.org/abs/2101.09023)
+    # Grid Search Space (https://arxiv.org/abs/2101.09023)
     gs_params = {
         'kernel': ('linear', 'rbf', 'poly'),
         'gamma': [0.01, 0.001, 0.0001, 0.00001],
