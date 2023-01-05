@@ -1,9 +1,7 @@
 import numpy as np
-
 # patch for intel speedup:
 from sklearnex import patch_sklearn
 patch_sklearn()
-
 import pandas as pd
 from sklearn.svm import SVC
 from tqdm import tqdm
@@ -21,7 +19,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from IPython.display import display
 import fasttext
 import tensorflow as tf
-from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import RandomizedSearchCV
 from transformers import AutoTokenizer
 from sklearn.model_selection import train_test_split
 import torch
@@ -51,7 +49,7 @@ def save_gridsearch_model(gs, filename):
     print("Saved model to: " + os.path.join(MODELS_FOLDER, GRIDSEARCH_FOLDER, filename+'.pkl'))
 
 
-def GridSearch_table_plot(grid_clf, param_name, method_name, num_results=15, negative=True, graph=True,
+def gridsearch_table_plot(grid_clf, param_name, method_name, num_results=15, negative=True, graph=True,
                           display_all_params=True):
     """
         Display grid search results in a figure
@@ -66,7 +64,7 @@ def GridSearch_table_plot(grid_clf, param_name, method_name, num_results=15, neg
         :param graph: boolean: should a graph be produced?
                            non-numeric parameters (True/False, None) don't graph well
                            Default: True
-        :param display_all_params: boolean: should we print out all of the parameters, not just the ones searched for?
+        :param display_all_params: boolean: should we print out of all the parameters, not just the ones searched for?
                            Default: True
     """
 
@@ -98,8 +96,7 @@ def GridSearch_table_plot(grid_clf, param_name, method_name, num_results=15, neg
 
     # display the top 'num_results' results
     # =====================================
-    display(pd.DataFrame(cv_results) \
-            .sort_values(by='rank_test_score').head(num_results))
+    display(pd.DataFrame(cv_results).sort_values(by='rank_test_score').head(num_results))
 
     # plot the results
     # ================
@@ -115,8 +112,6 @@ def GridSearch_table_plot(grid_clf, param_name, method_name, num_results=15, neg
     if not os.path.exists(os.path.join(OUT_DIR, DETECTION_FOLDER, GRIDSEARCH_FOLDER)):
         os.makedirs(os.path.join(OUT_DIR, DETECTION_FOLDER, GRIDSEARCH_FOLDER))
 
-    scores_df.to_csv(os.path.join(OUT_DIR, DETECTION_FOLDER, GRIDSEARCH_FOLDER, "gs_"+method_name+".csv"))
-
     # plot
     if graph:
         plt.figure(figsize=(8, 8))
@@ -130,6 +125,10 @@ def GridSearch_table_plot(grid_clf, param_name, method_name, num_results=15, neg
         plt.xlabel(param_name)
         plt.ylabel('Score')
         plt.savefig(os.path.join(OUT_DIR, DETECTION_FOLDER, GRIDSEARCH_FOLDER, 'gs_' + method_name + '.png'))
+
+    # save stats
+    scores_df.sort_index(inplace=True)
+    scores_df.to_csv(os.path.join(OUT_DIR, DETECTION_FOLDER, GRIDSEARCH_FOLDER, "gs_" + method_name + ".csv"))
 
 
 def predict_with_model(model, gs, X_test):
@@ -149,7 +148,7 @@ def predict_with_model(model, gs, X_test):
     return [p[true_i] for p in prediction_result], prediction_classes
 
 
-def semantic_sim_bert(text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs):
+def semantic_sim_bert(text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs, max_gs_iter):
     """
         Calculates the BERT embeddings for the given text pairs and uses an SVM to output classification
         and estimated probabilities for the provided test split. The optimal SVM parameters are determined by a grid
@@ -210,9 +209,9 @@ def semantic_sim_bert(text1_train, text1_test, text2_train, text2_test, y_train,
     print("Training the SVM...")
     model_svm = SVC(C=15, kernel='rbf', gamma=0.001, probability=True)
     # Grid Search
-    gs = GridSearchCV(model_svm, gs_params, cv=cv, verbose=verb, n_jobs=n_jobs)
+    gs = RandomizedSearchCV(model_svm, gs_params, n_iter=max_gs_iter, cv=cv, verbose=verb, n_jobs=n_jobs, random_state=0)
     gs.fit(X_train, y_train)
-    GridSearch_table_plot(gs, "C", "BERT", negative=False)
+    gridsearch_table_plot(gs, "C", "BERT", negative=False)
 
     save_gridsearch_model(gs, "bert_gs")
     best_model = gs.best_estimator_
@@ -220,7 +219,7 @@ def semantic_sim_bert(text1_train, text1_test, text2_train, text2_test, y_train,
     return predict_with_model(best_model, gs, X_test)
 
 
-def semantic_sim_t5(text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs):
+def semantic_sim_t5(text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs, max_gs_iter):
     """
         Calculates the T5 embeddings for the given text pairs and uses an SVM to output classification
         and estimated probabilities for the provided test split. The optimal SVM parameters are determined by a grid
@@ -273,9 +272,9 @@ def semantic_sim_t5(text1_train, text1_test, text2_train, text2_test, y_train, g
     print("Training the SVM...")
     model_svm = SVC(C=15, kernel='rbf', gamma=0.001, probability=True)
     # Grid Search
-    gs = GridSearchCV(model_svm, gs_params, cv=cv, verbose=verb, n_jobs=n_jobs)
+    gs = RandomizedSearchCV(model_svm, gs_params, n_iter=max_gs_iter, cv=cv, verbose=verb, n_jobs=n_jobs, random_state=0)
     gs.fit(X_train, y_train)
-    GridSearch_table_plot(gs, "C", "T5", negative=False)
+    gridsearch_table_plot(gs, "C", "T5", negative=False)
 
     save_gridsearch_model(gs, "t5_gs")
     best_model = gs.best_estimator_
@@ -283,7 +282,7 @@ def semantic_sim_t5(text1_train, text1_test, text2_train, text2_test, y_train, g
     return predict_with_model(best_model, gs, X_test)
 
 
-def ngram_sim(n, text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs):
+def ngram_sim(n, text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs, max_gs_iter):
     """
         Calculates the N-Gram similarities for the given text pairs and uses an SVM to output classification
         and estimated probabilities for the provided test split. The optimal SVM parameters are determined by a grid
@@ -321,13 +320,13 @@ def ngram_sim(n, text1_train, text1_test, text2_train, text2_test, y_train, gs_p
 
     # Grid Search
     model_svm = SVC(C=15, kernel='rbf', gamma=0.001, probability=True)
-    gs = GridSearchCV(model_svm, gs_params, cv=cv, verbose=verb, n_jobs=n_jobs)
+    gs = RandomizedSearchCV(model_svm, gs_params, n_iter=max_gs_iter, cv=cv, verbose=verb, n_jobs=n_jobs, random_state=0)
 
     # train the model
     print("Training the SVM...")
     gs.fit(sims_train, y_train)
     print("Output grid search stats...")
-    GridSearch_table_plot(gs, "C", "ngram", negative=False)
+    gridsearch_table_plot(gs, "C", "ngram", negative=False)
 
     # use the model to predict the testing instances
     save_gridsearch_model(gs, "ngram_gs")
@@ -336,7 +335,7 @@ def ngram_sim(n, text1_train, text1_test, text2_train, text2_test, y_train, gs_p
     return predict_with_model(best_model, gs, sims_test)
 
 
-def fuzzy_sim(text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs):
+def fuzzy_sim(text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs, max_gs_iter):
     """
         Calculates the fuzzy similarities for the given text pairs and uses an SVM to output classification
         and estimated probabilities for the provided test split. The optimal SVM parameters are determined by a grid
@@ -370,13 +369,13 @@ def fuzzy_sim(text1_train, text1_test, text2_train, text2_test, y_train, gs_para
 
     # Grid Search
     model_svm = SVC(C=15, kernel='rbf', gamma=0.001, probability=True)
-    gs = GridSearchCV(model_svm, gs_params, cv=cv, verbose=verb, n_jobs=n_jobs)
+    gs = RandomizedSearchCV(model_svm, gs_params, n_iter=max_gs_iter, cv=cv, verbose=verb, n_jobs=n_jobs, random_state=0)
 
     # train the model
     print("Training the SVM...")
     gs.fit(sims_train, y_train)
     print("Output grid search stats...")
-    GridSearch_table_plot(gs, "C", "fuzzy", negative=False)
+    gridsearch_table_plot(gs, "C", "fuzzy", negative=False)
 
     save_gridsearch_model(gs, "fuzzy_gs")
     best_model = gs.best_estimator_
@@ -400,7 +399,7 @@ def create_glove_embedding_matrix(word_index, embedding_dict, dimension):
     return embedding_matrix
 
 
-def semantic_sim_glove(text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs):
+def semantic_sim_glove(text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs, max_gs_iter):
     """
         Calculates the GloVe embeddings for the given text pairs and uses an SVM to output classification
         and estimated probabilities for the provided test split. The optimal SVM parameters are determined by a grid
@@ -471,9 +470,9 @@ def semantic_sim_glove(text1_train, text1_test, text2_train, text2_test, y_train
     print("Training the SVM...")
     model_svm = SVC(C=15, kernel='rbf', gamma=0.001, probability=True)
     # Grid Search
-    gs = GridSearchCV(model_svm, gs_params, cv=cv, verbose=verb, n_jobs=n_jobs)
+    gs = RandomizedSearchCV(model_svm, gs_params, n_iter=max_gs_iter, cv=cv, verbose=verb, n_jobs=n_jobs, random_state=0)
     gs.fit(X_train, y_train)
-    GridSearch_table_plot(gs, "C", "GloVe", negative=False)
+    gridsearch_table_plot(gs, "C", "GloVe", negative=False)
 
     save_gridsearch_model(gs, "glove_gs")
     best_model = gs.best_estimator_
@@ -481,7 +480,7 @@ def semantic_sim_glove(text1_train, text1_test, text2_train, text2_test, y_train
     return predict_with_model(best_model, gs, X_test)
 
 
-def fasttext_sim(text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs):
+def fasttext_sim(text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs, max_gs_iter):
     """
         Calculates the FastText vector representations for the given text pairs and uses an SVM to output classification
         and estimated probabilities for the provided test split. The optimal SVM parameters are determined by a grid
@@ -529,9 +528,9 @@ def fasttext_sim(text1_train, text1_test, text2_train, text2_test, y_train, gs_p
     print("Training the SVM...")
     model_svm = SVC(C=15, kernel='rbf', gamma=0.001, probability=True)
     # Grid Search
-    gs = GridSearchCV(model_svm, gs_params, cv=cv, verbose=verb, n_jobs=n_jobs)
+    gs = RandomizedSearchCV(model_svm, gs_params, n_iter=max_gs_iter, cv=cv, verbose=verb, n_jobs=n_jobs, random_state=0)
     gs.fit(X_train, y_train)
-    GridSearch_table_plot(gs, "C", "fasttext", negative=False)
+    gridsearch_table_plot(gs, "C", "fasttext", negative=False)
 
     save_gridsearch_model(gs, "fasttext_gs")
     best_model = gs.best_estimator_
@@ -539,7 +538,7 @@ def fasttext_sim(text1_train, text1_test, text2_train, text2_test, y_train, gs_p
     return predict_with_model(best_model, gs, X_test)
 
 
-def tfidf_cosine_sim(text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs):
+def tfidf_cosine_sim(text1_train, text1_test, text2_train, text2_test, y_train, gs_params, verb, cv, n_jobs, max_gs_iter):
     """
         Calculates the tfidf-vector representations for the given text pairs to calculate cosine similarites of all
         pairs.
@@ -578,13 +577,13 @@ def tfidf_cosine_sim(text1_train, text1_test, text2_train, text2_test, y_train, 
 
     # Grid Search
     model_svm = SVC(C=15, kernel='rbf', gamma=0.001, probability=True)
-    gs = GridSearchCV(model_svm, gs_params, cv=cv, verbose=verb, n_jobs=n_jobs)
+    gs = RandomizedSearchCV(model_svm, gs_params, n_iter=max_gs_iter, cv=cv, verbose=verb, n_jobs=n_jobs, random_state=0)
 
     # train the model
     print("Training the SVM...")
     gs.fit(sims_train, y_train)
     print("Output grid search stats...")
-    GridSearch_table_plot(gs, "C", "tfidf_cosine", negative=False)
+    gridsearch_table_plot(gs, "C", "tfidf_cosine", negative=False)
 
     save_gridsearch_model(gs, "tfidf_cosine_gs")
     best_model = gs.best_estimator_
@@ -686,13 +685,6 @@ if __name__ == "__main__":
     print(f"Train data size: {str(len(train_data[0]))}")
     print(f"Test data size: {str(len(test_data[0]))}")
 
-    # Grid Search Testing Range
-    '''
-    gs_params = {
-            'C': [10, 100]
-    }
-    '''
-
     # Grid Search Space (https://arxiv.org/abs/2101.09023)
     gs_params = {
         'kernel': ('linear', 'rbf', 'poly'),
@@ -701,43 +693,43 @@ if __name__ == "__main__":
         'C': [1, 10, 100],
     }
 
-    verb, cv, n_jobs = 50, 5, -1
+    verb, cv, n_jobs, max_gs_iter = 50, 3, -1, 40
 
     pred_result_df[TFIDF_COSINE], pred_result_df[TFIDF_COSINE_PRED] = tfidf_cosine_sim(train_data[1], test_data[1],
                                                                                        train_data[2], test_data[2],
                                                                                        train_data[3],
-                                                                                       gs_params, verb, cv, n_jobs)
+                                                                                       gs_params, verb, cv, n_jobs, max_gs_iter)
     pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
                            index=True, indent=4)
     pred_result_df[FASTTEXT], pred_result_df[FASTTEXT_PRED] = fasttext_sim(train_data[1], test_data[1],
                                                  train_data[2], test_data[2], train_data[3],
-                                                 gs_params, verb, cv, n_jobs)
+                                                 gs_params, verb, cv, n_jobs, max_gs_iter)
     pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
                            index=True, indent=4)
     pred_result_df[SEM_GLOVE], pred_result_df[SEM_GLOVE_PRED] = semantic_sim_glove(train_data[1], test_data[1],
                                                  train_data[2], test_data[2], train_data[3],
-                                                 gs_params, verb, cv, n_jobs)
+                                                 gs_params, verb, cv, n_jobs, max_gs_iter)
     pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
                            index=True, indent=4)
     pred_result_df[SEM_BERT], pred_result_df[SEM_BERT_PRED] = semantic_sim_bert(train_data[1], test_data[1],
                                                                                 train_data[2], test_data[2],
-                                                                                train_data[3],
-                                                                                gs_params, verb, cv, n_jobs)
+                                                                                train_data[3], gs_params, verb, cv,
+                                                                                n_jobs, max_gs_iter)
     pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
                            index=True, indent=4)
     pred_result_df[SEM_T5], pred_result_df[SEM_T5_PRED] = semantic_sim_t5(train_data[1], test_data[1],
                                                  train_data[2], test_data[2], train_data[3],
-                                                 gs_params, verb, cv, n_jobs)
+                                                 gs_params, verb, cv, n_jobs, max_gs_iter)
     pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
                            index=True, indent=4)
     pred_result_df[FUZZY], pred_result_df[FUZZY_PRED] = fuzzy_sim(train_data[1], test_data[1],
                                                  train_data[2], test_data[2], train_data[3],
-                                                 gs_params, verb, cv, n_jobs)
+                                                 gs_params, verb, cv, n_jobs, max_gs_iter)
     pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
                            index=True, indent=4)
     pred_result_df[NGRAM3], pred_result_df[NGRAM3_PRED] = ngram_sim(3,train_data[1], test_data[1],
                                                  train_data[2], test_data[2], train_data[3],
-                                                 gs_params, verb, cv, n_jobs)
+                                                 gs_params, verb, cv, n_jobs, max_gs_iter)
     pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
                            index=True, indent=4)
 
