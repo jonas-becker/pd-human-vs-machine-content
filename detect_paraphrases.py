@@ -695,6 +695,7 @@ if __name__ == "__main__":
 
     verb, cv, n_jobs, max_gs_iter = 50, 3, -1, 40
 
+    '''
     pred_result_df[TFIDF_COSINE], pred_result_df[TFIDF_COSINE_PRED] = tfidf_cosine_sim(train_data[1], test_data[1],
                                                                                        train_data[2], test_data[2],
                                                                                        train_data[3],
@@ -717,6 +718,7 @@ if __name__ == "__main__":
                                                                                 n_jobs, max_gs_iter)
     pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
                            index=True, indent=4)
+    '''
     pred_result_df[SEM_T5], pred_result_df[SEM_T5_PRED] = semantic_sim_t5(train_data[1], test_data[1],
                                                  train_data[2], test_data[2], train_data[3],
                                                  gs_params, verb, cv, n_jobs, max_gs_iter)
