@@ -29,6 +29,7 @@ import joblib
 gc.collect()
 
 np_config.enable_numpy_behavior()
+pd.set_option('display.max_columns', None)
 
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
 print("Using device " + str(device))
@@ -630,12 +631,13 @@ if __name__ == "__main__":
 
         # For datasets with only positive pairs, supplement the data with random pairs from other datasets
         if False not in df_dataset[PARAPHRASE].unique():
-            supplement_df = df[~(df[DATASET] == dataset)].sample(frac=1).reset_index(drop=True)
+            supplement_df = df[~(df[DATASET] == dataset)].sample(frac=1, random_state=0).reset_index(drop=True)
             supplement_df = supplement_df[~supplement_df[PARAPHRASE]].head(df_dataset.shape[0])
             supplement_df[SUPPLEMENT_FROM] = supplement_df[DATASET]
             supplement_df[DATASET] = dataset
             df_dataset = pd.concat([df_dataset, supplement_df])
             print("Supplemented dataset. It does now contain " + str(df_dataset.shape[0]) + " pairs.")
+
         df_dataset.reset_index(drop=True, inplace=True)
         print(df_dataset[PARAPHRASE].value_counts())
 
@@ -665,17 +667,6 @@ if __name__ == "__main__":
         train_data[2] = train_data[2] + X_text2_train.tolist()  # text 2
         train_data[3] = train_data[3] + y_train.tolist()  # labels
 
-        print(sum(map(lambda x: x == True, train_data[3])))
-        print(sum(map(lambda x: x == False, train_data[3])))
-        print("---")
-        print(sum(map(lambda x: x == True, test_data[3])))
-        print(sum(map(lambda x: x == False, test_data[3])))
-
-        print(type(X_pairID_test))
-        print(X_pairID_test.shape)
-        print(X_pairID_test)
-        print(X_text1_train)
-
         # add to pred result df in the correct order
         print("Appending test split to result dataframe...")
         pred_result_df = pd.concat([pred_result_df, df_dataset_test], ignore_index=True)
@@ -693,9 +684,8 @@ if __name__ == "__main__":
         'C': [1, 10, 100],
     }
 
-    verb, cv, n_jobs, max_gs_iter = 50, 3, -1, 40
+    verb, cv, n_jobs, max_gs_iter = 50, 2, -1, 25
 
-    '''
     pred_result_df[TFIDF_COSINE], pred_result_df[TFIDF_COSINE_PRED] = tfidf_cosine_sim(train_data[1], test_data[1],
                                                                                        train_data[2], test_data[2],
                                                                                        train_data[3],
@@ -718,7 +708,6 @@ if __name__ == "__main__":
                                                                                 n_jobs, max_gs_iter)
     pred_result_df.to_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index",
                            index=True, indent=4)
-    '''
     pred_result_df[SEM_T5], pred_result_df[SEM_T5_PRED] = semantic_sim_t5(train_data[1], test_data[1],
                                                  train_data[2], test_data[2], train_data[3],
                                                  gs_params, verb, cv, n_jobs, max_gs_iter)
