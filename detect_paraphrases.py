@@ -598,8 +598,6 @@ if __name__ == "__main__":
     if not os.path.isdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):
         os.makedirs(os.path.join(OUT_DIR, DETECTION_FOLDER))
 
-    stats_str = "STATISTICS OF DETECTION SCRIPT\n\n"
-
     print("Reading " + FORMATTED_DATA_FILENAME + " ...")
     df = pd.read_json(os.path.join(OUT_DIR, FORMATTED_DATA_FILENAME), orient="index")
     df = df.sort_values(by=[DATASET])  # sort to have datasets processed sequentially
