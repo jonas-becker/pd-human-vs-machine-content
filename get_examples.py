@@ -84,12 +84,12 @@ def get_detection_examples():
 
 def get_humanstudy_examples():
     print("Getting examples from all datasets combined for the human study...")
-    df = pd.DataFrame()
-    for dataset_file in os.listdir(os.path.join(OUT_DIR, DETECTION_FOLDER)):
-        df = pd.concat([df, pd.read_json(os.path.join(OUT_DIR, DETECTION_FOLDER, dataset_file), orient = "index")])
+    dataset_file = os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json")
+    print("Processing " + dataset_file)
+    df = pd.read_json(dataset_file, orient="index")
 
     print("Df len: " + str(df.shape[0]))
-    df = df[(df[COSINE_DISTANCE] <= 0.99) & (df[FUZZY] <= 0.99) & (df[NGRAM3] <= 0.99) & (df[SEM_BERT] <= 0.99) & (df[SEM_T5] <= 0.99) & (df[TFIDF_COSINE] <= 0.99) ]
+    df = df[(df[FUZZY] <= 0.99) & (df[NGRAM3] <= 0.99) & (df[SEM_BERT] <= 0.99) & (df[SEM_T5] <= 0.99) & (df[TFIDF_COSINE] <= 0.99) & (df[FASTTEXT] <= 0.99) & (df[SEM_GLOVE] <= 0.99)]
     print("Df len after filtering out to similar texts: " + str(df.shape[0]))
     
     # random pairs
