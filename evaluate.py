@@ -191,29 +191,33 @@ if __name__ == "__main__":
             if method1 != method2:
                 # get the correct axis names in nicer writing
                 if method1 == SEM_BERT:
-                    xlabel = "BERT Cosine Distance"
+                    xlabel = "BERT"
                 elif method1 == SEM_T5:
-                    xlabel = "T5 Cosine Distance"
+                    xlabel = "T5"
                 elif method1 == FUZZY:
-                    xlabel = "Fuzzy Similarity"
+                    xlabel = "Fuzzy"
                 elif method1 == TFIDF_COSINE:
-                    xlabel = "TF-IDF Cosine Distance"
+                    xlabel = "Tf-idf Cosine"
                 elif method1 == NGRAM3:
-                    xlabel = "3-Gram Similarity"
+                    xlabel = "3-Gram"
                 elif method1 == FASTTEXT:
-                    xlabel = "Fasttext Similarity"
+                    xlabel = "Fasttext"
+                elif method1 == SEM_GLOVE:
+                    xlabel = "GloVe"
                 if method2 == SEM_BERT:
-                    ylabel = "BERT Cosine Distance"
+                    ylabel = "BERT"
                 elif method2 == SEM_T5:
-                    ylabel = "T5 Cosine Distance"
+                    ylabel = "T5"
                 elif method2 == FUZZY:
-                    ylabel = "Fuzzy Similarity"
+                    ylabel = "Fuzzy"
                 elif method2 == TFIDF_COSINE:
-                    ylabel = "TF-IDF Cosine Distance"
+                    ylabel = "Tf-idf Cosine"
                 elif method2 == NGRAM3:
-                    ylabel = "3-Gram Similarity"
+                    ylabel = "3-Gram"
+                elif method2 == SEM_GLOVE:
+                    ylabel = "GloVe"
                 elif method2 == FASTTEXT:
-                    ylabel = "Fasttext Similarity"
+                    ylabel = "Fasttext"
 
                 this_corr_df_m = corr_df_m[corr_df_m[method1].notnull() & corr_df_m[method2].notnull()].truncate(after=CORR_GRAPH_SIZE)
                 this_corr_df_h = corr_df_h[corr_df_h[method1].notnull() & corr_df_h[method2].notnull()].truncate(after=CORR_GRAPH_SIZE)
@@ -248,25 +252,33 @@ if __name__ == "__main__":
         for method2 in DETECTION_METHODS:
             if method1 != method2:
                 if method1 == SEM_BERT:
-                    xlabel = "BERT Cosine Distance"
+                    xlabel = "BERT"
                 elif method1 == SEM_T5:
-                    xlabel = "T5 Cosine Distance"
+                    xlabel = "T5"
                 elif method1 == FUZZY:
-                    xlabel = "Fuzzy Similarity"
+                    xlabel = "Fuzzy"
                 elif method1 == TFIDF_COSINE:
-                    xlabel = "TF-IDF Cosine Distance"
+                    xlabel = "Tf-idf Cosine"
                 elif method1 == NGRAM3:
-                    xlabel = "3-Gram Similarity"
+                    xlabel = "3-Gram"
+                elif method1 == FASTTEXT:
+                    xlabel = "Fasttext"
+                elif method1 == SEM_GLOVE:
+                    xlabel = "GloVe"
                 if method2 == SEM_BERT:
-                    ylabel = "BERT Cosine Distance"
+                    ylabel = "BERT"
                 elif method2 == SEM_T5:
-                    ylabel = "T5 Cosine Distance"
+                    ylabel = "T5"
                 elif method2 == FUZZY:
-                    ylabel = "Fuzzy Similarity"
+                    ylabel = "Fuzzy"
                 elif method2 == TFIDF_COSINE:
-                    ylabel = "TF-IDF Cosine Distance"
+                    ylabel = "Tf-idf Cosine"
                 elif method2 == NGRAM3:
-                    ylabel = "3-Gram Similarity"
+                    ylabel = "3-Gram"
+                elif method2 == SEM_GLOVE:
+                    ylabel = "GloVe"
+                elif method2 == FASTTEXT:
+                    ylabel = "Fasttext"
 
                 this_corr_df_m = corr_df_m[corr_df_m[method1].notnull() & corr_df_m[method2].notnull()].truncate(after=CORR_GRAPH_SIZE)
                 this_corr_df_h = corr_df_h[corr_df_h[method1].notnull() & corr_df_h[method2].notnull()].truncate(after=CORR_GRAPH_SIZE)
