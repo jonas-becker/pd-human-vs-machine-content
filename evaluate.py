@@ -34,6 +34,28 @@ def plot_roc_curve(title, y_pred, y_test):
     plt.ylim(0, 1)
     plt.savefig(os.path.join(OUT_DIR, EVALUATION_FOLDER, title+".pdf"), bbox_inches='tight')
 
+def gini(x):
+    '''
+    Calculates the Gini Coefficient.
+    :param x: The pd series to calculate on
+    :return: the Gini Coefficient
+    '''
+    x = x.reset_index(drop=True)
+    w = np.ones_like(x)
+    w = pd.Series(w).reset_index(drop=True)
+    n = x.size
+    wxsum = sum(w * x)
+    wsum = sum(w)
+    sxw = np.argsort(x)
+    sx = x[sxw] * w[sxw]
+    sw = w[sxw]
+    pxi = np.cumsum(sx) / wxsum
+    pci = np.cumsum(sw) / wsum
+    g = 0.0
+    for i in np.arange(1, n):
+        g = g + pxi.iloc[i] * pci.iloc[i - 1] - pci.iloc[i] * pxi.iloc[i - 1]
+    return g
+
 def eval(df, dataset, method, eval_df, eval_string):
     actual = pd.Series(df[PARAPHRASE], name='Actual')
     predicted = pd.Series(df[method], name='Predicted')
@@ -101,8 +123,6 @@ if __name__ == "__main__":
         eval_string += d + ", "
     eval_string = eval_string[:-2] + "\n\n"
 
-
-    # find the optimal thresholds for each method and dataset and evaluate with said thresholds
     df_test = pd.read_json(os.path.join(OUT_DIR, DETECTION_FOLDER, "detection_test_result.json"), orient="index")
 
     for dataset in DATASETS:
@@ -116,12 +136,9 @@ if __name__ == "__main__":
         for method in DETECTION_METHODS:
             print("-> Method: " + method)
 
-            #evaluate classification
-            #val_df, eval_string = eval(df, dataset, SEM_BERT, eval_df, eval_string)
-
-            print("Calculating precision-recall curve...")
-            plot_pr_curve(method + "_" + dataset + "_pr", y_pred=np.array(df[method].tolist()), y_test=np.array(df[PARAPHRASE].tolist()).astype(int))
-            plot_roc_curve(method + "_" + dataset + "_roc", y_pred=np.array(df[method].tolist()), y_test=np.array(df[PARAPHRASE].tolist()).astype(int))
+            #print("Calculating precision-recall curve...")
+            #plot_pr_curve(method + "_" + dataset + "_pr", y_pred=np.array(df[method].tolist()), y_test=np.array(df[PARAPHRASE].tolist()).astype(int))
+            #plot_roc_curve(method + "_" + dataset + "_roc", y_pred=np.array(df[method].tolist()), y_test=np.array(df[PARAPHRASE].tolist()).astype(int))
 
             print("Getting statistics...")
             confusion_mat = confusion_matrix(y_true=df[PARAPHRASE].tolist(), y_pred=df[method+PRED_SUF].tolist())
@@ -139,33 +156,9 @@ if __name__ == "__main__":
                 TP: tp,
                 TN: tn,
                 F1: f1_score(y_true=df[PARAPHRASE].tolist(), y_pred=df[method+PRED_SUF].tolist()),
+                GINI_PRED: gini(df[method+PRED_SUF]),
+                GINI_PROB: gini(df[method])
             }, index=[dataset+"_"+method])])
-
-            print(eval_df.head(20))
-
-        #precision_sem_bert, recall_sem_bert, thresholds_sem_bert = precision_recall_curve(df[PARAPHRASE], df[SEM_BERT])
-        #precision_sem_t5, recall_sem_t5, thresholds_sem_t5 = precision_recall_curve(df["is_paraphrase"], df[SEM_T5])
-        #precision_fuzzy, recall_fuzzy, thresholds_fuzzy = precision_recall_curve(df["is_paraphrase"], df[FUZZY])
-        #precision_tfidf, recall_tfidf, thresholds_tfidf = precision_recall_curve(df["is_paraphrase"], df[TFIDF_COSINE])
-        #precision_ngram, recall_ngram, thresholds_ngram = precision_recall_curve(df["is_paraphrase"], df[NGRAM3])
-        #df_gpt3 = df[df[SEM_GPT3].notnull()]
-
-        #print("Plotting curves...")
-        #fig, ax = plt.subplots()
-        #ax.plot(recall_sem_bert, precision_sem_bert, color=c_pal[0], label='BERT')
-        #ax.plot(recall_sem_t5, precision_sem_t5, color=c_pal[1], label='T5')
-        #ax.plot(recall_fuzzy, precision_fuzzy, color=c_pal[2], label='Fuzzy')
-        #ax.plot(recall_tfidf, precision_tfidf, color=c_pal[3], label='TF-IDF')
-        #ax.plot(recall_ngram, precision_ngram, color=c_pal[4], label='3-Gram')
-        #if df_gpt3.shape[0] != 0:
-        #    ax.plot(recall_gpt3, precision_gpt3, color=c_pal[5], label='GPT-3')
-
-        #ax.set_xlabel('Recall')
-        #ax.set_ylabel('Precision')
-        #plt.xlim(0, 1)
-        #plt.ylim(0, 1)
-        #plt.savefig(os.path.join(OUT_DIR, EVALUATION_FOLDER, dataset+"_pr.pdf"), bbox_inches='tight')
-
 
     eval_df.to_json(os.path.join(OUT_DIR, EVALUATION_FOLDER, EVALUATION_RESULTS_FILENAME), orient = "index", index = True, indent = 4)
     eval_df.to_csv(os.path.join(OUT_DIR, EVALUATION_FOLDER, EVALUATION_RESULTS_FILENAME.replace(".json", ".csv")), index = True)
@@ -204,6 +197,8 @@ if __name__ == "__main__":
                     xlabel = "Fasttext"
                 elif method1 == SEM_GLOVE:
                     xlabel = "GloVe"
+                else:
+                    xlabel = "Unknown Method"
                 if method2 == SEM_BERT:
                     ylabel = "BERT"
                 elif method2 == SEM_T5:
@@ -218,6 +213,8 @@ if __name__ == "__main__":
                     ylabel = "GloVe"
                 elif method2 == FASTTEXT:
                     ylabel = "Fasttext"
+                else:
+                    ylabel = "Unknown Method"
 
                 this_corr_df_m = corr_df_m[corr_df_m[method1].notnull() & corr_df_m[method2].notnull()].truncate(after=CORR_GRAPH_SIZE)
                 this_corr_df_h = corr_df_h[corr_df_h[method1].notnull() & corr_df_h[method2].notnull()].truncate(after=CORR_GRAPH_SIZE)
@@ -265,6 +262,8 @@ if __name__ == "__main__":
                     xlabel = "Fasttext"
                 elif method1 == SEM_GLOVE:
                     xlabel = "GloVe"
+                else:
+                    xlabel = "Unknown Method"
                 if method2 == SEM_BERT:
                     ylabel = "BERT"
                 elif method2 == SEM_T5:
@@ -279,6 +278,8 @@ if __name__ == "__main__":
                     ylabel = "GloVe"
                 elif method2 == FASTTEXT:
                     ylabel = "Fasttext"
+                else:
+                    ylabel = "Unknown Method"
 
                 this_corr_df_m = corr_df_m[corr_df_m[method1].notnull() & corr_df_m[method2].notnull()].truncate(after=CORR_GRAPH_SIZE)
                 this_corr_df_h = corr_df_h[corr_df_h[method1].notnull() & corr_df_h[method2].notnull()].truncate(after=CORR_GRAPH_SIZE)
