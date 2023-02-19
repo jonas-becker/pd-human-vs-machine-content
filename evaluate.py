@@ -148,6 +148,8 @@ if __name__ == "__main__":
             tn = confusion_mat[0][0]
 
             eval_df = pd.concat([eval_df, pd.DataFrame({
+                DATASET: dataset,
+                METHOD: method,
                 PAIRS: df.shape[0],
                 PARA_PAIRS: df[df[PARAPHRASE] == True].shape[0],
                 ORIG_PAIRS: df[df[PARAPHRASE] == False].shape[0],
@@ -159,6 +161,38 @@ if __name__ == "__main__":
                 GINI_PRED: gini(df[method+PRED_SUF]),
                 GINI_PROB: gini(df[method])
             }, index=[dataset+"_"+method])])
+
+        eval_df = pd.concat([eval_df, pd.DataFrame({
+            DATASET: dataset,
+            METHOD: None,
+            PAIRS: eval_df[eval_df[DATASET] == dataset][PAIRS].mean(),
+            PARA_PAIRS: eval_df[eval_df[DATASET] == dataset][PARA_PAIRS].mean(),
+            ORIG_PAIRS: eval_df[eval_df[DATASET] == dataset][ORIG_PAIRS].mean(),
+            FP: eval_df[eval_df[DATASET] == dataset][FP].mean(),
+            FN: eval_df[eval_df[DATASET] == dataset][FN].mean(),
+            TP: eval_df[eval_df[DATASET] == dataset][TP].mean(),
+            TN: eval_df[eval_df[DATASET] == dataset][TN].mean(),
+            F1: eval_df[eval_df[DATASET] == dataset][F1].mean(),
+            GINI_PRED: eval_df[eval_df[DATASET] == dataset][GINI_PRED].mean(),
+            GINI_PROB: eval_df[eval_df[DATASET] == dataset][GINI_PROB].mean()
+        }, index=[dataset + "_MEAN"])])
+
+    # mean per method across datasets
+    for method in DETECTION_METHODS:
+        eval_df = pd.concat([eval_df, pd.DataFrame({
+            DATASET: None,
+            METHOD: method,
+            PAIRS: eval_df[eval_df[METHOD] == method][PAIRS].mean(),
+            PARA_PAIRS: eval_df[eval_df[METHOD] == method][PARA_PAIRS].mean(),
+            ORIG_PAIRS: eval_df[eval_df[METHOD] == method][ORIG_PAIRS].mean(),
+            FP: eval_df[eval_df[METHOD] == method][FP].mean(),
+            FN: eval_df[eval_df[METHOD] == method][FN].mean(),
+            TP: eval_df[eval_df[METHOD] == method][TP].mean(),
+            TN: eval_df[eval_df[METHOD] == method][TN].mean(),
+            F1: eval_df[eval_df[METHOD] == method][F1].mean(),
+            GINI_PRED: eval_df[eval_df[METHOD] == method][GINI_PRED].mean(),
+            GINI_PROB: eval_df[eval_df[METHOD] == method][GINI_PROB].mean()
+        }, index=["MEAN_"+method])])
 
     eval_df.to_json(os.path.join(OUT_DIR, EVALUATION_FOLDER, EVALUATION_RESULTS_FILENAME), orient = "index", index = True, indent = 4)
     eval_df.to_csv(os.path.join(OUT_DIR, EVALUATION_FOLDER, EVALUATION_RESULTS_FILENAME.replace(".json", ".csv")), index = True)
