@@ -345,20 +345,23 @@ if __name__ == "__main__":
     corr_df_h = shuffle(df_test[(df_test[DATASET].isin(HUMAN_PARAPHRASED_DATASETS))]).reset_index(drop=True)\
         .drop(columns=df_test.columns.difference(DETECTION_METHODS))
 
+    x_labels = ["TF-IDF", "Fasttext", "GloVe", "BERT", "T5", "Fuzzy", "3-Gram"]
+    y_labels = ["TF-IDF", "Fasttext", "GloVe", "BERT", "T5", "Fuzzy", "3-Gram"]
+
     plt.clf()
     corr_h_matrix = corr_df_h.corr()
     mask = np.triu(np.ones_like(corr_h_matrix, dtype=bool)) # Generate a mask for the upper triangle
     np.fill_diagonal(mask, False)
-    sns.heatmap(corr_h_matrix, mask=mask, annot=True, xticklabels=corr_df_h.columns.tolist(),
-                yticklabels=corr_df_h.columns.tolist(), vmin=0, vmax=1)
+    sns.heatmap(corr_h_matrix, fmt=".2f", mask=mask, annot=True, xticklabels=x_labels,
+                yticklabels=y_labels, vmin=0, vmax=1)
     plt.yticks(rotation=0)
     plt.xticks(rotation=45, ha='right')
     plt.savefig(os.path.join(OUT_DIR, EVALUATION_FOLDER, CORRELATIONS_FOLDER, "corr_human_prob.pdf"), bbox_inches="tight")
 
     plt.clf()
     corr_m_matrix = corr_df_m.corr()
-    sns.heatmap(corr_m_matrix, mask=mask, annot=True, xticklabels=corr_df_m.columns.tolist(),
-                yticklabels=corr_df_m.columns.tolist(), vmin=0, vmax=1)
+    sns.heatmap(corr_m_matrix, fmt=".2f", mask=mask, annot=True, xticklabels=x_labels,
+                yticklabels=y_labels, vmin=0, vmax=1)
     plt.yticks(rotation=0)
     plt.xticks(rotation=45, ha='right')
     plt.savefig(os.path.join(OUT_DIR, EVALUATION_FOLDER, CORRELATIONS_FOLDER, "corr_machine_prob.pdf"), bbox_inches="tight")
@@ -379,16 +382,16 @@ if __name__ == "__main__":
     corr_h_matrix = corr_df_h.corr()
     mask = np.triu(np.ones_like(corr_h_matrix, dtype=bool))  # Generate a mask for the upper triangle
     np.fill_diagonal(mask, False)
-    sns.heatmap(corr_h_matrix, mask=mask, annot=True, xticklabels=corr_df_h.columns.tolist(),
-                yticklabels=corr_df_h.columns.tolist(), vmin=0, vmax=1)
+    sns.heatmap(corr_h_matrix, fmt=".2f", mask=mask, annot=True, xticklabels=x_labels,
+                yticklabels=y_labels, vmin=0, vmax=1)
     plt.yticks(rotation=0)
     plt.xticks(rotation=45, ha='right')
     plt.savefig(os.path.join(OUT_DIR, EVALUATION_FOLDER, CORRELATIONS_FOLDER, "corr_human_pred.pdf"), bbox_inches="tight")
 
     plt.clf()
     corr_m_matrix = corr_df_m.corr()
-    sns.heatmap(corr_m_matrix, mask=mask, annot=True, xticklabels=corr_df_m.columns.tolist(),
-                yticklabels=corr_df_m.columns.tolist(), vmin=0, vmax=1)
+    sns.heatmap(corr_m_matrix, fmt=".2f", mask=mask, annot=True, xticklabels=x_labels,
+                yticklabels=y_labels, vmin=0, vmax=1)
     plt.yticks(rotation=0)
     plt.xticks(rotation=45, ha='right')
     plt.savefig(os.path.join(OUT_DIR, EVALUATION_FOLDER, CORRELATIONS_FOLDER, "corr_machine_pred.pdf"), bbox_inches="tight")
