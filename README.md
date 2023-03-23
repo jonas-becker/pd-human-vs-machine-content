@@ -54,6 +54,66 @@ We evaluated the results of our experiments in the linked paper above. However, 
     <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/APH.html">Live View</a></td>
     <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/APH_paraphrasedOnly.html">Live View</a></td>
   </tr>
+  <tr>
+    <td>APT</td>
+    <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/APT.html">Live View</a></td>
+    <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/APT_paraphrasedOnly.html">Live View</a></td>
+  </tr>
+  <tr>
+    <td>ETPC</td>
+    <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/ETPC.html">Live View</a></td>
+    <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/ETPC_paraphrasedOnly.html">Live View</a></td>
+  </tr>
+  <tr>
+    <td>MPC</td>
+    <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/MPC.html">Live View</a></td>
+    <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/MPC_paraphrasedOnly.html">Live View</a></td>
+  </tr>
+  <tr>
+    <td>MSCOCO</td>
+    <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/MSCOCO.html">Live View</a></td>
+    <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/MSCOCO_paraphrasedOnly.html">Live View</a></td>
+  </tr>
+  <tr>
+    <td>PAWS-Wiki</td>
+    <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/PAWSWiki.html">Live View</a></td>
+    <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/PAWSWiki_paraphrasedOnly.html">Live View</a></td>
+  </tr>
+  <tr>
+    <td>ParaNMT</td>
+    <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/ParaNMT.html">Live View</a></td>
+    <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/ParaNMT_paraphrasedOnly.html">Live View</a></td>
+  </tr>
+  <tr>
+    <td>ParaSCI</td>
+    <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/ParaSCI.html">Live View</a></td>
+    <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/ParaSCI_paraphrasedOnly.html">Live View</a></td>
+  </tr>
+  <tr>
+    <td>QQP</td>
+    <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/QQP.html">Live View</a></td>
+    <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/QQP_paraphrasedOnly.html">Live View</a></td>
+  </tr>
+  <tr>
+    <td>SAv2</td>
+    <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/SAv2.html">Live View</a></td>
+    <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/SAv2_paraphrasedOnly.html">Live View</a></td>
+  </tr>
+  <tr>
+    <td>SaR</td>
+    <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/SaR.html">Live View</a></td>
+    <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/SaR_paraphrasedOnly.html">Live View</a></td>
+  </tr>
+  <tr>
+    <td>TURL</td>
+    <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/TURL.html">Live View</a></td>
+    <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/TURL_paraphrasedOnly.html">Live View</a></td>
+  </tr>
+  <tr>
+    <td>All Datasets</td>
+    <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/total.html">Live View</a></td>
+    <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/total_paraphrasedOnly.html">Live View</a></td>
+  </tr>
 </table>
 </details>
 
