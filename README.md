@@ -41,8 +41,8 @@ This study includes twelve datasets (seven human-generated and five machine-gene
 
 We evaluated the results of our experiments in the linked paper above. However, we provide additional material here that was not used in the final version of the paper.
 
-<details>
-  <summary>t-SNE visualizations of each datasets BERT embeddings (interactive view powered by githack.com)</summary>
+<details open>
+  <summary>t-SNE visualizations of each datasets BERT embeddings</summary>
   <table>
   <tr>
     <th>Dataset</th>
@@ -52,73 +52,73 @@ We evaluated the results of our experiments in the linked paper above. However, 
   </tr>
   <tr>
     <td>APH</td>
-   <td>Human</td>
+    <td>Human</td>
     <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/APH.html">Live View</a></td>
     <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/APH_paraphrasedOnly.html">Live View</a></td>
   </tr>
   <tr>
     <td>APT</td>
-   <td>Machine</td>
+    <td>Machine</td>
     <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/APT.html">Live View</a></td>
     <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/APT_paraphrasedOnly.html">Live View</a></td>
   </tr>
   <tr>
     <td>ETPC</td>
-   <td>Human</td>
+    <td>Human</td>
     <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/ETPC.html">Live View</a></td>
     <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/ETPC_paraphrasedOnly.html">Live View</a></td>
   </tr>
   <tr>
     <td>MPC</td>
-   <td>Machine</td>
+    <td>Machine</td>
     <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/MPC.html">Live View</a></td>
     <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/MPC_paraphrasedOnly.html">Live View</a></td>
   </tr>
   <tr>
     <td>MSCOCO</td>
-   <td>Human</td>
+    <td>Human</td>
     <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/MSCOCO.html">Live View</a></td>
     <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/MSCOCO_paraphrasedOnly.html">Live View</a></td>
   </tr>
   <tr>
     <td>PAWS-Wiki</td>
-   <td>Machine</td>
+    <td>Machine</td>
     <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/PAWSWiki.html">Live View</a></td>
     <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/PAWSWiki_paraphrasedOnly.html">Live View</a></td>
   </tr>
   <tr>
     <td>ParaNMT-50M</td>
-   <td>Machine</td>
+    <td>Machine</td>
     <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/ParaNMT.html">Live View</a></td>
     <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/ParaNMT_paraphrasedOnly.html">Live View</a></td>
   </tr>
   <tr>
     <td>ParaSCI</td>
-   <td>Human</td>
+    <td>Human</td>
     <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/ParaSCI.html">Live View</a></td>
     <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/ParaSCI_paraphrasedOnly.html">Live View</a></td>
   </tr>
   <tr>
     <td>QQP</td>
-   <td>Human</td>
+    <td>Human</td>
     <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/QQP.html">Live View</a></td>
     <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/QQP_paraphrasedOnly.html">Live View</a></td>
   </tr>
   <tr>
     <td>SAv2</td>
-   <td>Machine</td>
+    <td>Machine</td>
     <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/SAv2.html">Live View</a></td>
     <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/SAv2_paraphrasedOnly.html">Live View</a></td>
   </tr>
   <tr>
     <td>SaR</td>
-   <td>Human</td>
+    <td>Human</td>
     <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/SaR.html">Live View</a></td>
     <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/SaR_paraphrasedOnly.html">Live View</a></td>
   </tr>
   <tr>
     <td>TURL</td>
-   <td>Human</td>
+    <td>Human</td>
     <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/TURL.html">Live View</a></td>
     <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/TURL_paraphrasedOnly.html">Live View</a></td>
   </tr>
@@ -132,8 +132,13 @@ We evaluated the results of our experiments in the linked paper above. However, 
 </details>
 
 <details>
+  <summary>Grid Search Results</summary>
+    We performed a 2-fold randomized grid search of 25 iterations once per detection method. The grid search results can be seen in <td><a href="https://github.com/jonas-becker/pd-human-vs-machine-content/tree/main/output/detection/gridsearch">this directory</a></td>.
+</details>
+
+<details>
   <summary>One-on-one correlation graphs of detection methods</summary>
-    add something
+    For a detailed view at each one-on-one correlation, please refer to <td><a href="https://github.com/jonas-becker/pd-human-vs-machine-content/tree/main/output/evaluation/correlations">this directory</a></td>.
 </details>
 
 ## Citation
