@@ -29,7 +29,7 @@ The project has multiple scripts included, each used for separate parts of the e
 
 ## Datasets
 
-Not all datasets used in the paper are freely available to the public which is why we do not offer our result on these datasets for public download. However, you are free to reprocess the experiments using all datasets from the paper once you got access.
+Not all datasets used in the paper are freely available to the public which is why we do not offer the prediction results on text pairs from these datasets for download. However, you are free to reprocess the experiments using all datasets from the paper once you got access.
 
 This study includes twelve datasets (seven human-generated and five machine-generated). For further information, please refer to the paper.
 
