@@ -42,8 +42,19 @@ This study includes twelve datasets (seven human-generated and five machine-gene
 We evaluated the results of our experiments in the linked paper above. However, we provide additional material here that was not used in the final version of the paper.
 
 <details>
-  <summary>t-SNE visualizations of each datasets BERT embeddings</summary>
-    add something
+  <summary>t-SNE visualizations of each datasets BERT embeddings (interactive view powered by githack.com)</summary>
+  <table>
+  <tr>
+    <th>Dataset</th>
+    <th>Mixed</th>
+    <th>Paraphrases Only</th>
+  </tr>
+  <tr>
+    <td>APH</td>
+    <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/APH.html">Live View</a></td>
+    <td><a href="https://raw.githack.com/jonas-becker/pd-human-vs-machine-content/main/output/figures/APH_paraphrasedOnly.html">Live View</a></td>
+  </tr>
+</table>
 </details>
 
 <details>
