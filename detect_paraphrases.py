@@ -500,8 +500,6 @@ def fasttext_sim(text1_train, text1_test, text2_train, text2_test, y_train, gs_p
     print("FastText Similarity \n------------")
     print("Loading model...")
 
-    #model = fasttext.load_facebook_vectors(os.path.join(MODELS_FOLDER, "model_filename.bin"))
-
     model = fasttext.load_model(os.path.join(MODELS_FOLDER, 'cc.en.300.bin'))
 
     X1_test = []
