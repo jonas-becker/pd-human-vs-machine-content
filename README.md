@@ -1,8 +1,8 @@
 # Paraphrase Detection: Human vs. Machine Content
 
-ADD ARXIV STICKERS HERE
+[![arXiv](https://img.shields.io/badge/arXiv-2303.13989-b31b1b.svg)](https://arxiv.org/abs/2303.13989)
 
-This is the official repository for the paper *Paraphrase Detection: Human vs. Machine Content*.
+This is the official repository for the paper [Paraphrase Detection: Human vs. Machine Content](https://arxiv.org/abs/2303.13989).
 
 ## Setup
 
@@ -145,5 +145,12 @@ We evaluated the results of our experiments in the linked paper above. However, 
 If you use this repository or our paper for your research work, please cite us in the following way.
 
 ```
-insert here
+@misc{becker2023paraphrase,
+      title={Paraphrase Detection: Human vs. Machine Content}, 
+      author={Jonas Becker and Jan Philip Wahle and Terry Ruas and Bela Gipp},
+      year={2023},
+      eprint={2303.13989},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL}
+}
 ```
